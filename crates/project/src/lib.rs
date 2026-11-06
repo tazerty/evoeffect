@@ -1,4 +1,4 @@
-//! The EffectCraft document model.
+//! The EvoEffect document model.
 //!
 //! `Project` → items (folders, compositions, footage, solids) → `Comp` → `Layer` → property tree
 //! ([`props`]). Compositions sit behind `Arc` so undo snapshots share everything that did not
@@ -20,14 +20,14 @@ pub mod tracking;
 use std::collections::BTreeMap;
 use std::sync::Arc;
 
-pub use effectcraft_color::ColorSpace;
-use effectcraft_color::{BlendMode, Label};
-use effectcraft_time::{FrameRate, Tick};
+pub use evoeffect_color::ColorSpace;
+use evoeffect_color::{BlendMode, Label};
+use evoeffect_time::{FrameRate, Tick};
 pub use props::{Expression, FeatherFalloff, GroupKind, MaskMode, MaskMotionBlur, Node, ParamUi, PropGroup, Property, Uid, parse_path};
 use serde::{Deserialize, Serialize};
 
-pub use effectcraft_keyframe as keyframe;
-pub use effectcraft_keyframe::{Keyframe, Value};
+pub use evoeffect_keyframe as keyframe;
+pub use evoeffect_keyframe::{Keyframe, Value};
 
 /// The project file schema. 2: effects on layers without a source rectangle (shape, text)
 /// measure positions from the top-left of their comp-sized bounds (effect space), not from
@@ -37,10 +37,10 @@ pub const SCHEMA_VERSION: u32 = 2;
 /// The first schema in which effect positions are in effect space (see [`SCHEMA_VERSION`]).
 pub const SCHEMA_EFFECT_SPACE: u32 = 2;
 
-/// The EffectCraft version, written into project files as `savedBy`.
+/// The EvoEffect version, written into project files as `savedBy`.
 pub const APP_VERSION: &str = env!("CARGO_PKG_VERSION");
 
-/// The EffectCraft version that wrote a project file (its `savedBy`), when it says.
+/// The EvoEffect version that wrote a project file (its `savedBy`), when it says.
 pub fn saved_by(text: &str) -> Option<String> {
     #[derive(Deserialize)]
     struct Meta {
@@ -1284,7 +1284,7 @@ impl Footage {
     /// Source time as the footage's timecode: its frame `frame` from Start Timecode
     /// (`0:00:41:20`), as the Footage panel shows it.
     pub fn timecode(&self, frame: i64) -> String {
-        effectcraft_time::format_timecode_ae(frame.saturating_add(self.start_timecode.unwrap_or(0)), self.frame_rate, false)
+        evoeffect_time::format_timecode_ae(frame.saturating_add(self.start_timecode.unwrap_or(0)), self.frame_rate, false)
     }
 
     /// The data format of data footage: `json`, `csv` or `tsv` (from the file extension).

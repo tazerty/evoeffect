@@ -1,10 +1,10 @@
 //! GPU stylize and distort family effects vs the CPU effects (the oracle): direct on a buffer at full and half
 //! resolution, as adjustment, and composited at 8 and 32 bpc.
 
-use effectcraft_keyframe::{Keyframe, Value};
-use effectcraft_project::BitDepth;
-use effectcraft_render::RenderOpts;
-use effectcraft_time::Tick;
+use evoeffect_keyframe::{Keyframe, Value};
+use evoeffect_project::BitDepth;
+use evoeffect_render::RenderOpts;
+use evoeffect_time::Tick;
 
 use crate::tests::{Scene, allow_llvmpipe_boundary_flips, c, check, compare_at, effect_case, n, opts, set};
 

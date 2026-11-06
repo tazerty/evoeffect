@@ -4,10 +4,10 @@
 
 use std::sync::Arc;
 
-use effectcraft_project::{Footage, FootageKind, ItemId};
-use effectcraft_raster::channels3d::{crypto_float, crypto_hash};
-use effectcraft_raster::{AuxChannels, Image};
-use effectcraft_time::{FrameRate, Tick};
+use evoeffect_project::{Footage, FootageKind, ItemId};
+use evoeffect_raster::channels3d::{crypto_float, crypto_hash};
+use evoeffect_raster::{AuxChannels, Image};
+use evoeffect_time::{FrameRate, Tick};
 use serde_json::{Value, json};
 
 use crate::Session;
@@ -90,7 +90,7 @@ fn selection(s: &Session) -> String {
     let l = &s.active_comp().unwrap().layers[0];
     let g = l.effects().unwrap().groups().next().unwrap();
     match &g.prop("selection").unwrap().value {
-        effectcraft_keyframe::Value::Str(t) => t.clone(),
+        evoeffect_keyframe::Value::Str(t) => t.clone(),
         v => panic!("{v:?}"),
     }
 }
@@ -117,7 +117,7 @@ fn picks_replace_add_and_remove_in_one_undo_step_each() {
     assert_eq!(r["selected"], false);
     // The text parses back to exactly the picked IDs.
     let manifest = aux_at(Tick::ZERO).manifests[0].1.clone();
-    let got = effectcraft_effects::selection_hashes(&selection(&s), Some(&manifest));
+    let got = evoeffect_effects::selection_hashes(&selection(&s), Some(&manifest));
     assert_eq!(got, [COMMA, "star*", "ghost"].map(crypto_hash));
     assert_eq!(s.history.undo.len(), steps + 5);
     s.execute("edit.undo", json!({})).unwrap();
@@ -190,8 +190,8 @@ fn rendered_matte_of_pick(s: &mut Session, x: f64, y: f64, scale: f64) -> (Strin
     s.execute_checked("prop.set", json!({"path": format!("effects/#{fx}/matteOnly"), "value": true})).unwrap();
     let (cid, comp) = (s.active_comp_id().unwrap(), s.active_comp().unwrap());
     let layer = &comp.layers[0];
-    let ctx = effectcraft_render::EvalCtx { project: &s.project, comp_id: cid, comp, time: Tick::ZERO, expr: None, footage: None };
-    let buf = s.renderer(effectcraft_render::RenderOpts { scale, ..Default::default() }).content_buf(&ctx, layer).unwrap();
+    let ctx = evoeffect_render::EvalCtx { project: &s.project, comp_id: cid, comp, time: Tick::ZERO, expr: None, footage: None };
+    let buf = s.renderer(evoeffect_render::RenderOpts { scale, ..Default::default() }).content_buf(&ctx, layer).unwrap();
     let (px, py) = buf.to_px([x, y]);
     let m = buf.img.get(px.floor() as i64, py.floor() as i64)[0];
     (r["name"].as_str().unwrap_or("?").to_string(), m)
@@ -212,7 +212,7 @@ fn pick_at_scale_0_8_matches_the_native_buffer_the_effect_renders() {
 #[test]
 fn pick_on_a_proxy_matches_the_proxy_sized_buffer() {
     let mut s = session();
-    let item = *s.project.items.iter().find(|(_, i)| matches!(i.kind, effectcraft_project::ItemKind::Footage(_))).unwrap().0;
+    let item = *s.project.items.iter().find(|(_, i)| matches!(i.kind, evoeffect_project::ItemKind::Footage(_))).unwrap().0;
     s.execute("file.setProxy", json!({"item": item.0, "path": "/renders/crypto_proxy.exr"})).unwrap();
     let (name, m) = rendered_matte_of_pick(&mut s, 6.5, 1.5, 1.0);
     assert!(m >= 0.5, "picked {name:?}, but the render gives it matte {m} there");

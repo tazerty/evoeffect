@@ -1,7 +1,7 @@
 //! Convert the persisted workspace schema to shared docking transactions.
 
-use craft_ui::docking::{Action, Floating as SharedFloating, Layout as SharedLayout, Node, Placement, StackEntry as SharedStackEntry};
-use craft_ui::layout::{SplitAxis, SplitSize as SharedSplitSize};
+use evo_ui::docking::{Action, Floating as SharedFloating, Layout as SharedLayout, Node, Placement, StackEntry as SharedStackEntry};
+use evo_ui::layout::{SplitAxis, SplitSize as SharedSplitSize};
 
 use crate::dock::{DockNode, Floating, Layout, PanelKind, SplitSize, StackEntry};
 
@@ -163,11 +163,11 @@ pub(crate) fn apply(layout: &mut Layout, action: Action<PanelKind>) -> Result<()
                         panel,
                         anchor,
                         match zone {
-                            craft_ui::docking::Zone::Left => crate::dock::Zone::Left,
-                            craft_ui::docking::Zone::Right => crate::dock::Zone::Right,
-                            craft_ui::docking::Zone::Top => crate::dock::Zone::Top,
-                            craft_ui::docking::Zone::Bottom => crate::dock::Zone::Bottom,
-                            craft_ui::docking::Zone::Center => crate::dock::Zone::Center,
+                            evo_ui::docking::Zone::Left => crate::dock::Zone::Left,
+                            evo_ui::docking::Zone::Right => crate::dock::Zone::Right,
+                            evo_ui::docking::Zone::Top => crate::dock::Zone::Top,
+                            evo_ui::docking::Zone::Bottom => crate::dock::Zone::Bottom,
+                            evo_ui::docking::Zone::Center => crate::dock::Zone::Center,
                         },
                     ),
                 };

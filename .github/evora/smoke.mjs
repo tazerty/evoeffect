@@ -3,11 +3,11 @@
 // Headless Chrome (the runner's own) loads a parent page served on origin B; the parent frames the
 // engine page served on origin A (another port). Over the DevTools protocol the test waits for the
 // engine to start inside the cross-origin iframe and requires: the engine's execution context on
-// origin A, `window.effectcraftLoad.readyMs` set without error, the canvas present and sized, the
+// origin A, `window.evoeffectLoad.readyMs` set without error, the canvas present and sized, the
 // loading notice gone, the parent unable to read the frame (cross-origin), and no page error (no
 // exception, no console error, no error log entry, no Content-Security-Policy issue) in the page,
 // the frame or the engine's workers. It also reads the menus the engine draws (`ui.menu.list` in
-// every catalog language) and the widgets on screen (`ui.elements`), and counts ArtCraft marks and
+// every catalog language) and the widgets on screen (`ui.elements`), and counts the upstream project's marks and
 // default-emoji characters in them, and sensitive terms in the menu labels as drawn. Prints `SMOKE` lines, a JSON report and a
 // screenshot; exits non-zero on failure. Every pass that started also requires (EVORA-KIN-25) the
 // engine's graphics device alive at its end (no « device lost » notice, js/host.js showDeviceLost)
@@ -62,7 +62,7 @@ const witnessTolerate = (opt["witness-tolerate"] || "").split("|").filter(Boolea
 // `--languages=en,fr` (EVORA-KIN-25): the catalog languages whose menus are read (all by default;
 // the device-loss witness reads English only).
 const LANGUAGES = opt.languages ? opt.languages.split(",").filter(Boolean) : ["en", "ja", "zh-hans", "zh-hant", "uk", "es", "pt-br", "ru", "fr", "de", "cs"];
-const BRAND = /artcraft|discord\.gg|getartcraft/i;
+const BRAND = /art[c]raft|discord\.gg|getart[c]raft/i;
 const EMOJI = /\p{Emoji_Presentation}|\u{FE0F}|\u{20E3}/u;
 const PICTO = /\p{Extended_Pictographic}/u;
 const TERMS = /lumetri|lightroom|acrobat|premiere|adobe|cycore/i;
@@ -280,13 +280,13 @@ const ENGINE_DIAG = `(async () => {
   const raf = await within(new Promise((res) => { let n = 0; const t0 = performance.now();
     const tick = () => { n += 1; if (performance.now() - t0 < 1000) requestAnimationFrame(tick); else res(n); }; requestAnimationFrame(tick); }));
   let inspect = null;
-  try { const r = await within(window.effectcraft.request("ui.inspect", {}));
+  try { const r = await within(window.evoeffect.request("ui.inspect", {}));
     inspect = r && r.ui ? { theme: r.ui.theme, fps: Math.round(r.fps || 0), elements: r.elements, windowFocused: r.windowFocused, dialog: r.dialog, window: r.window, renderMs: r.renderMs } : r;
   } catch (e) { inspect = "error " + String(e); }
   let mode = null;
-  try { mode = await within(window.effectcraft.execute("prefs.get", { key: "appearance.appearanceMode" })); } catch (e) { mode = "error " + String(e); }
+  try { mode = await within(window.evoeffect.execute("prefs.get", { key: "appearance.appearanceMode" })); } catch (e) { mode = "error " + String(e); }
   let gpu = null;
-  try { const i = window.effectcraft.info(); gpu = i ? { gpu: i.gpu, backend: i.backend } : null; } catch (e) { gpu = "error " + String(e); }
+  try { const i = window.evoeffect.info(); gpu = i ? { gpu: i.gpu, backend: i.backend } : null; } catch (e) { gpu = "error " + String(e); }
   const lost = document.getElementById("device-lost");
   return JSON.parse(JSON.stringify({ at: Date.now(), visibility: document.visibilityState, hasFocus: document.hasFocus(),
     deviceLost: lost ? (lost.querySelector("small") || lost).textContent.slice(0, 300) : false, raf, inspect, mode, gpu }));
@@ -309,8 +309,8 @@ const LOST_NOTICE = `(() => { const n = document.getElementById("device-lost"); 
 // What the engine's frame shows at the end of a pass: the notice, the widgets of the last drawn
 // frame (`ui.elements`, -1 when the answer isn't a list) and the frame workers' GPU (diagnostic).
 const SCREEN_STATE = `(async () => { const lost = ${LOST_NOTICE};
-  const els = await window.effectcraft.request("ui.elements", {});
-  let workers = null; try { workers = window.effectcraft.info().frameWorkers; } catch (e) { workers = "error " + String(e); }
+  const els = await window.evoeffect.request("ui.elements", {});
+  let workers = null; try { workers = window.evoeffect.info().frameWorkers; } catch (e) { workers = "error " + String(e); }
   return JSON.parse(JSON.stringify({ lost, elements: Array.isArray(els) ? els.length : -1, workers })); })()`;
 // The adapter the engine's page gets (diagnostic): what the runner's browser offers WebGPU.
 const ADAPTER_INFO = `(async () => { if (!navigator.gpu) return "no navigator.gpu";
@@ -405,7 +405,7 @@ const CAT_EXCEPTIONS = {
   "effect.apply.effect-ec.noise.removegrain": "applies the Remove Grain effect: adds an effect, removes nothing",
   "effect.apply.effect-ec.channel.removecolormatting": "applies the Remove Color Matting effect: adds an effect, removes nothing",
 };
-const CAT_BRAND = /effectcraft|artcraft|lumetri|premiere|adobe|cycore/i;
+const CAT_BRAND = /evoeffect|effect[c]raft|art[c]raft|lumetri|premiere|adobe|cycore/i;
 const CAT_ID = /^[a-z][A-Za-z0-9_.-]*$/;
 // The words of an id (dots, dashes and camelCase split) and of a label (letters only).
 const idWords = (id) => (String(id).match(/[A-Z]?[a-z]+|[A-Z]+(?![a-z])/g) || []).map((w) => w.toLowerCase());
@@ -493,7 +493,7 @@ const EHP_HIDE_SETTLE_MS = 1500;
 const EHP_HIDDEN_WAIT_MS = 10000;
 const EHP_OTHER_NS = "c".repeat(64);
 const ULID = /^[0-9A-HJKMNP-TV-Z]{26}$/;
-const ENGINE_STORES = ["effectcraft", "effectcraft-cache", "effectcraft-handles"];
+const ENGINE_STORES = ["evoeffect", "evoeffect-cache", "evoeffect-handles"];
 const NAMESPACED = /^evns-([A-Za-z0-9_-]{1,64})--(.+)$/;
 // The namespace of an engine store's name ("" upstream's), null when it isn't the engine's (as
 // js/host.js classifies them).
@@ -503,7 +503,7 @@ const storeNs = (name) => {
   return m && ENGINE_STORES.includes(m[2]) ? m[1] : null;
 };
 const keyNs = (key) => {
-  if (/^effectcraft/.test(key)) return "";
+  if (/^evoeffect/.test(key)) return "";
   const m = NAMESPACED.exec(key);
   return m ? m[1] : null;
 };
@@ -563,13 +563,13 @@ async function runEhp(ectx, parentOrigin) {
   const step = (name) => evalIn(parentCtx(parentOrigin), `__ehp.step.${name}()`);
   const stepWith = (name, ...args) => evalIn(parentCtx(parentOrigin), `__ehp.step.${name}(${args.map((a) => (a === undefined ? "undefined" : JSON.stringify(a))).join(", ")})`);
   const exec = (command, params) =>
-    evalIn(ectx, `window.effectcraft.execute(${JSON.stringify(command)}, ${JSON.stringify(params || {})}).then((v) => JSON.parse(JSON.stringify(v ?? null)))`, true, 60000);
-  const request = (method) => evalIn(ectx, `window.effectcraft.request(${JSON.stringify(method)}, {}).then((v) => JSON.parse(JSON.stringify(v ?? null)))`, true, 60000);
+    evalIn(ectx, `window.evoeffect.execute(${JSON.stringify(command)}, ${JSON.stringify(params || {})}).then((v) => JSON.parse(JSON.stringify(v ?? null)))`, true, 60000);
+  const request = (method) => evalIn(ectx, `window.evoeffect.request(${JSON.stringify(method)}, {}).then((v) => JSON.parse(JSON.stringify(v ?? null)))`, true, 60000);
   // A request with parameters, its failure as {rejected: message} (a refused command).
   const requestWith = (method, params) =>
     evalIn(
       ectx,
-      `window.effectcraft.request(${JSON.stringify(method)}, ${JSON.stringify(params || {})}).then((v) => JSON.parse(JSON.stringify(v ?? null)), (e) => ({ rejected: String((e && e.message) || e) }))`,
+      `window.evoeffect.request(${JSON.stringify(method)}, ${JSON.stringify(params || {})}).then((v) => JSON.parse(JSON.stringify(v ?? null)), (e) => ({ rejected: String((e && e.message) || e) }))`,
       true,
       60000,
     );
@@ -592,15 +592,15 @@ async function runEhp(ectx, parentOrigin) {
   };
   const labelsOf = (items) => (items || []).flatMap((it) => [String(it.label ?? ""), ...(it.path || []).map(String)]);
   const seeded = {
-    opfs: ["effectcraft", "effectcraft-cache", `evns-${EHP_OTHER_NS}--effectcraft`, `evns-${EHP_OTHER_NS}--effectcraft-cache`, "evns-ci-a--effectcraft", `evns-${ehpNs}--effectcraft-cache`, "evora-keep"],
-    idb: ["effectcraft-handles", `evns-${EHP_OTHER_NS}--effectcraft-handles`, `evns-${ehpNs}--effectcraft-handles`, "evora-keep"],
-    ls: [`evns-${EHP_OTHER_NS}--effectcraft`, "effectcraft-seed", `evns-${ehpNs}--effectcraft`, "evora-keep"],
+    opfs: ["evoeffect", "evoeffect-cache", `evns-${EHP_OTHER_NS}--evoeffect`, `evns-${EHP_OTHER_NS}--evoeffect-cache`, "evns-ci-a--evoeffect", `evns-${ehpNs}--evoeffect-cache`, "evora-keep"],
+    idb: ["evoeffect-handles", `evns-${EHP_OTHER_NS}--evoeffect-handles`, `evns-${ehpNs}--evoeffect-handles`, "evora-keep"],
+    ls: [`evns-${EHP_OTHER_NS}--evoeffect`, "evoeffect-seed", `evns-${ehpNs}--evoeffect`, "evora-keep"],
   };
   // The account's own stores the seed page leaves (kept by evora:init, deleted by evora:purge).
   // KIN-02: the account's disk cache folder (with its `v1/mattes/` entry) is not kept: the bridge
   // has no disk cache, evora:init deletes it.
-  const seededOwn = [`idb:evns-${ehpNs}--effectcraft-handles`, `ls:evns-${ehpNs}--effectcraft`];
-  const seededOwnCache = `opfs:evns-${ehpNs}--effectcraft-cache`;
+  const seededOwn = [`idb:evns-${ehpNs}--evoeffect-handles`, `ls:evns-${ehpNs}--evoeffect`];
+  const seededOwnCache = `opfs:evns-${ehpNs}--evoeffect-cache`;
   const keepers = (l) => l.opfs.includes("evora-keep") && l.idb.includes("evora-keep") && l.ls.includes("evora-keep");
 
   // 1. The seed page saw its fixture (else a purge check would pass on nothing).
@@ -612,7 +612,7 @@ async function runEhp(ectx, parentOrigin) {
   check(!!(seed && seed.listing && ["opfs", "idb", "ls"].every((k) => seeded[k].every((n) => seed.listing[k].includes(n)))), `[ehp] amorçage incomplet : ${JSON.stringify(seed)}`);
   // NR-5 (EVORA-KIN-31): every seeded cache folder holds a `v1/mattes/` entry (cache kind of
   // v0.11.1), so the folders evora:init and evora:purge must remove carry that kind too.
-  const seededMattes = seeded.opfs.filter((n) => n.endsWith("effectcraft-cache"));
+  const seededMattes = seeded.opfs.filter((n) => n.endsWith("evoeffect-cache"));
   check(!!(seed && seed.listing && Array.isArray(seed.listing.mattes) && seededMattes.length === 3 && seededMattes.every((n) => seed.listing.mattes.includes(n))), `[ehp] amorçage incomplet (cache mattes) : ${JSON.stringify(seed && seed.listing ? seed.listing.mattes : null)}`);
 
   // 2. evora:ready, once; evora:init accepted, the version 2 copy ignored.
@@ -671,7 +671,7 @@ async function runEhp(ectx, parentOrigin) {
   s = await until("evora:dirty {dirty: false} après l'ouverture", (x) => x.log.some((m) => m.type === "evora:dirty" && m.payload && m.payload.dirty === false && m.payload.docRef === x.ids.doc));
 
   // 3. Browser storage once evora:init is applied (E5).
-  const info = await evalIn(ectx, "JSON.parse(JSON.stringify(window.effectcraft.info()))");
+  const info = await evalIn(ectx, "JSON.parse(JSON.stringify(window.evoeffect.info()))");
   const afterInit = await listing();
   r.backend = info && info.storage ? info.storage.backend : null;
   r.afterInit = afterInit;
@@ -684,7 +684,7 @@ async function runEhp(ectx, parentOrigin) {
   check(lostOwn.length === 0, `[ehp] magasins du même compte effacés au démarrage (ils doivent rester) : ${JSON.stringify(lostOwn)}`);
   // KIN-02: the premise (the seed page left this account's cache folder, mattes included), then
   // the folder gone once evora:init is applied.
-  check(!!(seed && seed.listing && seed.listing.opfs.includes(`evns-${ehpNs}--effectcraft-cache`)), `[ehp-cache] prémisse : cache disque du compte absent de l'amorçage : ${JSON.stringify(seed && seed.listing ? seed.listing.opfs : null)}`);
+  check(!!(seed && seed.listing && seed.listing.opfs.includes(`evns-${ehpNs}--evoeffect-cache`)), `[ehp-cache] prémisse : cache disque du compte absent de l'amorçage : ${JSON.stringify(seed && seed.listing ? seed.listing.opfs : null)}`);
   check(!own.includes(seededOwnCache), `[ehp-cache] cache disque du compte non vidé au démarrage (mattes compris) : ${JSON.stringify(own)}`);
   if (ehpMode === "memory") {
     check(r.backend === "memory", `[ehp] stockage du moteur ${r.backend} (attendu : memory)`);
@@ -693,13 +693,13 @@ async function runEhp(ectx, parentOrigin) {
     check(created.length === 0, `[ehp] le moteur a créé un magasin en mode mémoire : ${JSON.stringify(created)}`);
   } else {
     check(r.backend === "opfs", `[ehp] stockage du moteur ${r.backend} (attendu : opfs)`);
-    check(own.includes(`opfs:evns-${ehpNs}--effectcraft`), `[ehp] aucun magasin « evns-${ehpNs.slice(0, 8)}…--effectcraft » : ${JSON.stringify(own)}`);
+    check(own.includes(`opfs:evns-${ehpNs}--evoeffect`), `[ehp] aucun magasin « evns-${ehpNs.slice(0, 8)}…--evoeffect » : ${JSON.stringify(own)}`);
   }
 
   // 4. The document, the language and the theme of evora:init.
   const summary = await exec("project.summary");
   note("summary", summary);
-  check(summary && summary.path === "/evora-smoke.ecproj" && summary.dirty === false, `[ehp] document ouvert inattendu : ${JSON.stringify(summary)}`);
+  check(summary && summary.path === "/evora-smoke.evoeffect" && summary.dirty === false, `[ehp] document ouvert inattendu : ${JSON.stringify(summary)}`);
   const frLabels = labelsOf(await request("ui.menu.list"));
   const inspect1 = await request("ui.inspect");
   const theme1 = String(inspect1 && inspect1.ui ? inspect1.ui.theme : "");
@@ -752,8 +752,8 @@ async function runEhp(ectx, parentOrigin) {
       leg.duplicate = await tryExec("shortcuts.preset", { op: "duplicate", from: "Kinetika", name: L.copy });
       leg.setOwn = await tryExec("shortcuts.set", { command: L.own.command, keys: L.own.keys });
       await passes();
-      leg.flushed = await evalIn(ectx, "window.effectcraft.flush().then(() => true, (e) => String((e && e.message) || e))", true, 60000).catch((e) => String(e));
-      const stored = await evalIn(ectx, "window.effectcraft.listStored().then((v) => JSON.parse(JSON.stringify(v)))", true, 60000).catch(() => null);
+      leg.flushed = await evalIn(ectx, "window.evoeffect.flush().then(() => true, (e) => String((e && e.message) || e))", true, 60000).catch((e) => String(e));
+      const stored = await evalIn(ectx, "window.evoeffect.listStored().then((v) => JSON.parse(JSON.stringify(v)))", true, 60000).catch(() => null);
       leg.stored = stored && { config: stored.config, pending: stored.pending };
       check(
         leg.flushed === true && !!stored && Array.isArray(stored.config) && stored.config.includes("shortcuts.json") && stored.pending === false,
@@ -781,7 +781,7 @@ async function runEhp(ectx, parentOrigin) {
         !!leg.copyReset && same(leg.copyReset.save, ["Cmd+S"]) && same(leg.copyReset.upstream, []) && same(leg.copyReset.own, []) && same(leg.copyReset.alias, []),
         `[ehp-keys-upstream] préréglage réinitialisé sans les touches du profil : ${JSON.stringify(leg.copyReset)}`,
       );
-      leg.selectUpstream = await tryExec("shortcuts.preset", { op: "select", name: "EffectCraft Default" });
+      leg.selectUpstream = await tryExec("shortcuts.preset", { op: "select", name: "EvoEffect Default" });
       await passes();
       const after = await tryExec("shortcuts.list", { assigned: true });
       leg.afterUpstream = after && after.preset;
@@ -834,7 +834,7 @@ async function runEhp(ectx, parentOrigin) {
   if (s) {
     const v = s.saves.find((x) => x.re === s.ids.save);
     note("save", v);
-    check(v.docRef === s.ids.doc && v.name === "evora-smoke.ecproj" && v.saveAs === false && v.arrayBuffer && v.byteLength > 0 && v.items >= 1, `[ehp] evora:save inattendu : ${JSON.stringify(v)}`);
+    check(v.docRef === s.ids.doc && v.name === "evora-smoke.evoeffect" && v.saveAs === false && v.arrayBuffer && v.byteLength > 0 && v.items >= 1, `[ehp] evora:save inattendu : ${JSON.stringify(v)}`);
     // Received after the evora:save (`seq`): both often arrive in the same millisecond.
     const after = await until("evora:dirty {dirty: false} après l'enregistrement", (x) => x.log.some((m) => m.type === "evora:dirty" && m.payload && m.payload.dirty === false && m.seq > v.seq));
     if (!after) {
@@ -843,12 +843,12 @@ async function runEhp(ectx, parentOrigin) {
     }
   }
   // Save As: a copy (saveAs, the original docRef); the host's new docRef is the document after.
-  await exec("file.saveAs", { path: "/evora-copie.ecproj" });
+  await exec("file.saveAs", { path: "/evora-copie.evoeffect" });
   s = await until("evora:save d'un « Enregistrer sous »", (x) => x.saves.some((v) => v.saveAs === true));
   if (s) {
     const v = s.saves.find((x) => x.saveAs === true);
     note("saveAs", v);
-    check(v.docRef === s.ids.doc && v.name === "evora-copie.ecproj" && v.re === null && v.byteLength > 0, `[ehp] « Enregistrer sous » inattendu : ${JSON.stringify(v)}`);
+    check(v.docRef === s.ids.doc && v.name === "evora-copie.evoeffect" && v.re === null && v.byteLength > 0, `[ehp] « Enregistrer sous » inattendu : ${JSON.stringify(v)}`);
     await sleep(EHP_ADOPT_MS);
     await exec("comp.new", {});
     await exec("file.save", {});
@@ -856,7 +856,7 @@ async function runEhp(ectx, parentOrigin) {
     if (s) {
       const w = s.saves.find((x) => x.docRef === s.ids.copy);
       note("save of the copy", w);
-      check(w.saveAs === false && w.name === "evora-copie.ecproj" && w.byteLength > 0, `[ehp] enregistrement de la copie inattendu : ${JSON.stringify(w)}`);
+      check(w.saveAs === false && w.name === "evora-copie.evoeffect" && w.byteLength > 0, `[ehp] enregistrement de la copie inattendu : ${JSON.stringify(w)}`);
     }
   }
 
@@ -921,12 +921,12 @@ async function runEhp(ectx, parentOrigin) {
     }
   }
 
-  // 7a. E2-KIN (lot KIN-FK-B2, Q-K41 (a)): the palette the editor shows (effectcraft.info().evoraTheme,
+  // 7a. E2-KIN (lot KIN-FK-B2, Q-K41 (a)): the palette the editor shows (evoeffect.info().evoraTheme,
   //     the values compiled and applied): zinc surfaces, no gradient, the 12 px radius, the accent of
   //     evora:init and evora:theme with its shades, every pair above its WCAG floor; in light (indigo,
   //     after the second evora:theme), in dark with another accent (pink), then light indigo again.
   {
-    const look = () => evalIn(ectx, "JSON.parse(JSON.stringify((window.effectcraft.info() || {}).evoraTheme || null))");
+    const look = () => evalIn(ectx, "JSON.parse(JSON.stringify((window.evoeffect.info() || {}).evoraTheme || null))");
     const lookUntil = async (pred) => {
       const end = Date.now() + EHP_WAIT_MS;
       let t = await look();
@@ -1100,7 +1100,7 @@ async function runEhp(ectx, parentOrigin) {
     const sum = await exec("project.summary");
     const check2 = await exec("footage.check", { wait: true }).catch((e) => ({ error: String(e && e.message) }));
     note("footage after need", { summary: sum && sum.path, check: check2 });
-    check(!!sum && sum.path === "/evora-medias.ecproj" && !!check2 && check2.checked === 2 && check2.missing === 0, `[ehp-need] le projet rouvert n'a pas retrouvé ses deux médias : ${JSON.stringify({ path: sum && sum.path, check: check2 })}`);
+    check(!!sum && sum.path === "/evora-medias.evoeffect" && !!check2 && check2.checked === 2 && check2.missing === 0, `[ehp-need] le projet rouvert n'a pas retrouvé ses deux médias : ${JSON.stringify({ path: sum && sum.path, check: check2 })}`);
   }
 
   // 7g. command.catalog (lot KIN-FK-B2; AVENANT of 2026-10-27, §4 and §5): evora:commands after the
@@ -1335,7 +1335,7 @@ try {
       try {
         // A context that goes away while it is asked (the « pont-ehp » bench's seed page opening
         // the engine) may leave the question unanswered: ask again rather than wait.
-        load = await Promise.race([evalIn(ctx, "window.effectcraftLoad ? JSON.parse(JSON.stringify(window.effectcraftLoad)) : null"), sleep(LOAD_POLL_MS).then(() => null)]);
+        load = await Promise.race([evalIn(ctx, "window.evoeffectLoad ? JSON.parse(JSON.stringify(window.evoeffectLoad)) : null"), sleep(LOAD_POLL_MS).then(() => null)]);
       } catch {
         load = null;
       }
@@ -1356,20 +1356,20 @@ try {
     const ctx = defaultCtx(engineOrigin);
     report.dom = await evalIn(
       ctx,
-      `(() => { const c = document.getElementById("effectcraft_canvas"); const r = c ? c.getBoundingClientRect() : null;
+      `(() => { const c = document.getElementById("evoeffect_canvas"); const r = c ? c.getBoundingClientRect() : null;
         const nav = performance.getEntriesByType("navigation")[0];
         let top; try { top = window.top.location.href; } catch (e) { top = "inaccessible (" + e.name + ")"; }
         return { origin: location.origin, href: location.href, canvas: !!c, width: c ? c.width : 0, height: c ? c.height : 0,
           cssWidth: r ? r.width : 0, cssHeight: r ? r.height : 0, loading: !!document.getElementById("loading"), top,
           navigation: nav ? { fetchStart: nav.fetchStart, responseEnd: nav.responseEnd, domContentLoaded: nav.domContentLoadedEventEnd, load: nav.loadEventEnd } : null }; })()`,
     );
-    report.info = await evalIn(ctx, "JSON.parse(JSON.stringify(window.effectcraft.info()))");
+    report.info = await evalIn(ctx, "JSON.parse(JSON.stringify(window.evoeffect.info()))");
     check(report.dom.canvas && report.dom.width > 0 && report.dom.height > 0, `canevas absent ou vide : ${JSON.stringify(report.dom)}`);
     check(!report.dom.loading, "l'avis de chargement est toujours affiché");
     const parentOrigin = new URL(parentUrl).origin;
     const pctx = parentCtx(parentOrigin);
     report.parent = pctx
-      ? await evalIn(pctx, `(() => { const f = document.getElementById("engine"); let read; try { read = f.contentDocument === null ? "null (cross-origin)" : "readable"; } catch (e) { read = "blocked (" + e.name + ")"; } let api; try { api = typeof f.contentWindow.effectcraft; } catch (e) { api = "blocked (" + e.name + ")"; } return { origin: location.origin, contentDocument: read, contentWindowApi: api, sandbox: f.getAttribute("sandbox") }; })()`)
+      ? await evalIn(pctx, `(() => { const f = document.getElementById("engine"); let read; try { read = f.contentDocument === null ? "null (cross-origin)" : "readable"; } catch (e) { read = "blocked (" + e.name + ")"; } let api; try { api = typeof f.contentWindow.evoeffect; } catch (e) { api = "blocked (" + e.name + ")"; } return { origin: location.origin, contentDocument: read, contentWindowApi: api, sandbox: f.getAttribute("sandbox") }; })()`)
       : null;
     check(report.parent && report.parent.origin !== report.dom.origin, "le parent et le moteur ont la même origine");
     check(report.parent && report.parent.contentDocument !== "readable", "le parent lit le document du moteur (même origine)");
@@ -1379,14 +1379,14 @@ try {
     const labels = [];
     const perLanguage = {};
     if (!ehpMode) {
-    const menuLabels = () => evalIn(ctx, `window.effectcraft.request("ui.menu.list", {}).then((r) => r.map((i) => String(i.label ?? "")))`, true, 60000);
+    const menuLabels = () => evalIn(ctx, `window.evoeffect.request("ui.menu.list", {}).then((r) => r.map((i) => String(i.label ?? "")))`, true, 60000);
     const initialLabels = expectLang ? await menuLabels() : null;
     let englishLabels = null;
     for (const lang of LANGUAGES) {
-      await evalIn(ctx, `window.effectcraft.execute("prefs.set", { key: "general.language", value: ${JSON.stringify(lang === "en" ? "en" : lang)} })`, true, 30000).catch((e) =>
+      await evalIn(ctx, `window.evoeffect.execute("prefs.set", { key: "general.language", value: ${JSON.stringify(lang === "en" ? "en" : lang)} })`, true, 30000).catch((e) =>
         warnings.push(`prefs.set ${lang}: ${e.message}`),
       );
-      const items = await evalIn(ctx, `window.effectcraft.request("ui.menu.list", {}).then((r) => JSON.parse(JSON.stringify(r)))`, true, 60000);
+      const items = await evalIn(ctx, `window.evoeffect.request("ui.menu.list", {}).then((r) => JSON.parse(JSON.stringify(r)))`, true, 60000);
       const texts = [];
       for (const it of items || []) {
         texts.push(String(it.label ?? ""));
@@ -1396,9 +1396,9 @@ try {
       if (lang === "en") englishLabels = (items || []).map((it) => String(it.label ?? ""));
       labels.push(...texts.map((t) => [lang, t, "menu"]));
     }
-    await evalIn(ctx, `window.effectcraft.execute("prefs.set", { key: "general.language", value: "system" })`, true, 30000).catch(() => {});
+    await evalIn(ctx, `window.evoeffect.execute("prefs.set", { key: "general.language", value: "system" })`, true, 30000).catch(() => {});
     if (expectTheme) {
-      const inspect = await evalIn(ctx, `window.effectcraft.request("ui.inspect", {}).then((r) => JSON.parse(JSON.stringify(r)))`, true, 60000);
+      const inspect = await evalIn(ctx, `window.evoeffect.request("ui.inspect", {}).then((r) => JSON.parse(JSON.stringify(r)))`, true, 60000);
       const theme = String(inspect && inspect.ui ? inspect.ui.theme : "");
       report.theme = { expected: expectTheme, shown: theme };
       check(theme.toLowerCase() === expectTheme, `thème imposé « ${expectTheme} » absent (thème affiché « ${theme} »)`);
@@ -1414,7 +1414,7 @@ try {
       const before = await pages();
       const errBefore = errors.length;
       for (const cmd of ["help.github", "help.docs", "help.reportIssue", "help.onlineTutorials"]) {
-        await evalIn(ctx, `window.effectcraft.execute(${JSON.stringify(cmd)}, {})`, true, 30000).catch((e) => warnings.push(`${cmd}: ${e.message}`));
+        await evalIn(ctx, `window.evoeffect.execute(${JSON.stringify(cmd)}, {})`, true, 30000).catch((e) => warnings.push(`${cmd}: ${e.message}`));
       }
       await sleep(2000);
       const after = await pages();
@@ -1422,7 +1422,7 @@ try {
       check(after === before, `un lien externe a ouvert une page (${before} -> ${after})`);
       check(errors.length === errBefore, `erreur(s) en ouvrant les liens externes : ${JSON.stringify(errors.slice(errBefore))}`);
     }
-    const elements = await evalIn(ctx, `window.effectcraft.request("ui.elements", {}).then((r) => JSON.parse(JSON.stringify(r)))`, true, 60000).catch((e) => {
+    const elements = await evalIn(ctx, `window.evoeffect.request("ui.elements", {}).then((r) => JSON.parse(JSON.stringify(r)))`, true, 60000).catch((e) => {
       warnings.push(`ui.elements: ${e.message}`);
       return [];
     });
@@ -1443,7 +1443,7 @@ try {
       termsCount: hits(TERMS, "menu").length,
     };
     check(labels.length > 0, "aucun libellé relu au rendu (ui.menu.list, ui.elements)");
-    check(report.render.brand.length === 0, `marques ArtCraft au rendu : ${JSON.stringify(report.render.brand)}`);
+    check(report.render.brand.length === 0, `marques de l'amont au rendu : ${JSON.stringify(report.render.brand)}`);
     check(report.render.emoji.length === 0, `émojis au rendu : ${JSON.stringify(report.render.emoji)}`);
     if (termsMode === "block") check(report.render.termsCount === 0, `termes sensibles au rendu : ${JSON.stringify(report.render.terms)}`);
     }

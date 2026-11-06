@@ -1,15 +1,15 @@
 //! Sizes, frame rates and motion-blur samples stay within the project limits when a project is
 //! opened and when a command sets them (#788).
 
-use effectcraft_project::{ItemKind, limits};
-use effectcraft_render::RenderOpts;
-use effectcraft_time::{FrameRate, Tick};
+use evoeffect_project::{ItemKind, limits};
+use evoeffect_render::RenderOpts;
+use evoeffect_time::{FrameRate, Tick};
 use serde_json::{Value, json};
 
 use crate::{Event, Session};
 
 fn tmp(name: &str) -> String {
-    let d = std::env::temp_dir().join(format!("effectcraft-limits-tests-{}", std::process::id()));
+    let d = std::env::temp_dir().join(format!("evoeffect-limits-tests-{}", std::process::id()));
     std::fs::create_dir_all(&d).unwrap();
     d.join(name).to_string_lossy().to_string()
 }
@@ -43,17 +43,17 @@ fn hostile_project() -> String {
 
 #[test]
 fn a_hostile_project_opens_within_the_limits_and_says_what_changed() {
-    let json_path = tmp("Hostile.ecproj");
+    let json_path = tmp("Hostile.evoeffect");
     let text = hostile_project();
     std::fs::write(&json_path, &text).unwrap();
-    let xml_path = tmp("Hostile.ecprojx");
+    let xml_path = tmp("Hostile.evoeffectx");
     std::fs::write(&xml_path, crate::xml_project::to_xml(&text).unwrap()).unwrap();
     for path in [json_path, xml_path] {
         let mut s = Session::default();
         let r = s.execute("file.open", json!({"path": path})).unwrap();
         let repaired = r["repaired"].as_array().unwrap();
         assert!(repaired.iter().any(|n| n.as_str().unwrap().contains("4000000000 × 0 px → 30000 × 1 px")), "{path}: {repaired:?}");
-        let toast = s.drain_events().into_iter().any(|e| matches!(e, Event::Toast { message, .. } if message.contains("outside EffectCraft's limits")));
+        let toast = s.drain_events().into_iter().any(|e| matches!(e, Event::Toast { message, .. } if message.contains("outside EvoEffect's limits")));
         assert!(toast, "{path}");
         let (cid, c) = s.project.comps().next().map(|(id, c)| (*id, c.clone())).unwrap();
         assert_eq!((c.width, c.height), (limits::MAX_SIZE, 1));
@@ -74,7 +74,7 @@ fn a_project_within_the_limits_opens_unchanged() {
     let mut s = Session::default();
     s.execute("comp.new", json!({"name": "Main", "width": 64, "height": 32, "frameRate": 24, "duration": 2})).unwrap();
     let text = s.project.to_file_json().unwrap();
-    let (p, notes) = effectcraft_project::Project::from_json_repaired(&text).unwrap();
+    let (p, notes) = evoeffect_project::Project::from_json_repaired(&text).unwrap();
     assert!(notes.is_empty(), "{notes:?}");
     assert_eq!(p, *s.project);
 }
@@ -118,12 +118,12 @@ fn a_project_with_a_precomp_cycle_opens_adds_and_renders_without_running_out_of_
         let proj = std::sync::Arc::make_mut(&mut s.project);
         for (outer, inner) in [(a, b), (b, a)] {
             let comp = proj.comp(outer).unwrap().clone();
-            let l = effectcraft_project::build::layer(proj, &comp, "pre", effectcraft_project::LayerSource::Comp { item: inner }, (32, 32), None);
+            let l = evoeffect_project::build::layer(proj, &comp, "pre", evoeffect_project::LayerSource::Comp { item: inner }, (32, 32), None);
             let ItemKind::Comp(cc) = &mut proj.item_mut(outer).unwrap().kind else { panic!("comp") };
             std::sync::Arc::make_mut(cc).layers.push(l);
         }
     }
-    let path = tmp("cycle.ecproj");
+    let path = tmp("cycle.evoeffect");
     std::fs::write(&path, s.project.to_file_json().unwrap()).unwrap();
     let mut t = Session::default();
     t.execute("file.open", json!({"path": path})).unwrap();

@@ -1,22 +1,22 @@
-//! File ▸ Save a Copy As XML…: the project as an XML document (`.ecprojx`), the counterpart of
-//! After Effects' `.aepx`. It is a lossless, element-per-value encoding of the `.ecproj` JSON, so
-//! File ▸ Open reads it back (and saving to a `.ecprojx` path writes XML again):
+//! File ▸ Save a Copy As XML…: the project as an XML document (`.evoeffectx`), the counterpart of
+//! After Effects' `.aepx`. It is a lossless, element-per-value encoding of the `.evoeffect` JSON, so
+//! File ▸ Open reads it back (and saving to a `.evoeffectx` path writes XML again):
 //!
 //! ```xml
 //! <?xml version="1.0" encoding="UTF-8"?>
-//! <EffectCraftProject encoding="json" version="1">
+//! <EvoEffectProject encoding="json" version="1">
 //!   <obj>
 //!     <m n="version"><num>3</num></m>
 //!     <m n="items"><arr>…</arr></m>
 //!   </obj>
-//! </EffectCraftProject>
+//! </EvoEffectProject>
 //! ```
 //!
 //! `obj`/`m n="key"` (object members), `arr`, `str`, `num`, `bool`, `null`.
 
 use serde_json::{Map, Value};
 
-const ROOT: &str = "EffectCraftProject";
+const ROOT: &str = "EvoEffectProject";
 
 /// How deep `arr`/`obj` elements may nest: the JSON reader's own limit (`serde_json` stops at
 /// 128), so every project the JSON form can hold reads from XML too. Without a limit a deeply
@@ -32,7 +32,7 @@ pub fn is_xml(text: &str) -> bool {
 /// Whether a path names an XML project copy.
 pub fn is_xml_path(path: &str) -> bool {
     let p = path.to_ascii_lowercase();
-    p.ends_with(".ecprojx") || p.ends_with(".xml")
+    p.ends_with(".evoeffectx") || p.ends_with(".xml")
 }
 
 fn esc(s: &str, out: &mut String) {
@@ -249,7 +249,7 @@ pub fn from_xml(text: &str) -> Result<String, String> {
     let mut p = P { s: text.trim_start_matches('\u{feff}'), i: 0 };
     let (root, _, _) = p.open()?;
     if root != ROOT {
-        return Err(format!("not an EffectCraft XML project (root <{root}>)"));
+        return Err(format!("not an EvoEffect XML project (root <{root}>)"));
     }
     let v = p.value(0)?;
     p.close(ROOT)?;

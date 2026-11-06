@@ -1,7 +1,7 @@
 //! Auto-save and crash recovery (PRJ-7).
 //!
-//! - **Auto-save**: every *n* minutes a dirty project is written to an "EffectCraft Auto-Save"
-//!   folder next to it (or a custom folder) as `<name> auto-save N.ecproj`, the After Effects
+//! - **Auto-save**: every *n* minutes a dirty project is written to an "EvoEffect Auto-Save"
+//!   folder next to it (or a custom folder) as `<name> auto-save N.evoeffect`, the After Effects
 //!   naming. Slots rotate through 1…max versions, overwriting the oldest. Writes are atomic
 //!   (temporary file + rename), so a crash mid-write never damages the previous auto-save.
 //! - **Crash recovery**: while the app runs, a sentinel (`session.lock` in the config store)
@@ -17,10 +17,10 @@ use crate::config::{ConfigStore, FileOps, StdFiles};
 use crate::prefs::Prefs;
 
 /// Folder created next to a project for its auto-saves.
-pub const AUTOSAVE_FOLDER: &str = "EffectCraft Auto-Save";
+pub const AUTOSAVE_FOLDER: &str = "EvoEffect Auto-Save";
 /// Crash-recovery sentinel in the config store.
 pub const SENTINEL: &str = "session.lock";
-const EXT: &str = "ecproj";
+const EXT: &str = "evoeffect";
 
 /// Auto-save bookkeeping of a session.
 #[derive(Clone, Debug, Default)]
@@ -86,12 +86,12 @@ impl PendingWrite {
     }
 }
 
-/// File-name stem of a project (`/a/Intro.ecproj` → `Intro`; untitled → `Untitled Project`).
+/// File-name stem of a project (`/a/Intro.evoeffect` → `Intro`; untitled → `Untitled Project`).
 pub fn project_stem(path: Option<&str>) -> String {
     path.and_then(|p| Path::new(p).file_stem()).map(|s| s.to_string_lossy().to_string()).unwrap_or_else(|| "Untitled Project".into())
 }
 
-/// `<stem> auto-save N.ecproj`.
+/// `<stem> auto-save N.evoeffect`.
 pub fn file_name(stem: &str, n: u32) -> String {
     format!("{stem} auto-save {n}.{EXT}")
 }
@@ -256,8 +256,8 @@ pub fn end(store: &dyn ConfigStore) {
     let _ = store.remove(SENTINEL);
 }
 
-/// After Effects' Increment and Save name: `Intro.ecproj` → `Intro 2.ecproj`, `Intro 2.ecproj`
-/// → `Intro 3.ecproj` (skipping names that exist; the extension, `.ecprojx` too, is kept).
+/// After Effects' Increment and Save name: `Intro.evoeffect` → `Intro 2.evoeffect`, `Intro 2.evoeffect`
+/// → `Intro 3.evoeffect` (skipping names that exist; the extension, `.evoeffectx` too, is kept).
 pub fn increment_path(path: &str, exists: impl Fn(&str) -> bool) -> String {
     let p = Path::new(path);
     let stem = p.file_stem().map(|s| s.to_string_lossy().to_string()).unwrap_or_default();

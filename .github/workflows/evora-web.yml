@@ -1,8 +1,8 @@
-# Evora : build web (WASM) du fork tazerty/effectcraft, futur moteur d'Evora Kinetika.
+# Evora : build web (WASM) du fork tazerty/evoeffect, futur moteur d'Evora Kinetika.
 #
 # Écrit par Evora (patchs EVORA-KIN-00 à 02, puis EVORA-KIN-04 « CI : portes bloquantes ») à
 # partir de packaging/web/package.sh et de docs/web.md de ce dépôt (MIT OR Apache-2.0). Rien n'est
-# repris de storytold/craft-common-actions. Accord de Gabriel du 2026-10-12 (D-2) : poussée de la
+# repris de amont/evo-common-actions. Accord de Gabriel du 2026-10-12 (D-2) : poussée de la
 # branche evora/<tag>, activation d'Actions sur ce fork, code d'application sur la branche.
 #
 # - Aucune action tierce : seulement actions/checkout, actions/cache et actions/upload-artifact,
@@ -13,8 +13,8 @@
 #   ubuntu-latest, qui change d'image sans commit) : leurs versions sont imprimées au journal.
 # - Portes BLOQUANTES depuis E1 (EVORA-KIN-03) : témoins des détecteurs ; cargo-deny (avis de
 #   sécurité, interdits, licences et sources depuis EVORA-KIN-23, deny.toml, avec un témoin de
-#   source git non admise) ; cargo-about (LICENSES/THIRD-PARTY-LICENSES.txt, --fail) ;
-#   fichiers d'hébergement absents ; marques ArtCraft absentes du site ; .br/.gz vérifiés ;
+#   source non admise) et aucune source git dans Cargo.lock ; cargo-about (LICENSES/THIRD-PARTY-LICENSES.txt, --fail) ;
+#   fichiers d'hébergement absents ; marques de l'amont et nom amont retiré absents du site ; .br/.gz vérifiés ;
 #   empreintes CSP des scripts inline (csp-hashes.txt) ; test de fumée Chrome (iframe d'une autre
 #   origine, puis sous la CSP prévue, plus un témoin saboté qui doit échouer) ; evora-host.json
 #   livré neutre, pont muet ; banc « pont-ehp » : pont EHP v1 natif (E4, EVORA-KIN-14), espace de
@@ -217,13 +217,37 @@ jobs:
         run: cargo fetch --locked
 
       # cargo-deny complet depuis EVORA-KIN-23 (CI-DENY-KIN) : avis, interdits, licences et sources
-      # (crates.io, storytold/filmcraft et storytold/craft-libs seulement, deny.toml). Témoin : une
-      # copie de deny.toml dont allow-git n'admet plus storytold/filmcraft doit faire rougir la
-      # catégorie « sources » sur ses crates, d'un seul motif, sans nommer craft-libs (craft-ui).
+      # (crates.io seulement, deny.toml : les bibliothèques de l'amont sont recopiées sous vendor/ et
+      # plus aucune source git n'est admise). Deux témoins remplacent celui qui retirait un dépôt git de
+      # allow-git : Cargo.lock ne porte aucune source git, et ce contrôle rougit sur une copie où on en
+      # plante une ; une copie de deny.toml qui n'admet plus crates.io doit faire rougir la catégorie
+      # « sources », d'un seul motif (cargo-deny juge donc bien les sources du graphe).
       - name: Advisories, bans, licences and sources (cargo-deny, web crate graph, wasm32)
         run: |
           set -euo pipefail
-          deny() { cargo deny --manifest-path apps/effectcraft-web/Cargo.toml --config "$1" --locked --color never check --show-stats "${@:2}"; }
+          deny() { cargo deny --manifest-path apps/evoeffect-web/Cargo.toml --config "$1" --locked --color never check --show-stats "${@:2}"; }
+          # Aucune source git dans Cargo.lock ; témoin : le contrôle doit voir celle qu'on plante sur une copie.
+          git_sources() { grep -c '^source = "git+' "$1" || true; }
+          if [ "$(git_sources Cargo.lock)" != 0 ]; then
+            grep -n '^source = "git+' Cargo.lock
+            echo "::error::Cargo.lock tire encore une source git : les bibliothèques de l'amont doivent rester sous vendor/"
+            exit 1
+          fi
+          planted="$RUNNER_TEMP/evora-lock-temoin.lock"
+          python3 - Cargo.lock "$planted" <<'PY'
+          import re, sys
+          src, dst = sys.argv[1:]
+          s = open(src, encoding="utf-8").read()
+          t, n = re.subn(r'(?m)^(version = "[^"]+")\nsource = "registry\+[^"]+"$', r'\1\nsource = "git+https://example.invalid/planted?rev=0#0"', s, count=1)
+          if n != 1:
+              sys.exit(f"aucun paquet à source à détourner dans {src}")
+          open(dst, "w", encoding="utf-8").write(t)
+          PY
+          if [ "$(git_sources "$planted")" != 1 ]; then
+            echo "::error::témoin des sources : le contrôle de Cargo.lock ne voit pas la source git plantée"
+            exit 1
+          fi
+          echo "Témoin de Cargo.lock OK : aucune source git, et la source plantée sur la copie est vue"
           deny deny.toml advisories bans licenses sources
           sab="$RUNNER_TEMP/evora-deny-sabotage.toml"
           log="$RUNNER_TEMP/evora-deny-sabotage.log"
@@ -231,25 +255,24 @@ jobs:
           import sys
           src, dst = sys.argv[1:]
           s = open(src, encoding="utf-8").read()
-          a = '    "https://github.com/storytold/filmcraft",\n'
+          a = 'allow-registry = ["https://github.com/rust-lang/crates.io-index"]\n'
           if s.count(a) != 1:
-              sys.exit(f"allow-git storytold/filmcraft introuvable (ou multiple) dans {src}")
-          open(dst, "w", encoding="utf-8").write(s.replace(a, ""))
+              sys.exit(f"allow-registry crates.io introuvable (ou multiple) dans {src}")
+          open(dst, "w", encoding="utf-8").write(s.replace(a, "allow-registry = []\n"))
           PY
           cmp -s deny.toml "$sab" && { echo "::error::copie sabotée de deny.toml identique à l'original"; exit 1; }
           if deny "$sab" sources > "$log" 2>&1; then
             cat "$log"
-            echo "::error::témoin des sources : une source git non admise (storytold/filmcraft) passe cargo-deny"
+            echo "::error::témoin des sources : une source non admise (crates.io retiré de allow-registry) passe cargo-deny"
             exit 1
           fi
           codes="$(grep -oE '^error\[[a-z0-9-]+\]' "$log" | sort -u | tr '\n' ' ' || true)"
           ncodes="$(grep -oE '^error\[[a-z0-9-]+\]' "$log" | sort -u | wc -l | tr -d ' ' || true)"
-          # craft-libs et craft-ui comme mots (« effectcraft-ui-egui » n'est pas craft-ui).
-          if grep -q 'sources FAILED' "$log" && grep -q 'filmcraft' "$log" && ! grep -qE '(^|[^A-Za-z0-9_-])craft-(libs|ui)([^A-Za-z0-9_-]|$)' "$log" && [ "$ncodes" = 1 ]; then
-            echo "Témoin des sources OK : $(grep -c '^error\[' "$log") erreur(s) $codes sur storytold/filmcraft ; $(grep 'sources FAILED' "$log")"
+          if grep -q 'sources FAILED' "$log" && grep -q '^error\[source-not-allowed\]' "$log" && [ "$ncodes" = 1 ]; then
+            echo "Témoin des sources OK : $(grep -c '^error\[' "$log") erreur(s) $codes sur crates.io retiré ; $(grep 'sources FAILED' "$log")"
           else
             cat "$log"
-            echo "::error::témoin des sources : cargo-deny ne rougit pas exactement sur la source git retirée (motifs : $codes)"
+            echo "::error::témoin des sources : cargo-deny ne rougit pas exactement sur la source retirée (motifs : $codes)"
             exit 1
           fi
 
@@ -263,7 +286,7 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p "$RUNNER_TEMP/evora-about"
-          cargo about generate --manifest-path apps/effectcraft-web/Cargo.toml --locked --fail \
+          cargo about generate --manifest-path apps/evoeffect-web/Cargo.toml --locked --fail \
             -c .github/evora/about.toml -o "$RUNNER_TEMP/evora-about/THIRD-PARTY-LICENSES.txt" \
             .github/evora/third-party-licenses.hbs
           f="$RUNNER_TEMP/evora-about/THIRD-PARTY-LICENSES.txt"
@@ -309,7 +332,7 @@ jobs:
           # E4 : origines parentes admises par le pont EHP (?host=evora), après la précompression (un
           # .br/.gz périmé survivrait au provisionnement). Vide dans l'artefact : le pont reste muet
           # tant que le provisionnement d'Evora ne l'a pas écrit depuis engines.json
-          # (HOST-PROTOCOL §2.3) ; même contrat que le Colophon Atelier (pdfcraft).
+          # (HOST-PROTOCOL §2.3) ; même contrat que le Colophon Atelier (evopdf).
           printf '{"parentOrigins": []}\n' > "$work/$NAME/evora-host.json"
           {
             echo "dir=$work/$NAME"
@@ -317,10 +340,21 @@ jobs:
             echo "out=$out"
           } >> "$GITHUB_OUTPUT"
 
-      - name: Gates on the site (hosting files, ArtCraft marks, provisioned files, .br/.gz, CSP hashes, sizes)
+      - name: Gates on the site (hosting files, upstream marks, provisioned files, .br/.gz, CSP hashes, sizes)
         env:
           DIR: ${{ steps.pkg.outputs.dir }}
         run: python3 .github/evora/gates.py site --dir "$DIR"
+
+      # Porte zéro terme : le nom amont retiré, sous toutes ses formes, n'apparaît plus dans le site,
+      # binaires compris, hors de LICENSES/ où la licence impose de garder les mentions d'origine. Les
+      # copies .br et .gz sont couvertes par la fidélité vérifiée à la porte précédente.
+      - name: Zero-term gate (the removed upstream name absent from the site, LICENSES/ excepted)
+        env:
+          DIR: ${{ steps.pkg.outputs.dir }}
+        run: |
+          set -euo pipefail
+          python3 .github/evora/zero-terme.py selftest
+          python3 .github/evora/zero-terme.py check "$DIR"
 
       - name: Gate on the displayed catalogues (emoji and symbols, E10)
         run: python3 .github/evora/gates.py catalog --repo . --stacks "$EVORA_FONT_STACKS" --mode "$EVORA_EMOJI_GATE"
@@ -336,10 +370,10 @@ jobs:
           DIR: ${{ steps.pkg.outputs.dir }}
         run: |
           set +e
-          cargo tree --manifest-path apps/effectcraft-web/Cargo.toml --locked -e normal \
+          cargo tree --manifest-path apps/evoeffect-web/Cargo.toml --locked -e normal \
             --target wasm32-unknown-unknown --prefix none --format '{p}' | LC_ALL=C sort -u | sed 's/^/SURFACE tree /'
           echo "SURFACE tree status=${PIPESTATUS[0]}"
-          python3 .github/evora/surface.py imports --wasm "$DIR/effectcraft_web_bg.wasm"
+          python3 .github/evora/surface.py imports --wasm "$DIR/evoeffect_web_bg.wasm"
           python3 .github/evora/surface.py net --dir "$DIR"
           exit 0
 
@@ -354,19 +388,19 @@ jobs:
           DIR: ${{ steps.pkg.outputs.dir }}
         run: |
           set -euo pipefail
-          cargo build --locked --target wasm32-unknown-unknown -p effectcraft-web --profile release --features evora-witness
+          cargo build --locked --target wasm32-unknown-unknown -p evoeffect-web --profile release --features evora-witness
           git diff --exit-code -- Cargo.lock || { echo "::error::le build du témoin a modifié Cargo.lock"; exit 1; }
           wout="$RUNNER_TEMP/evora-witness-wasm"
           site="$RUNNER_TEMP/evora-witness-site"
           mkdir -p "$wout" "$site"
-          wasm-bindgen --target web --no-typescript --out-dir "$wout" target/wasm32-unknown-unknown/release/effectcraft_web.wasm
+          wasm-bindgen --target web --no-typescript --out-dir "$wout" target/wasm32-unknown-unknown/release/evoeffect_web.wasm
           # Le site de l'artefact sans son moteur (wasm, colle JS, snippets), puis le moteur témoin.
-          (cd "$DIR" && tar --exclude='./snippets' --exclude='./effectcraft_web*' -cf - .) | (cd "$site" && tar -xf -)
+          (cd "$DIR" && tar --exclude='./snippets' --exclude='./evoeffect_web*' -cf - .) | (cd "$site" && tar -xf -)
           cp -R "$wout/." "$site/"
-          [ -f "$site/effectcraft_web_bg.wasm" ] && [ -f "$site/effectcraft_web.js" ] || { echo "::error::moteur témoin incomplet"; exit 1; }
-          cmp -s "$DIR/effectcraft_web_bg.wasm" "$site/effectcraft_web_bg.wasm" && { echo "::error::le moteur témoin est celui de l'artefact"; exit 1; }
+          [ -f "$site/evoeffect_web_bg.wasm" ] && [ -f "$site/evoeffect_web.js" ] || { echo "::error::moteur témoin incomplet"; exit 1; }
+          cmp -s "$DIR/evoeffect_web_bg.wasm" "$site/evoeffect_web_bg.wasm" && { echo "::error::le moteur témoin est celui de l'artefact"; exit 1; }
           [ "$(cd "$site" && ls snippets/*/js/host.js | wc -l)" = 1 ] || { echo "::error::js/host.js du témoin introuvable ou multiple"; exit 1; }
-          echo "Moteur témoin : $(stat -c %s "$site/effectcraft_web_bg.wasm") octets (artefact : $(stat -c %s "$DIR/effectcraft_web_bg.wasm"))"
+          echo "Moteur témoin : $(stat -c %s "$site/evoeffect_web_bg.wasm") octets (artefact : $(stat -c %s "$DIR/evoeffect_web_bg.wasm"))"
           echo "site=$site" >> "$GITHUB_OUTPUT"
 
       - name: Smoke test (headless Chrome, engine framed by another origin)
@@ -473,7 +507,7 @@ jobs:
             done
             [ "$code" != "000" ] || { echo "::error::serveur du port $p muet"; exit 1; }
           done
-          curl -fsSI "http://127.0.0.1:$PA/effectcraft_web_bg.wasm" | grep -i '^content-type'
+          curl -fsSI "http://127.0.0.1:$PA/evoeffect_web_bg.wasm" | grep -i '^content-type'
           echo "CSP prévue : $csp"
           rc=0
           node $NODE_WS .github/evora/smoke.mjs --parent="http://127.0.0.1:$PB/engine-$PA.html" --engine="http://127.0.0.1:$PA" \

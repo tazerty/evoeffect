@@ -38,15 +38,15 @@
   };
   try {
     const root = await navigator.storage.getDirectory();
-    const folders = ["effectcraft", "effectcraft-cache", `evns-${OTHER}--effectcraft`, `evns-${OTHER}--effectcraft-cache`, "evns-ci-a--effectcraft", "evora-keep"];
-    if (OWN) folders.push(`evns-${OWN}--effectcraft-cache`);
+    const folders = ["evoeffect", "evoeffect-cache", `evns-${OTHER}--evoeffect`, `evns-${OTHER}--evoeffect-cache`, "evns-ci-a--evoeffect", "evora-keep"];
+    if (OWN) folders.push(`evns-${OWN}--evoeffect-cache`);
     for (const name of folders) {
       const dir = await root.getDirectoryHandle(name, { create: true });
       const file = await dir.getFileHandle("seed", { create: true });
       const w = await file.createWritable();
       await w.write("seed");
       await w.close();
-      if (name.endsWith("effectcraft-cache")) {
+      if (name.endsWith("evoeffect-cache")) {
         let d = dir;
         for (const n of MATTE) d = await d.getDirectoryHandle(n, { create: true });
         const mw = await (await d.getFileHandle("seed", { create: true })).createWritable();
@@ -56,8 +56,8 @@
     }
     // The account's own IndexedDB database and localStorage key too: kept by evora:init, deleted by
     // evora:purge (the engine opens neither under Chrome before a folder is picked).
-    const dbs = ["effectcraft-handles", `evns-${OTHER}--effectcraft-handles`, "evora-keep"];
-    if (OWN) dbs.push(`evns-${OWN}--effectcraft-handles`);
+    const dbs = ["evoeffect-handles", `evns-${OTHER}--evoeffect-handles`, "evora-keep"];
+    if (OWN) dbs.push(`evns-${OWN}--evoeffect-handles`);
     for (const name of dbs) {
       await new Promise((res, rej) => {
         const r = indexedDB.open(name, 1);
@@ -66,8 +66,8 @@
         r.onerror = () => rej(r.error);
       });
     }
-    const keys = [`evns-${OTHER}--effectcraft`, "effectcraft-seed", "evora-keep"];
-    if (OWN) keys.push(`evns-${OWN}--effectcraft`);
+    const keys = [`evns-${OTHER}--evoeffect`, "evoeffect-seed", "evora-keep"];
+    if (OWN) keys.push(`evns-${OWN}--evoeffect`);
     for (const key of keys) localStorage.setItem(key, "seed");
     report({ listing: await list() });
   } catch (e) {

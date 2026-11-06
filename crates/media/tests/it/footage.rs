@@ -9,11 +9,11 @@ use std::process::Command;
 use std::sync::Arc;
 use std::time::Instant;
 
-use effectcraft_media::{MediaPool, probe, probe_bytes};
-use effectcraft_project::{AlphaMode, Footage, FootageKind, ItemId};
-use effectcraft_raster::Image;
-use effectcraft_render::FootageSource;
-use effectcraft_time::{FrameRate, TICKS_PER_SECOND, Tick};
+use evoeffect_media::{MediaPool, probe, probe_bytes};
+use evoeffect_project::{AlphaMode, Footage, FootageKind, ItemId};
+use evoeffect_raster::Image;
+use evoeffect_render::FootageSource;
+use evoeffect_time::{FrameRate, TICKS_PER_SECOND, Tick};
 
 fn fixtures() -> PathBuf {
     Path::new(env!("CARGO_MANIFEST_DIR")).join("../../target/fixtures/media")
@@ -253,7 +253,7 @@ fn h264_frames_at_reduced_sizes() {
         let sized = pool.frame_at_size(ItemId(1), &f, t, w, h).expect("frame");
         let full = pool.frame(ItemId(1), &f, t).expect("frame");
         assert_eq!((sized.width, sized.height), (w, h));
-        let db = psnr(&sized, &effectcraft_raster::resample(&full, w, h));
+        let db = psnr(&sized, &evoeffect_raster::resample(&full, w, h));
         eprintln!("h264 frame {n} at {w}×{h}: {db:.2} dB against the resampled full frame");
         // Converting at half size averages before the YUV→RGB clip, so saturated pixels differ
         // slightly; how much depends on the encoder that made the fixture (50 dB with x264 from
@@ -388,7 +388,7 @@ fn rotated_mp4_imports_upright() {
         let (hw, hh) = (f.width / 2, f.height / 2);
         let sized = pool.frame_at_size(ItemId(2), &f, t, hw, hh).expect("frame");
         assert_eq!((sized.width, sized.height), (hw, hh), "{name}°: reduced size");
-        let db = psnr(&sized, &effectcraft_raster::resample(&img, hw, hh));
+        let db = psnr(&sized, &evoeffect_raster::resample(&img, hw, hh));
         assert!(db > 45.0, "{name}° at half size: {db:.2} dB");
     }
 }
@@ -479,9 +479,9 @@ fn dnxhd_mxf() -> Option<PathBuf> {
 /// MXF is importable footage (After Effects imports it), whatever the extension's case.
 #[test]
 fn mxf_is_importable() {
-    assert!(effectcraft_media::is_importable(Path::new("/media/A001C003.mxf")));
-    assert!(effectcraft_media::is_importable(Path::new("/media/A001C003.MXF")));
-    assert!(!effectcraft_media::is_importable(Path::new("/media/A001C003.avi")), "no AVI demuxer yet");
+    assert!(evoeffect_media::is_importable(Path::new("/media/A001C003.mxf")));
+    assert!(evoeffect_media::is_importable(Path::new("/media/A001C003.MXF")));
+    assert!(!evoeffect_media::is_importable(Path::new("/media/A001C003.avi")), "no AVI demuxer yet");
 }
 
 #[test]
@@ -606,7 +606,7 @@ fn stills_at_reduced_sizes_are_resampled_once() {
     assert_eq!(pool.stats().misses, misses);
     for (w, h) in [(306, 48), (153, 24), (77, 12)] {
         let sized = pool.frame_at_size(ItemId(1), &f, Tick::ZERO, w, h).expect("frame");
-        assert_eq!(*sized, effectcraft_raster::resample(&full, w, h), "{w}×{h}: the renderer's resample");
+        assert_eq!(*sized, evoeffect_raster::resample(&full, w, h), "{w}×{h}: the renderer's resample");
         let misses = pool.stats().misses;
         let again = pool.frame_at_size(ItemId(1), &f, Tick(3 * TICKS_PER_SECOND), w, h).expect("frame");
         assert!(Arc::ptr_eq(&sized, &again), "{w}×{h}: kept at that size");
@@ -618,7 +618,7 @@ fn stills_at_reduced_sizes_are_resampled_once() {
     let larger = Footage { width: 306, height: 48, ..f.clone() };
     let smaller = Footage { width: 1226, height: 194, ..f.clone() };
     let sized = pool.frame_at_size(ItemId(2), &larger, Tick::ZERO, 153, 24).expect("frame");
-    assert_eq!(*sized, effectcraft_raster::resample(&full, 153, 24));
+    assert_eq!(*sized, evoeffect_raster::resample(&full, 153, 24));
     let kept = pool.frame_at_size(ItemId(3), &smaller, Tick::ZERO, 153, 24).expect("frame");
     assert_eq!(*kept, *full);
     let _ = std::fs::remove_dir_all(&dir);
@@ -645,9 +645,9 @@ fn png_with_alpha() {
 /// File ▸ Import of an FBX scene: importable by extension and probed as a 3D model item.
 #[test]
 fn fbx_imports_as_a_model() {
-    assert!(effectcraft_media::is_importable(Path::new("scene.fbx")));
+    assert!(evoeffect_media::is_importable(Path::new("scene.fbx")));
     let fbx = "FBXHeaderExtension: {\n FBXVersion: 7400\n}\nObjects: {\n Geometry: 1, \"Geometry::Tri\", \"Mesh\" {\n  Vertices: *9 {\n   a: 0,0,0,1,0,0,0,1,0\n  }\n  PolygonVertexIndex: *3 {\n   a: 0,1,-3\n  }\n }\n Model: 2, \"Model::Tri\", \"Mesh\" {\n }\n}\nConnections: {\n C: \"OO\",2,0\n C: \"OO\",1,2\n}\n";
-    let f = effectcraft_media::probe_bytes("scene.fbx", Arc::from(fbx.as_bytes())).expect("probe");
+    let f = evoeffect_media::probe_bytes("scene.fbx", Arc::from(fbx.as_bytes())).expect("probe");
     assert_eq!(f.kind, FootageKind::Model);
     assert_eq!(f.codec, "FBX (1 meshes, 1 triangles)");
 }
@@ -708,13 +708,13 @@ fn perf_sequential_1080p_h264() {
     let Some(p) = h264_mp4() else { return };
     let f = probe(&p).expect("probe");
     let n = 60;
-    // FilmCraft alone (decode only, YUV frames)
+    // EvoFilm alone (decode only, YUV frames)
     let bytes: Arc<[u8]> = std::fs::read(&p).expect("read").into();
-    let src = filmcraft_codecs::open_bytes("a.mp4", bytes).expect("open");
+    let src = evofilm_codecs::open_bytes("a.mp4", bytes).expect("open");
     let t0 = Instant::now();
     for i in 0..n {
-        let t = filmcraft_time::Tick(f.frame_rate.tick_of(i).0 + f.frame_rate.frame_duration().0 / 2);
-        src.video_frame(filmcraft_media::FrameRequest::full(t)).expect("frame");
+        let t = evofilm_time::Tick(f.frame_rate.tick_of(i).0 + f.frame_rate.frame_duration().0 / 2);
+        src.video_frame(evofilm_media::FrameRequest::full(t)).expect("frame");
     }
     let raw = n as f64 / t0.elapsed().as_secs_f64();
     // Through the pool (decode + conversion to f32 RGBA), cold cache, without and with read-ahead
@@ -740,7 +740,7 @@ fn perf_sequential_1080p_h264() {
     let cached = 20.0 / t0.elapsed().as_secs_f64();
     assert!(pool.stats().hits >= 20);
     eprintln!(
-        "1080p H.264 sequential: filmcraft decode {raw:.1} fps; MediaPool (decode + RGBA f32) {plain:.1} fps, with read-ahead {ours:.1} fps; cached {cached:.0} fps"
+        "1080p H.264 sequential: evofilm decode {raw:.1} fps; MediaPool (decode + RGBA f32) {plain:.1} fps, with read-ahead {ours:.1} fps; cached {cached:.0} fps"
     );
 }
 
@@ -774,7 +774,7 @@ fn targa_still_matches_ffmpeg() {
     let Some(png) = alpha_png() else { return };
     // ffmpeg's Targa encoder (run-length compressed)
     let Some(tga) = ffmpeg_fixture("alpha.tga", &["-i", png.to_str().expect("utf8")]) else { return };
-    assert!(effectcraft_media::is_importable(&tga));
+    assert!(evoeffect_media::is_importable(&tga));
     let f = probe(&tga).expect("probe");
     assert_eq!(f.kind, FootageKind::Still);
     assert_eq!((f.width, f.height), (256, 128));
@@ -786,7 +786,7 @@ fn targa_still_matches_ffmpeg() {
     let bytes = std::fs::read(&tga).expect("read");
     for n in [0, 5, 18, 40, bytes.len() / 2] {
         let cut: Arc<[u8]> = bytes.get(..n).expect("cut").into();
-        if let Ok(f) = effectcraft_media::probe_bytes("cut.tga", cut.clone()) {
+        if let Ok(f) = evoeffect_media::probe_bytes("cut.tga", cut.clone()) {
             let pool = MediaPool::new();
             pool.add_bytes("cut.tga", cut);
             let _ = pool.frame_at(&f, Tick::ZERO);
@@ -804,7 +804,7 @@ fn radiance_hdr_still_is_linear_float() {
     let p = dir.join(format!("float-{}.hdr", std::process::id()));
     let px = vec![0.214f32, 0.214, 0.214, 4.0, 4.0, 4.0];
     image::DynamicImage::ImageRgb32F(image::ImageBuffer::from_raw(2, 1, px).expect("buf")).save(&p).expect("write hdr");
-    assert!(effectcraft_media::is_importable(&p));
+    assert!(evoeffect_media::is_importable(&p));
     let f = probe(&p).expect("probe");
     assert_eq!(f.kind, FootageKind::Still);
     assert_eq!((f.width, f.height), (2, 1));
@@ -878,7 +878,7 @@ fn flac_audio_of_any_shape_reads_in_device_blocks() {
         // ffmpeg's sine source has an amplitude of 1/8 (mono is duplicated). The fixture carries
         // channels 0 and 1 at full level and the others at half, so a multichannel file sounds as
         // its stereo downmix (tests/it/downmix.rs checks that matrix channel by channel).
-        let gains = effectcraft_media::downmix::stereo_gains(channels as usize, false);
+        let gains = evoeffect_media::downmix::stereo_gains(channels as usize, false);
         let side = |s: usize| gains.iter().enumerate().map(|(c, g)| f64::from(g[s]) * if c < 2 { 1.0 } else { 0.5 }).sum::<f64>();
         let want = 0.125 * ((side(0).powi(2) + side(1).powi(2)) / 2.0).sqrt() / 2f64.sqrt();
         let rms = (sum / n.max(1) as f64).sqrt();
@@ -943,9 +943,9 @@ fn conformed_flac_audio_reads_back_like_the_decoder() {
 /// File ▸ Import of an STL part: importable by extension and probed as a 3D model item.
 #[test]
 fn stl_imports_as_a_model() {
-    assert!(effectcraft_media::is_importable(Path::new("part.stl")));
+    assert!(evoeffect_media::is_importable(Path::new("part.stl")));
     let ascii = "solid part\nfacet normal 0 0 1\nouter loop\nvertex 0 0 0\nvertex 1 0 0\nvertex 0 1 0\nendloop\nendfacet\nendsolid part\n";
-    let f = effectcraft_media::probe_bytes("part.stl", Arc::from(ascii.as_bytes())).expect("probe");
+    let f = evoeffect_media::probe_bytes("part.stl", Arc::from(ascii.as_bytes())).expect("probe");
     assert_eq!(f.kind, FootageKind::Model);
     assert_eq!(f.codec, "STL (1 meshes, 1 triangles)");
 }
@@ -989,7 +989,7 @@ fn dpx_stills_match_ffmpeg() {
     for (pf, codec, alpha) in formats {
         // 250 px wide: 8-bit and 10-bit lines need padding to a 32-bit word.
         let Some(p) = ffmpeg_fixture(&format!("dpx-{pf}.dpx"), &["-i", src, "-vf", "scale=250:100", "-pix_fmt", pf]) else { return };
-        assert!(effectcraft_media::is_importable(&p));
+        assert!(evoeffect_media::is_importable(&p));
         let f = probe(&p).expect(pf);
         assert_eq!(f.kind, FootageKind::Still);
         assert_eq!((f.width, f.height), (250, 100), "{pf}");
@@ -1053,9 +1053,9 @@ fn cineon_still_shows_code_values() {
         }
     }
     let bytes: Arc<[u8]> = b.clone().into();
-    let f = effectcraft_media::probe_bytes("scan.cin", bytes.clone()).expect("probe");
+    let f = evoeffect_media::probe_bytes("scan.cin", bytes.clone()).expect("probe");
     assert_eq!((f.kind, f.width, f.height, f.codec.as_str(), f.alpha), (FootageKind::Still, 5, 3, "Cineon 10-bit RGB, log", AlphaMode::Ignore));
-    assert!(effectcraft_media::is_importable(Path::new("scan.cin")));
+    assert!(evoeffect_media::is_importable(Path::new("scan.cin")));
     let pool = MediaPool::new();
     pool.add_bytes("scan.cin", bytes);
     let img = pool.frame_at(&f, Tick::ZERO).expect("frame");
@@ -1068,7 +1068,7 @@ fn cineon_still_shows_code_values() {
     }
     for n in [3, 100, 700, 1024, b.len() - 1] {
         let cut: Arc<[u8]> = b.get(..n).expect("cut").into();
-        assert!(effectcraft_media::probe_bytes("cut.cin", cut).is_err(), "{n}");
+        assert!(evoeffect_media::probe_bytes("cut.cin", cut).is_err(), "{n}");
     }
 }
 
@@ -1108,7 +1108,7 @@ fn an_unsupported_stream_reports_why_it_shows_no_picture() {
     let pool = MediaPool::new();
     assert_eq!(pool.problem(&f), None, "nothing is wrong before a frame was asked for");
     if pool.frame(ItemId(1), &f, Tick::ZERO).is_some() {
-        // a decoder that handles 4:2:2 (FilmCraft's, or a hardware one): no notice
+        // a decoder that handles 4:2:2 (EvoFilm's, or a hardware one): no notice
         assert_eq!(pool.problem(&f), None);
         return;
     }

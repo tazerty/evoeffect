@@ -1,10 +1,10 @@
 //! Distort / stylize GPU effects vs the CPU effects (the oracle): see `fx_distort.rs`.
 
-use effectcraft_keyframe::Value;
-use effectcraft_project::build::{self, Ids};
-use effectcraft_project::{BitDepth, LayerSource};
-use effectcraft_render::RenderOpts;
-use effectcraft_time::Tick;
+use evoeffect_keyframe::Value;
+use evoeffect_project::build::{self, Ids};
+use evoeffect_project::{BitDepth, LayerSource};
+use evoeffect_render::RenderOpts;
+use evoeffect_time::Tick;
 
 use crate::tests::{Scene, check, compare_at, effect_case, n, opts, set};
 

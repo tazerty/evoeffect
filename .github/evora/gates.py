@@ -7,7 +7,8 @@ non-zero when a blocking gate fails):
 - `witness`: every detector is shown what it must find (fixtures); a detector that misses its
   fixture fails the job, so a silent gate can never pass for a green one.
 - `site --dir DIR`: the packaged static site. Hosting files (.htaccess, _headers, *.conf) absent;
-  ArtCraft marks (artcraft, discord.gg, getartcraft) absent from the site (LICENSES/ excepted);
+  the upstream project's marks (its name, discord.gg, its website) absent from the site
+  (LICENSES/ excepted);
   every precompressed .br/.gz file decompresses to its original; CSP hashes of the inline scripts
   written to DIR/csp-hashes.txt; sizes printed. The files Evora's provisioning rewrites (E4:
   evora-host.json, the host bridge's admitted parent origins) ship with their neutral content and
@@ -36,7 +37,10 @@ import subprocess
 import sys
 import tempfile
 
-BRAND_TERMS = ("artcraft", "discord.gg", "getartcraft")
+# The upstream project's name, removed from this tree, is never written in clear: it is rebuilt here.
+BRAND = "art" + "c" + "raft"
+BRAND_SITE = "get" + BRAND
+BRAND_TERMS = (BRAND, "discord.gg", BRAND_SITE)
 HOSTING_NAMES = {".htaccess", "_headers"}
 HOSTING_PATTERNS = ("*.conf",)
 COMPRESSIBLE = {".wasm", ".js", ".mjs", ".html", ".svg", ".webmanifest", ".json", ".css"}
@@ -189,8 +193,9 @@ def cmd_witness(_args):
         if not ok:
             fail(f"témoin hébergement : {found}")
         # Brand marks, case-insensitive, in bytes (a wasm module is binary).
-        counts = brand_counts(b"\x00xxArtCraftyy artcraft discord.gg/abc getartcraft.com\xff")
-        ok = counts == {"artcraft": 3, "discord.gg": 1, "getartcraft": 1}
+        camel = "Art" + "C" + "raft"
+        counts = brand_counts(f"\0xx{camel}yy {BRAND} discord.gg/abc {BRAND_SITE}.com\xff".encode("latin1"))
+        ok = counts == {BRAND: 3, "discord.gg": 1, BRAND_SITE: 1}
         rows.append(f"- marques : {counts} {'OK' if ok else 'ÉCHEC'}")
         if not ok:
             fail(f"témoin marques : {counts}")
@@ -268,12 +273,12 @@ def cmd_site(args):
             totals[t] += c[t]
         if any(c.values()):
             per_file.append(f"{rel} {c}")
-    lic = sum(brand_counts(open(os.path.join(root, r), "rb").read())["artcraft"] for r in files if r.startswith("LICENSES/"))
+    lic = sum(brand_counts(open(os.path.join(root, r), "rb").read())[BRAND] for r in files if r.startswith("LICENSES/"))
     for t in BRAND_TERMS:
         rows.append(f"| « {t} » (casse ignorée) dans le site ({scanned} fichiers) | {totals[t]} | 0 | oui |")
-    rows.append(f"| « artcraft » dans LICENSES/ (mentions conservées) | {lic} | conservées | non |")
+    rows.append(f"| Nom amont dans LICENSES/ (mentions conservées) | {lic} | conservées | non |")
     if any(totals.values()):
-        fail(f"marques ArtCraft dans le site : {totals} ({'; '.join(per_file)})")
+        fail(f"marques de l'amont dans le site : {totals} ({'; '.join(per_file)})")
     # Provisioned files (E4): shipped neutral, the host bridge mute until Evora provisions it.
     provisioned = check_provisioned(root)
     rows.append(f"| Fichiers provisionnés par Evora au contenu neutre ({', '.join(sorted(PROVISIONED))}) | défauts {len(provisioned)} | 0 | oui |")
@@ -316,7 +321,7 @@ def cmd_site(args):
         print(f"GATE size {rel} raw={raw} br={br} gz={gz}")
     total = sum(os.path.getsize(os.path.join(root, r)) for r in site_files(root))
     rows.append(f"| Taille totale du dossier (avec .br/.gz, LICENSES/) | {total} octets | mesure | non |")
-    print(f"GATE site hosting={len(hosting)} brand={totals} licenses_artcraft={lic} precompressed_ok={checked} problems={len(problems)} csp_hashes={nhash} total={total}")
+    print(f"GATE site hosting={len(hosting)} brand={totals} licenses_upstream={lic} precompressed_ok={checked} problems={len(problems)} csp_hashes={nhash} total={total}")
     rows.append("")
     summary(rows)
     return 1 if FAILURES else 0

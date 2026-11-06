@@ -1,9 +1,9 @@
 //! The native (macOS) menu bar as a plain, serializable spec. The desktop app turns it into an
-//! `NSMenu` with `muda` (`apps/effectcraft/src/native_menu.rs`); everything that decides *what*
+//! `NSMenu` with `muda` (`apps/evoeffect/src/native_menu.rs`); everything that decides *what*
 //! the menu contains lives here, so it is tested without creating real menus and builds for the
 //! web (where the in-window menu bar is used).
 //!
-//! The spec mirrors the engine's After Effects menu tree ([`effectcraft_engine::menus`]):
+//! The spec mirrors the engine's After Effects menu tree ([`evoeffect_engine::menus`]):
 //! submenus, separators, labels (Undo/Redo and label names are live), check marks, enabled
 //! state, and the active shortcut preset's keys as accelerators. File ▸ Open Recent lists the
 //! recent projects. The application menu's Hide / Hide Others / Show All are macOS'
@@ -18,8 +18,8 @@ use std::hash::{Hash, Hasher};
 use serde::Serialize;
 use serde_json::{Value, json};
 
-use crate::EffectcraftApp;
-use effectcraft_engine::menus::{MenuNode, menu_bar};
+use crate::EvoEffectApp;
+use evoeffect_engine::menus::{MenuNode, menu_bar};
 
 /// What macOS performs itself (no command dispatch).
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, Serialize)]
@@ -57,7 +57,7 @@ pub struct NativeItem {
     pub command: String,
     #[serde(skip_serializing_if = "Value::is_null")]
     pub params: Value,
-    /// The shortcut in EffectCraft notation (`Cmd+Shift+S`).
+    /// The shortcut in EvoEffect notation (`Cmd+Shift+S`).
     pub shortcut: Option<String>,
     /// The menu key equivalent in `muda` accelerator notation, when the shortcut can be one (see
     /// [`accelerator`]).
@@ -127,8 +127,8 @@ impl NativeMenu {
 }
 
 /// Build the native menu spec for the app's current state.
-pub fn build(app: &EffectcraftApp) -> NativeMenu {
-    fn rec(app: &EffectcraftApp, nodes: &[MenuNode], path: &str, out: &mut Vec<NativeNode>) {
+pub fn build(app: &EvoEffectApp) -> NativeMenu {
+    fn rec(app: &EvoEffectApp, nodes: &[MenuNode], path: &str, out: &mut Vec<NativeNode>) {
         let mut services_added = false;
         for (i, n) in nodes.iter().enumerate() {
             let id = format!("{path}.{i}");
@@ -138,7 +138,7 @@ pub fn build(app: &EffectcraftApp) -> NativeMenu {
                     // Recent projects / footage / presets, undo history, shortcut slots, viewers,
                     // saved workspaces.
                     let saved = app.saved_workspace_names();
-                    let (entries, empty) = effectcraft_engine::menus::dynamic(&app.session, name, &crate::menus::dyn_ctx(&app.ui.workspace, &saved));
+                    let (entries, empty) = evoeffect_engine::menus::dynamic(&app.session, name, &crate::menus::dyn_ctx(&app.ui.workspace, &saved));
                     if entries.is_empty()
                         && let Some(e) = empty
                     {
@@ -175,7 +175,7 @@ pub fn build(app: &EffectcraftApp) -> NativeMenu {
                         crate::i18n::submenu(
                             app,
                             label,
-                            effectcraft_engine::menus::submenu_label(&app.session, label, &crate::menus::dyn_ctx(&app.ui.workspace, &[])),
+                            evoeffect_engine::menus::submenu_label(&app.session, label, &crate::menus::dyn_ctx(&app.ui.workspace, &[])),
                         )
                     });
                     out.push(NativeNode::Submenu { label: shown, children: kids });
@@ -240,7 +240,7 @@ pub fn build(app: &EffectcraftApp) -> NativeMenu {
     NativeMenu { menus }
 }
 
-/// The `muda` accelerator for an EffectCraft shortcut, or `None` when it must stay a plain
+/// The `muda` accelerator for an EvoEffect shortcut, or `None` when it must stay a plain
 /// keyboard shortcut. Only shortcuts with Cmd or Ctrl (and function keys) become menu key
 /// equivalents: a single-key shortcut (`V`, `Space`, `U`) or an Alt/Shift-only one would be
 /// swallowed by the menu while typing into a text field. Those still work through the
@@ -298,7 +298,7 @@ pub fn accelerator(shortcut: &str) -> Option<String> {
 
 /// Cheap per-frame fingerprint of everything menu labels, check marks and enabled state depend
 /// on (project revision, selection, history, settings, executed commands, viewer toggles).
-pub fn state_key(app: &EffectcraftApp) -> u64 {
+pub fn state_key(app: &EvoEffectApp) -> u64 {
     let mut h = std::collections::hash_map::DefaultHasher::new();
     let s = &app.session;
     s.revision.hash(&mut h);
@@ -355,7 +355,7 @@ fn text_field_event(command: &str, clipboard: Option<String>) -> Option<Vec<egui
 
 /// Run a native menu item (by id) the way the in-window menu bar does. While a text field has
 /// the keyboard, Edit ▸ Cut/Copy/Paste/Select All/Undo/Redo edit the text instead.
-pub fn activate(app: &mut EffectcraftApp, ctx: &egui::Context, menu: &NativeMenu, id: &str) -> Result<Value, String> {
+pub fn activate(app: &mut EvoEffectApp, ctx: &egui::Context, menu: &NativeMenu, id: &str) -> Result<Value, String> {
     let item = menu.find(id).ok_or_else(|| format!("no native menu item `{id}`"))?;
     let (command, params) = (item.command.clone(), item.params.clone());
     // The menu bar takes Cmd+D and Cmd+R before the window sees them: while a confirmation that
@@ -391,10 +391,10 @@ pub fn activate(app: &mut EffectcraftApp, ctx: &egui::Context, menu: &NativeMenu
 mod tests {
     use super::*;
 
-    fn app() -> EffectcraftApp {
-        let mut s = effectcraft_engine::Session::default();
+    fn app() -> EvoEffectApp {
+        let mut s = evoeffect_engine::Session::default();
         s.execute("file.openDemoProject", json!({})).unwrap();
-        EffectcraftApp::new(s)
+        EvoEffectApp::new(s)
     }
 
     #[test]
@@ -416,7 +416,7 @@ mod tests {
         }
         let mut got = vec![];
         commands(&spec.menus, &mut got);
-        let want: Vec<(String, String)> = effectcraft_engine::menus::entries().into_iter().map(|(_, e)| (e.command.clone(), e.params.to_string())).collect();
+        let want: Vec<(String, String)> = evoeffect_engine::menus::entries().into_iter().map(|(_, e)| (e.command.clone(), e.params.to_string())).collect();
         assert_eq!(got, want, "native menu must mirror the engine tree entry for entry");
         // Top-level menus in order.
         let tops: Vec<&str> = spec
@@ -427,7 +427,7 @@ mod tests {
                 _ => None,
             })
             .collect();
-        assert_eq!(tops, effectcraft_engine::menus::top_level());
+        assert_eq!(tops, evoeffect_engine::menus::top_level());
         // Ids are unique.
         let ids: std::collections::BTreeSet<&str> = spec.items().iter().map(|i| i.id.as_str()).collect();
         assert_eq!(ids.len(), spec.items().len());
@@ -440,10 +440,10 @@ mod tests {
     #[test]
     fn saved_workspaces_are_in_the_native_workspace_menu() {
         let mut app = app();
-        app.session.config = Some(std::sync::Arc::new(effectcraft_engine::config::MemoryConfig::default()));
+        app.session.config = Some(std::sync::Arc::new(evoeffect_engine::config::MemoryConfig::default()));
         let ctx = egui::Context::default();
         crate::menus::invoke(&mut app, &ctx, "window.saveWorkspaceAs", json!({"name": "My Layout"})).unwrap();
-        let entry = |app: &EffectcraftApp| build(app).items().into_iter().find(|i| i.label == "My Layout").cloned();
+        let entry = |app: &EvoEffectApp| build(app).items().into_iter().find(|i| i.label == "My Layout").cloned();
         let it = entry(&app).expect("the saved workspace is listed");
         assert_eq!((it.command.as_str(), &it.params, it.checked), ("window.workspace", &json!({"name": "My Layout"}), Some(true)));
         crate::menus::invoke(&mut app, &ctx, "window.workspace", json!({"name": "Default"})).unwrap();
@@ -455,7 +455,7 @@ mod tests {
         if !cfg!(target_os = "macos") {
             return;
         }
-        let mut app = EffectcraftApp::new(effectcraft_engine::Session::default());
+        let mut app = EvoEffectApp::new(evoeffect_engine::Session::default());
         app.session.execute("prefs.set", json!({"key": "general.language", "value": "uk"})).unwrap();
         fn labels(nodes: &[NativeNode], out: &mut Vec<String>) {
             for node in nodes {
@@ -468,7 +468,7 @@ mod tests {
         }
         let mut translated = vec![];
         labels(&build(&app).menus, &mut translated);
-        assert_eq!(translated, ["Служби", "Приховати EffectCraft", "Приховати решту", "Показати все"]);
+        assert_eq!(translated, ["Служби", "Приховати EvoEffect", "Приховати решту", "Показати все"]);
     }
 
     #[test]
@@ -476,7 +476,7 @@ mod tests {
         if !cfg!(target_os = "macos") {
             return;
         }
-        let mut app = EffectcraftApp::new(effectcraft_engine::Session::default());
+        let mut app = EvoEffectApp::new(evoeffect_engine::Session::default());
         app.session.execute("prefs.set", json!({"key": "general.language", "value": "cs"})).unwrap();
         fn labels(nodes: &[NativeNode], out: &mut Vec<String>) {
             for node in nodes {
@@ -489,7 +489,7 @@ mod tests {
         }
         let mut translated = vec![];
         labels(&build(&app).menus, &mut translated);
-        assert_eq!(translated, ["Služby", "Skrýt EffectCraft", "Skrýt ostatní", "Zobrazit vše"]);
+        assert_eq!(translated, ["Služby", "Skrýt EvoEffect", "Skrýt ostatní", "Zobrazit vše"]);
     }
 
     #[test]
@@ -497,7 +497,7 @@ mod tests {
         if !cfg!(target_os = "macos") {
             return;
         }
-        let mut app = EffectcraftApp::new(effectcraft_engine::Session::default());
+        let mut app = EvoEffectApp::new(evoeffect_engine::Session::default());
         app.session.execute("prefs.set", json!({"key": "general.language", "value": "ka"})).unwrap();
         fn labels(nodes: &[NativeNode], out: &mut Vec<String>) {
             for node in nodes {
@@ -510,7 +510,7 @@ mod tests {
         }
         let mut translated = vec![];
         labels(&build(&app).menus, &mut translated);
-        assert_eq!(translated, ["სერვისები", "EffectCraft-ის დამალვა", "სხვების დამალვა", "ყველას ჩვენება"]);
+        assert_eq!(translated, ["სერვისები", "EvoEffect-ის დამალვა", "სხვების დამალვა", "ყველას ჩვენება"]);
     }
 
     #[test]
@@ -594,7 +594,7 @@ mod tests {
     fn window_menu_checks_the_panels_on_screen() {
         use crate::dock::PanelKind;
         let mut app = app();
-        let checked = |app: &EffectcraftApp, panel: &str| {
+        let checked = |app: &EvoEffectApp, panel: &str| {
             build(app).items().into_iter().find(|i| i.command == "window.panel" && i.params["panel"] == panel).and_then(|i| i.checked)
         };
         assert_eq!(checked(&app, "timeline"), Some(true));
@@ -630,10 +630,10 @@ mod tests {
         assert_eq!(lock, Some(true));
         assert_ne!(undo(&spec0), undo(&spec1));
         // A recent project changes the structure (Open Recent grows).
-        app.session.prefs.push_recent("/tmp/Recent Test.ecproj");
+        app.session.prefs.push_recent("/tmp/Recent Test.evoeffect");
         let spec2 = build(&app);
         assert_ne!(spec1.structure(), spec2.structure());
-        assert!(spec2.items().iter().any(|i| i.command == "file.openRecent" && i.label == "Recent Test.ecproj"));
+        assert!(spec2.items().iter().any(|i| i.command == "file.openRecent" && i.label == "Recent Test.evoeffect"));
     }
 
     /// #1630: a checked Window menu entry closes its panel; an unchecked one opens it.
@@ -642,7 +642,7 @@ mod tests {
         use crate::dock::PanelKind;
         let mut app = app();
         let ctx = egui::Context::default();
-        let choose = |app: &mut EffectcraftApp| {
+        let choose = |app: &mut EvoEffectApp| {
             let spec = build(app);
             let id = spec.items().into_iter().find(|i| i.command == "window.panel" && i.params["panel"] == "align").unwrap().id.clone();
             activate(app, &ctx, &spec, &id).unwrap();

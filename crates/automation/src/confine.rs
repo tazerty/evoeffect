@@ -1,5 +1,5 @@
-//! File access confinement for automation (`effectcraft-cli mcp --automation-read-root DIR
-//! --automation-write-root DIR`, as in PhotoCraft): an agent may only read files under a read
+//! File access confinement for automation (`evoeffect-cli mcp --automation-read-root DIR
+//! --automation-write-root DIR`, as in EvoPhoto): an agent may only read files under a read
 //! root (or a write root) and only write under a write root.
 //!
 //! Every engine command an agent runs ([`crate::Backend::exec`], also each step of an

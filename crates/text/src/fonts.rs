@@ -96,13 +96,13 @@ impl DirectorySource {
         // folders (/run/host/…) and the folders the fontconfig configuration names.
         #[cfg(all(unix, not(target_os = "macos"), not(target_arch = "wasm32")))]
         dirs.extend(crate::font_dirs::unix_font_dirs(&crate::font_dirs::FontEnv::from_process()));
-        dirs.extend(extra_dirs(std::env::var_os("EFFECTCRAFT_FONT_DIRS").as_deref()));
+        dirs.extend(extra_dirs(std::env::var_os("EVOEFFECT_FONT_DIRS").as_deref()));
         Self { dirs }
     }
 }
 
-/// Extra font folders from `EFFECTCRAFT_FONT_DIRS` (a path list, `:`-separated, `;` on Windows), so a
-/// tool can hand EffectCraft its own font library without installing the fonts system-wide.
+/// Extra font folders from `EVOEFFECT_FONT_DIRS` (a path list, `:`-separated, `;` on Windows), so a
+/// tool can hand EvoEffect its own font library without installing the fonts system-wide.
 fn extra_dirs(var: Option<&std::ffi::OsStr>) -> Vec<PathBuf> {
     var.map(|v| std::env::split_paths(v).filter(|p| !p.as_os_str().is_empty()).collect()).unwrap_or_default()
 }
@@ -755,14 +755,14 @@ fn requested_cjk_locale() -> Option<String> {
 }
 
 /// The CJK locale to use: [`set_cjk_locale`] when the host asked for one, otherwise the locale
-/// environment (`LANG`, `LC_ALL`, `LC_CTYPE`; `EFFECTCRAFT_CJK_LOCALE` overrides them).
+/// environment (`LANG`, `LC_ALL`, `LC_CTYPE`; `EVOEFFECT_CJK_LOCALE` overrides them).
 fn active_cjk_locale() -> String {
     requested_cjk_locale().unwrap_or_else(environment_cjk_locale)
 }
 
 /// Read the environment independently of another UI's process-wide language request.
 fn environment_cjk_locale() -> String {
-    ["EFFECTCRAFT_CJK_LOCALE", "LC_ALL", "LC_CTYPE", "LANG"]
+    ["EVOEFFECT_CJK_LOCALE", "LC_ALL", "LC_CTYPE", "LANG"]
         .iter()
         .filter_map(|k| std::env::var(k).ok())
         .map(|v| v.trim().to_ascii_lowercase())
@@ -1039,7 +1039,7 @@ mod tests {
     #[test]
     #[cfg(not(target_arch = "wasm32"))]
     fn cjk_requests_keep_their_language_and_cache_entries() {
-        const CHILD: &str = "EFFECTCRAFT_TEST_ISOLATED_CJK";
+        const CHILD: &str = "EVOEFFECT_TEST_ISOLATED_CJK";
         if std::env::var_os(CHILD).is_none() {
             let output = std::process::Command::new(std::env::current_exe().unwrap())
                 .args(["--exact", "fonts::tests::cjk_requests_keep_their_language_and_cache_entries", "--nocapture"])
@@ -1191,11 +1191,11 @@ mod tests {
     /// font menus list every instance.
     #[test]
     fn variable_named_instances_resolve_and_list() {
-        const FAMILY: &str = "EffectCraft Instance Test";
+        const FAMILY: &str = "EvoEffect Instance Test";
         let instances = [
-            ("Light", 300.0, Some("EffectCraftInstanceTest-Light")),
-            ("Regular", 400.0, Some("EffectCraftInstanceTest-Regular")),
-            ("Black", 900.0, Some("EffectCraftInstanceTest-Black")),
+            ("Light", 300.0, Some("EvoEffectInstanceTest-Light")),
+            ("Regular", 400.0, Some("EvoEffectInstanceTest-Regular")),
+            ("Black", 900.0, Some("EvoEffectInstanceTest-Black")),
             ("Extra Bold", 800.0, None),
         ];
         assert_eq!(add_font_data(crate::sfnt::test_font::variable(FAMILY, &instances, true)).len(), 1);
@@ -1213,11 +1213,11 @@ mod tests {
         assert!(!bold.synth_bold, "{bold:?}");
         assert_eq!(wght(&bold), vec![("wght".to_string(), 800.0)]);
         // By PostScript name, the font's own and the derived one, and by full name.
-        let ps = resolve("EffectCraftInstanceTest-Black", "Regular");
+        let ps = resolve("EvoEffectInstanceTest-Black", "Regular");
         assert!(!ps.missing && ps.face == black.face, "{ps:?}");
         assert_eq!(wght(&ps), vec![("wght".to_string(), 900.0)]);
-        assert_eq!(wght(&resolve("EffectCraftInstanceTest-ExtraBold", "")), vec![("wght".to_string(), 800.0)]);
-        assert_eq!(wght(&resolve("effectcraft instance test extra bold", "")), vec![("wght".to_string(), 800.0)]);
+        assert_eq!(wght(&resolve("EvoEffectInstanceTest-ExtraBold", "")), vec![("wght".to_string(), 800.0)]);
+        assert_eq!(wght(&resolve("evoeffect instance test extra bold", "")), vec![("wght".to_string(), 800.0)]);
         // The font menu lists every instance, in weight order.
         let fams = families();
         let styles = &fams.iter().find(|(f, _)| f == FAMILY).unwrap().1;

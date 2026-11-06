@@ -1,29 +1,29 @@
 //! Long menus and lists scroll instead of running off the window, with a scroll bar to drag
 //! (egui_kittest, UI logic only).
 
-use effectcraft_engine::Session;
-use effectcraft_ui_egui::EffectcraftApp;
+use evoeffect_engine::Session;
+use evoeffect_ui_egui::EvoEffectApp;
 use egui::{Event, Pos2, Rect, pos2, vec2};
 use egui_kittest::Harness;
 use egui_kittest::kittest::Queryable;
 use serde_json::json;
 
 /// Open the demo project in a UI test harness with the requested window size.
-fn harness(w: f32, h: f32) -> Harness<'static, EffectcraftApp> {
+fn harness(w: f32, h: f32) -> Harness<'static, EvoEffectApp> {
     let mut s = Session::default();
     s.execute("file.openDemoProject", json!({})).unwrap();
-    let mut h = Harness::builder().with_size(vec2(w, h)).build_eframe(|_| EffectcraftApp::new(s));
+    let mut h = Harness::builder().with_size(vec2(w, h)).build_eframe(|_| EvoEffectApp::new(s));
     h.run_steps(3);
     h
 }
 
 /// Return a registered widget's rectangle so UI tests can inspect its layout.
-fn rect(h: &Harness<'_, EffectcraftApp>, id: &str) -> Rect {
+fn rect(h: &Harness<'_, EvoEffectApp>, id: &str) -> Rect {
     let e = h.state().auto.find(id).unwrap_or_else(|| panic!("no {id}"));
     Rect::from_min_size(pos2(e.rect[0], e.rect[1]), vec2(e.rect[2], e.rect[3]))
 }
 
-fn click_at(h: &mut Harness<'_, EffectcraftApp>, p: Pos2) {
+fn click_at(h: &mut Harness<'_, EvoEffectApp>, p: Pos2) {
     h.input_mut().events.push(Event::PointerMoved(p));
     h.input_mut().events.push(Event::PointerButton { pos: p, button: egui::PointerButton::Primary, pressed: true, modifiers: Default::default() });
     h.step();
@@ -31,7 +31,7 @@ fn click_at(h: &mut Harness<'_, EffectcraftApp>, p: Pos2) {
     h.run_steps(2);
 }
 
-fn wheel(h: &mut Harness<'_, EffectcraftApp>, at: Pos2, dy: f32) {
+fn wheel(h: &mut Harness<'_, EvoEffectApp>, at: Pos2, dy: f32) {
     h.input_mut().events.push(Event::PointerMoved(at));
     h.input_mut().events.push(Event::MouseWheel {
         unit: egui::MouseWheelUnit::Point,
@@ -43,20 +43,20 @@ fn wheel(h: &mut Harness<'_, EffectcraftApp>, at: Pos2, dy: f32) {
 }
 
 /// Press the primary button at `p` and keep it down (press-and-browse, as on a menu title).
-fn hold(h: &mut Harness<'_, EffectcraftApp>, p: Pos2) {
+fn hold(h: &mut Harness<'_, EvoEffectApp>, p: Pos2) {
     h.input_mut().events.push(Event::PointerMoved(p));
     h.input_mut().events.push(Event::PointerButton { pos: p, button: egui::PointerButton::Primary, pressed: true, modifiers: Default::default() });
     h.run_steps(2);
 }
 
 /// Move the pointer to `p`, keeping whatever button is held.
-fn move_to(h: &mut Harness<'_, EffectcraftApp>, p: Pos2) {
+fn move_to(h: &mut Harness<'_, EvoEffectApp>, p: Pos2) {
     h.input_mut().events.push(Event::PointerMoved(p));
     h.run_steps(2);
 }
 
 /// The open menu popup's rect (frame included), from egui's area memory: the only tall area up.
-fn open_popup(h: &Harness<'_, EffectcraftApp>) -> Rect {
+fn open_popup(h: &Harness<'_, EvoEffectApp>) -> Rect {
     h.ctx
         .memory(|m| {
             m.areas()
@@ -85,7 +85,7 @@ fn a_menu_taller_than_the_window_scrolls() {
     let last = h.query_by_label_contains("Keyboard Shortcuts").expect("still open").rect();
     assert!(last.min.y >= 0.0 && last.max.y <= 520.0, "scrolled into the window ({last:?})");
     click_at(&mut h, last.center());
-    assert_eq!(h.state().dialog, Some(effectcraft_ui_egui::Dialog::Shortcuts), "the entry takes the click");
+    assert_eq!(h.state().dialog, Some(evoeffect_ui_egui::Dialog::Shortcuts), "the entry takes the click");
 }
 
 /// With the title still held down (press-and-browse), resting the pointer against the bottom
@@ -134,7 +134,7 @@ fn without_the_hold_the_edge_does_not_scroll_the_menu() {
     }
 }
 
-fn drag(h: &mut Harness<'_, EffectcraftApp>, from: Pos2, to: Pos2) {
+fn drag(h: &mut Harness<'_, EvoEffectApp>, from: Pos2, to: Pos2) {
     h.input_mut().events.push(Event::PointerMoved(from));
     h.input_mut().events.push(Event::PointerButton { pos: from, button: egui::PointerButton::Primary, pressed: true, modifiers: Default::default() });
     h.step();
@@ -147,7 +147,7 @@ fn drag(h: &mut Harness<'_, EffectcraftApp>, from: Pos2, to: Pos2) {
 }
 
 /// A scroll bar's "scroll/max" automation label.
-fn scrolled(h: &Harness<'_, EffectcraftApp>, id: &str) -> (f32, f32) {
+fn scrolled(h: &Harness<'_, EvoEffectApp>, id: &str) -> (f32, f32) {
     let label = h.state().auto.find(id).unwrap_or_else(|| panic!("no {id}")).label.clone();
     let (s, max) = label.split_once('/').unwrap_or_else(|| panic!("{id}: {label}"));
     (s.parse().unwrap(), max.parse().unwrap())
@@ -157,7 +157,7 @@ fn scrolled(h: &Harness<'_, EffectcraftApp>, id: &str) -> (f32, f32) {
 /// scrolls them: without a mouse wheel or touchpad there was no way down most panels (#271).
 #[test]
 fn panels_taller_than_their_space_have_a_scroll_bar_to_drag() {
-    use effectcraft_ui_egui::dock::PanelKind;
+    use evoeffect_ui_egui::dock::PanelKind;
     // (The Project panel's list starts below its item preview and search: a taller window.)
     for (panel, id, height) in [
         (PanelKind::EffectControls, "effectControls.scroll", 240.0),
@@ -201,7 +201,7 @@ fn panels_taller_than_their_space_have_a_scroll_bar_to_drag() {
 /// navigator (â—€ â—† â–¶), which was drawn over them (#271).
 #[test]
 fn effect_values_stay_clear_of_the_keyframe_navigator() {
-    use effectcraft_ui_egui::dock::PanelKind;
+    use evoeffect_ui_egui::dock::PanelKind;
     let mut h = harness(1600.0, 1000.0);
     let app = h.state_mut();
     let lid = app.session.active_comp().unwrap().layers[0].id.0;
@@ -210,7 +210,7 @@ fn effect_values_stay_clear_of_the_keyframe_navigator() {
     let path = "effects/#1/point";
     app.session.execute("prop.toggleAnimation", json!({"layer": lid, "path": path})).unwrap();
     app.session.execute("prop.set", json!({"layer": lid, "path": path, "value": [123456.7, 123456.7]})).unwrap();
-    let uid = app.session.active_comp().unwrap().layer(effectcraft_engine::project::LayerId(lid)).unwrap().props.prop(path).unwrap().uid;
+    let uid = app.session.active_comp().unwrap().layer(evoeffect_engine::project::LayerId(lid)).unwrap().props.prop(path).unwrap().uid;
     assert!(app.edit_layout(|l| l.float(PanelKind::EffectControls, [300.0, 150.0, 330.0, 500.0])));
     h.run_steps(3);
     let value = rect(&h, &format!("effectControls.prop.{uid}.value.1"));
@@ -225,7 +225,7 @@ fn effect_values_stay_clear_of_the_keyframe_navigator() {
 fn settings_dialog_does_not_scroll_sideways() {
     let mut h = harness(1400.0, 900.0);
     let ctx = h.ctx.clone();
-    effectcraft_ui_egui::menus::invoke(h.state_mut(), &ctx, "app.settings", json!({"page": "general"})).unwrap();
+    evoeffect_ui_egui::menus::invoke(h.state_mut(), &ctx, "app.settings", json!({"page": "general"})).unwrap();
     h.run_steps(3);
     let (ok, page) = (rect(&h, "settings.ok"), rect(&h, "settings.page.general"));
     h.input_mut().events.push(Event::PointerMoved(page.center()));
@@ -242,18 +242,18 @@ fn settings_dialog_does_not_scroll_sideways() {
 /// #2034: the Settings sidebar uses the translated page names when deciding its width.
 #[test]
 fn settings_page_column_fits_japanese_names() {
-    use effectcraft_ui_egui::theme::Tokens;
+    use evoeffect_ui_egui::theme::Tokens;
 
     let mut session = Session::default();
     session.prefs.general.language = "ja".into();
-    let mut h = Harness::builder().with_size(vec2(1400.0, 900.0)).build_eframe(|_| EffectcraftApp::new(session));
+    let mut h = Harness::builder().with_size(vec2(1400.0, 900.0)).build_eframe(|_| EvoEffectApp::new(session));
     h.run_steps(3);
     let ctx = h.ctx.clone();
-    effectcraft_ui_egui::menus::invoke(h.state_mut(), &ctx, "app.settings", json!({"page": "scripting"})).unwrap();
+    evoeffect_ui_egui::menus::invoke(h.state_mut(), &ctx, "app.settings", json!({"page": "scripting"})).unwrap();
     h.run_steps(3);
 
     // The panel titles a page with its Settings menu row, minus the ellipsis.
-    let name = effectcraft_ui_egui::menus::menu_items(h.state())
+    let name = evoeffect_ui_egui::menus::menu_items(h.state())
         .into_iter()
         .find(|m| m.id == "app.settings" && m.params["page"] == "scripting")
         .and_then(|m| m.label.strip_suffix("...").map(str::to_owned))

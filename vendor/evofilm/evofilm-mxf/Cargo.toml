@@ -1,0 +1,10 @@
+[package]
+name = "evofilm-mxf"
+description = "Clean-room MXF (SMPTE ST 377-1) demuxer and writer: OP1a and OP-Atom, index tables, AVC/VC-3/ProRes/MPEG-2/PCM essence"
+version = "0.1.1"
+edition = "2024"
+license = "MIT OR Apache-2.0"
+rust-version = "1.95"
+
+[dependencies]
+

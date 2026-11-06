@@ -1,0 +1,16 @@
+[package]
+name = "evofilm-mpeg2v"
+description = "Clean-room MPEG-2 video (ITU-T H.262 | ISO/IEC 13818-2) and MPEG-1 video (ISO/IEC 11172-2) decoder"
+version = "0.1.1"
+edition = "2024"
+license = "MIT OR Apache-2.0"
+rust-version = "1.95"
+
+[features]
+default = ["threads"]
+threads = ["dep:rayon"]
+
+[dependencies]
+thiserror = { version = "2" }
+rayon = { version = "1", optional = true }
+

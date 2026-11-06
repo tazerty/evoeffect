@@ -18,7 +18,7 @@ use serde_json::json;
 use crate::i18n::{tr, tr_args};
 use crate::icons::{self, Icon};
 use crate::theme::Tokens;
-use crate::{EffectcraftApp, widgets};
+use crate::{EvoEffectApp, widgets};
 
 pub const THUMB_W: usize = 96;
 pub const THUMB_H: usize = 54;
@@ -40,7 +40,7 @@ pub struct RecentEntry {
 }
 
 /// The recent projects, most recent first (Settings ▸ General ▸ recent items).
-pub fn recent_entries(prefs: &effectcraft_engine::prefs::Prefs) -> Vec<RecentEntry> {
+pub fn recent_entries(prefs: &evoeffect_engine::prefs::Prefs) -> Vec<RecentEntry> {
     prefs
         .recent_projects
         .iter()
@@ -128,7 +128,7 @@ pub fn format_size(bytes: u64) -> String {
 /// The Kind column: what a recent file is, by its extension, in the interface language.
 fn kind_of(path: &str) -> &'static str {
     tr(match std::path::Path::new(path).extension().and_then(|e| e.to_str()).map(str::to_ascii_lowercase).as_deref() {
-        Some("ecproj") => "EffectCraft project",
+        Some("evoeffect") => "EvoEffect project",
         Some("aep" | "aepx") => "After Effects project",
         Some("json" | "lottie") => "Lottie animation",
         _ => "Project",
@@ -179,7 +179,7 @@ pub fn decode_thumb(text: &str) -> Option<egui::ColorImage> {
 
 /// Store the viewer's frame as the open project's thumbnail after it is opened or saved (once per
 /// saved revision, when the viewer shows that revision).
-pub fn capture_thumbnail(app: &mut EffectcraftApp) {
+pub fn capture_thumbnail(app: &mut EvoEffectApp) {
     let s = &app.session;
     let (Some(path), Some(_)) = (s.path.clone(), s.config.as_ref()) else { return };
     if s.is_dirty() {
@@ -203,7 +203,7 @@ pub fn capture_thumbnail(app: &mut EffectcraftApp) {
     app.home_thumb_saved = Some(key);
 }
 
-fn thumb_texture(app: &mut EffectcraftApp, ctx: &egui::Context, path: &str) -> Option<egui::TextureHandle> {
+fn thumb_texture(app: &mut EvoEffectApp, ctx: &egui::Context, path: &str) -> Option<egui::TextureHandle> {
     if let Some(t) = app.home_thumbs.get(path) {
         return t.clone();
     }
@@ -222,7 +222,7 @@ fn thumb_texture(app: &mut EffectcraftApp, ctx: &egui::Context, path: &str) -> O
 const RAIL_W: f32 = 236.0;
 
 /// Draw the Home screen over `rect` (the whole workspace).
-pub fn show(app: &mut EffectcraftApp, ui: &mut egui::Ui, rect: Rect) {
+pub fn show(app: &mut EvoEffectApp, ui: &mut egui::Ui, rect: Rect) {
     let t = app.tokens;
     let ctx = ui.ctx().clone();
     let p = ui.painter().with_clip_rect(rect);
@@ -244,7 +244,7 @@ pub fn show(app: &mut EffectcraftApp, ui: &mut egui::Ui, rect: Rect) {
 }
 
 /// The left rail: New / Open Project and the pages (Evora E1/E7: no community links).
-fn rail_ui(app: &mut EffectcraftApp, ui: &mut egui::Ui, p: &egui::Painter, rail: Rect, actions: &mut Vec<(&'static str, serde_json::Value)>) {
+fn rail_ui(app: &mut EvoEffectApp, ui: &mut egui::Ui, p: &egui::Painter, rail: Rect, actions: &mut Vec<(&'static str, serde_json::Value)>) {
     let t = app.tokens;
     let x0 = rail.min.x + 16.0;
     let w = rail.width() - 32.0;
@@ -283,15 +283,15 @@ fn rail_ui(app: &mut EffectcraftApp, ui: &mut egui::Ui, p: &egui::Painter, rail:
         }
         y += 38.0;
     }
-    // Evora (E1, E7): the upstream community links (Discord, getartcraft.com, the app page, GitHub)
-    // and the sibling apps are not shown: the build carries no ArtCraft mark and the Evora shell
+    // Evora (E1, E7): the upstream community links (Discord, upstream-site.com, the app page, GitHub)
+    // and the sibling apps are not shown: the build carries no Upstream mark and the Evora shell
     // owns every external link.
     let _ = (y, x0, w);
 }
 
 /// The Home page: the welcome, quick-start tiles and the recent projects table.
 fn home_page(
-    app: &mut EffectcraftApp,
+    app: &mut EvoEffectApp,
     ui: &mut egui::Ui,
     p: &egui::Painter,
     area: Rect,
@@ -301,7 +301,7 @@ fn home_page(
     let t = app.tokens;
     let (x0, w) = (area.min.x, area.width());
     let mut y = area.min.y;
-    p.text(pos2(x0, y + 14.0), Align2::LEFT_CENTER, tr("Welcome to EffectCraft"), Tokens::semibold(26.0), t.tab_text_active);
+    p.text(pos2(x0, y + 14.0), Align2::LEFT_CENTER, tr("Welcome to EvoEffect"), Tokens::semibold(26.0), t.tab_text_active);
     y += 40.0;
     p.text(
         pos2(x0, y + 8.0),
@@ -434,7 +434,7 @@ fn home_page(
     }
 }
 
-fn run_actions(app: &mut EffectcraftApp, ctx: &egui::Context, actions: Vec<(&str, serde_json::Value)>) {
+fn run_actions(app: &mut EvoEffectApp, ctx: &egui::Context, actions: Vec<(&str, serde_json::Value)>) {
     for (id, params) in actions {
         let before = (app.session.path.clone(), app.session.revision);
         match crate::menus::invoke(app, ctx, id, params) {
@@ -464,9 +464,9 @@ mod tests {
 
     #[test]
     fn recent_list_comes_from_settings() {
-        let mut prefs = effectcraft_engine::prefs::Prefs::default();
-        prefs.push_recent("/projects/a/Alpha.ecproj");
-        prefs.push_recent("/projects/b/Beta.ecproj");
+        let mut prefs = evoeffect_engine::prefs::Prefs::default();
+        prefs.push_recent("/projects/a/Alpha.evoeffect");
+        prefs.push_recent("/projects/b/Beta.evoeffect");
         let e = recent_entries(&prefs);
         assert_eq!(e.len(), 2);
         assert_eq!((e[0].name.as_str(), e[0].folder.as_str(), e[0].index), ("Beta", "/projects/b", 0));
@@ -475,7 +475,7 @@ mod tests {
         // A real file has a date.
         let dir = std::env::temp_dir().join(format!("ec-home-{}", std::process::id()));
         std::fs::create_dir_all(&dir).unwrap();
-        let f = dir.join("Real.ecproj");
+        let f = dir.join("Real.evoeffect");
         std::fs::write(&f, "{}").unwrap();
         prefs.push_recent(&f.to_string_lossy());
         let e = recent_entries(&prefs);
@@ -502,7 +502,7 @@ mod tests {
         assert_eq!(back.pixels[THUMB_H / 2 * THUMB_W + THUMB_W / 2], Color32::from_rgb(10, 200, 30));
         assert_ne!(back.pixels[THUMB_W / 2], Color32::from_rgb(10, 200, 30));
         assert!(decode_thumb("abc").is_none());
-        assert_ne!(thumb_name("/a.ecproj"), thumb_name("/b.ecproj"));
+        assert_ne!(thumb_name("/a.evoeffect"), thumb_name("/b.evoeffect"));
     }
 
     #[test]
@@ -516,7 +516,7 @@ mod tests {
         assert_eq!(format_ago(now, now - 30 * 86_400), "2026-08-22");
         assert_eq!(format_ago(now, now + 100), "Just now");
         assert_eq!((format_size(900), format_size(13_000), format_size(3_500_000)), ("900 B".into(), "13 KB".into(), "3.3 MB".into()));
-        assert_eq!((kind_of("/a/B.ecproj"), kind_of("c.AEP"), kind_of("x")), ("EffectCraft project", "After Effects project", "Project"));
+        assert_eq!((kind_of("/a/B.evoeffect"), kind_of("c.AEP"), kind_of("x")), ("EvoEffect project", "After Effects project", "Project"));
         // After a week it is the date, whole even for a five-digit year.
         assert_eq!(format_ago(i64::MAX, 253_402_300_800), "10000-01-01");
     }
@@ -527,8 +527,8 @@ mod tests {
     fn home_text_follows_the_interface_language() {
         let now = 1_790_000_000;
         crate::i18n::set_current("zh-hans");
-        let shown = (format_ago(now, now - 5), format_ago(now, now - 3 * 3_600), format_ago(now, now - 90_000), kind_of("/a/B.ecproj"));
-        let catalog = (tr("Just now").to_string(), tr_args("{} hours ago", &[&3]), tr("Yesterday").to_string(), tr("EffectCraft project"));
+        let shown = (format_ago(now, now - 5), format_ago(now, now - 3 * 3_600), format_ago(now, now - 90_000), kind_of("/a/B.evoeffect"));
+        let catalog = (tr("Just now").to_string(), tr_args("{} hours ago", &[&3]), tr("Yesterday").to_string(), tr("EvoEffect project"));
         crate::i18n::set_current("en");
         assert_eq!(shown, catalog);
         assert_eq!(tr("Filter recent files"), "Filter recent files");
@@ -536,9 +536,9 @@ mod tests {
 
     #[test]
     fn home_screen_registers_its_controls() {
-        let mut s = effectcraft_engine::Session::default();
-        s.prefs.push_recent("/projects/Alpha.ecproj");
-        let mut app = EffectcraftApp::new(s);
+        let mut s = evoeffect_engine::Session::default();
+        s.prefs.push_recent("/projects/Alpha.evoeffect");
+        let mut app = EvoEffectApp::new(s);
         let ctx = egui::Context::default();
         crate::theme::install(&ctx, &app.tokens, crate::i18n::language(&app));
         ctx.run_ui(Default::default(), |_| {}).textures_delta.clear();
@@ -567,12 +567,12 @@ mod tests {
 
     #[test]
     fn learn_tab_lists_and_starts_tutorials() {
-        let mut app = EffectcraftApp::new(effectcraft_engine::Session::default());
+        let mut app = EvoEffectApp::new(evoeffect_engine::Session::default());
         app.ui.start_screen = true;
         app.ui.home_learn = true;
         let ctx = egui::Context::default();
         crate::theme::install(&ctx, &app.tokens, crate::i18n::language(&app));
-        let frame = |app: &mut EffectcraftApp| {
+        let frame = |app: &mut EvoEffectApp| {
             ctx.run_ui(Default::default(), |ui| {
                 app.auto.begin_frame();
                 show(app, ui, Rect::from_min_size(pos2(0.0, 0.0), vec2(1200.0, 800.0)));
@@ -583,7 +583,7 @@ mod tests {
         };
         frame(&mut app);
         frame(&mut app);
-        for t in effectcraft_engine::learn::tutorials() {
+        for t in evoeffect_engine::learn::tutorials() {
             assert!(app.auto.find(&format!("home.learn.{}.start", t.id)).is_some(), "{}", t.id);
         }
         assert!(app.auto.find("home.recent.0").is_none());

@@ -3,12 +3,12 @@
 
 use std::sync::Arc;
 
-use effectcraft_engine::Session;
-use effectcraft_engine::project::{Footage, FootageKind, ItemId, ItemKind};
-use effectcraft_engine::render::FootageSource;
-use effectcraft_render::Image;
-use effectcraft_time::Tick;
-use effectcraft_ui_egui::EffectcraftApp;
+use evoeffect_engine::Session;
+use evoeffect_engine::project::{Footage, FootageKind, ItemId, ItemKind};
+use evoeffect_engine::render::FootageSource;
+use evoeffect_render::Image;
+use evoeffect_time::Tick;
+use evoeffect_ui_egui::EvoEffectApp;
 use egui_kittest::Harness;
 use serde_json::json;
 
@@ -26,7 +26,7 @@ impl FootageSource for Stub {
     }
 }
 
-fn harness(broken: bool) -> (Harness<'static, EffectcraftApp>, ItemId) {
+fn harness(broken: bool) -> (Harness<'static, EvoEffectApp>, ItemId) {
     let mut s = Session { footage: Arc::new(Stub(broken)), ..Default::default() };
     s.execute("comp.new", json!({"name": "Main", "width": 320, "height": 180, "duration": 4})).unwrap();
     let footage = Footage {
@@ -41,7 +41,7 @@ fn harness(broken: bool) -> (Harness<'static, EffectcraftApp>, ItemId) {
     let clip = std::sync::Arc::make_mut(&mut s.project).add_item("Clip", Default::default(), None, ItemKind::Footage(footage));
     s.execute("layer.addItem", json!({"item": clip.0})).unwrap();
     s.execute("project.select", json!({"items": []})).unwrap();
-    let mut h = Harness::builder().with_size(egui::vec2(1600.0, 1000.0)).build_eframe(|_| EffectcraftApp::new(s));
+    let mut h = Harness::builder().with_size(egui::vec2(1600.0, 1000.0)).build_eframe(|_| EvoEffectApp::new(s));
     h.run_steps(4);
     (h, clip)
 }

@@ -1,0 +1,17 @@
+[package]
+name = "evofilm-media"
+description = "Media sources: probing, decoding traits, frame cache, generators, stills"
+version = "0.1.1"
+edition = "2024"
+license = "MIT OR Apache-2.0"
+rust-version = "1.95"
+
+[dependencies]
+evofilm-time = { path = "../evofilm-time" }
+evofilm-color = { path = "../evofilm-color" }
+evofilm-frame = { path = "../evofilm-frame" }
+rayon = { version = "1" }
+serde = { version = "1", features = ["derive", "rc"] }
+thiserror = { version = "2" }
+image = { version = "0.25", default-features = false, features = ["png", "jpeg", "gif", "webp", "tiff", "bmp"] }
+

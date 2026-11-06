@@ -1,6 +1,6 @@
 [package]
-name = "effectcraft-media"
-description = "Footage import: probing, stills, image sequences, video and audio via FilmCraft's pure-Rust codecs, memory-budgeted frame cache"
+name = "evoeffect-media"
+description = "Footage import: probing, stills, image sequences, video and audio via EvoFilm's pure-Rust codecs, memory-budgeted frame cache"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
@@ -10,22 +10,22 @@ rust-version.workspace = true
 workspace = true
 
 [dependencies]
-craft-docpath = { workspace = true }
-effectcraft-time = { workspace = true }
-effectcraft-project = { workspace = true }
-effectcraft-raster = { workspace = true }
-effectcraft-render = { workspace = true }
-effectcraft-psd = { workspace = true }
-effectcraft-svg = { workspace = true }
-effectcraft-pdf = { workspace = true }
-effectcraft-model = { workspace = true }
-filmcraft-codecs = { workspace = true }
-filmcraft-media = { workspace = true }
-filmcraft-isobmff = { workspace = true }
-filmcraft-frame = { workspace = true }
-filmcraft-color = { workspace = true }
-filmcraft-time = { workspace = true }
-# AIFF import (#1428): enables the aiff reader of filmcraft-codecs' symphonia.
+evo-docpath = { workspace = true }
+evoeffect-time = { workspace = true }
+evoeffect-project = { workspace = true }
+evoeffect-raster = { workspace = true }
+evoeffect-render = { workspace = true }
+evoeffect-psd = { workspace = true }
+evoeffect-svg = { workspace = true }
+evoeffect-pdf = { workspace = true }
+evoeffect-model = { workspace = true }
+evofilm-codecs = { workspace = true }
+evofilm-media = { workspace = true }
+evofilm-isobmff = { workspace = true }
+evofilm-frame = { workspace = true }
+evofilm-color = { workspace = true }
+evofilm-time = { workspace = true }
+# AIFF import (#1428): enables the aiff reader of evofilm-codecs' symphonia.
 symphonia = { workspace = true }
 exr = { workspace = true }
 gif = { workspace = true }

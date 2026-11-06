@@ -1,0 +1,14 @@
+[package]
+name = "evofilm-frame"
+description = "Video frames and audio buffers with explicit colour metadata"
+version = "0.1.1"
+edition = "2024"
+license = "MIT OR Apache-2.0"
+rust-version = "1.95"
+
+[dependencies]
+evofilm-color = { path = "../evofilm-color" }
+evofilm-time = { path = "../evofilm-time" }
+rayon = { version = "1" }
+serde = { version = "1", features = ["derive", "rc"] }
+

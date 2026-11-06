@@ -1,0 +1,11 @@
+[package]
+name = "evofilm-mpegts"
+description = "Clean-room MPEG-2 Systems (ISO/IEC 13818-1) demuxer: Transport Stream (188-byte, 192-byte M2TS) and Program Stream (MPEG-1/2 PS, VOB, MOD)"
+version = "0.1.1"
+edition = "2024"
+license = "MIT OR Apache-2.0"
+rust-version = "1.95"
+
+[dependencies]
+thiserror = { version = "2" }
+

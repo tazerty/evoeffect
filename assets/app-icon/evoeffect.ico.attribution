@@ -1,0 +1,8 @@
+asset:        evoeffect.ico
+title:        EvoEffect Windows app icon
+author:       EvoEffect contributors (drawing by the project owner in Upstream)
+source:       original work
+license:      MIT OR Apache-2.0
+license-file: assets/app-icon/LICENSE.txt
+added:        2026-10-02 by EvoEffect contributors (Claude agent, app icon)
+notes:        Rendered from evoeffect.svg (16-256 px) with resvg and packed by cargo xtask ico (packaging/icons.sh).

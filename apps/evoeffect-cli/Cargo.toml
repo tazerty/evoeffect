@@ -1,0 +1,25 @@
+[package]
+name = "evoeffect-cli"
+description = "EvoEffect headless CLI: render frames and sequences, run commands, MCP server"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[lints]
+workspace = true
+
+[[bin]]
+name = "evoeffect-cli"
+path = "src/main.rs"
+
+[dependencies]
+evoeffect-engine = { workspace = true }
+evoeffect-host = { workspace = true }
+evoeffect-automation = { workspace = true }
+evoeffect-ui-egui = { workspace = true }
+evoeffect-render = { workspace = true }
+evoeffect-gpu = { workspace = true }
+evoeffect-time = { workspace = true }
+serde_json = { workspace = true }
+image = { workspace = true }
+cpu-time = "1"

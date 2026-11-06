@@ -1,12 +1,12 @@
 {
   "mcpServers": {
-    "effectcraft": {
+    "evoeffect": {
       "command": "cargo",
-      "args": ["run", "--quiet", "--release", "-p", "effectcraft-cli", "--", "mcp", "--demo"]
+      "args": ["run", "--quiet", "--release", "-p", "evoeffect-cli", "--", "mcp", "--demo"]
     },
-    "effectcraft-app": {
+    "evoeffect-app": {
       "command": "cargo",
-      "args": ["run", "--quiet", "--release", "-p", "effectcraft-cli", "--", "mcp", "--bridge", "9877"]
+      "args": ["run", "--quiet", "--release", "-p", "evoeffect-cli", "--", "mcp", "--bridge", "9877"]
     }
   }
 }

@@ -12,7 +12,7 @@
 //! starts it after every open ([`Session::check_footage_on_open`]); agents and the CLI run it
 //! with `wait: true`.
 
-use effectcraft_project::{Footage, FootageKind, ItemId, ItemKind};
+use evoeffect_project::{Footage, FootageKind, ItemId, ItemKind};
 use serde_json::{Value, json};
 
 use crate::Session;
@@ -227,7 +227,7 @@ mod tests {
         let clip = dir.join("media").join("ec-relative-clip.png");
         std::fs::write(&clip, b"x").unwrap();
         let mut s = session_with(&["media/ec-relative-clip.png", "/nonexistent/ec/abs.png", "media/ec-relative-gone.png"]);
-        let path = dir.join("p.ecproj");
+        let path = dir.join("p.evoeffect");
         s.execute("file.saveAs", json!({"path": path.to_string_lossy()})).unwrap();
         let mut o = Session::default();
         o.execute("file.open", json!({"path": path.to_string_lossy()})).unwrap();
@@ -257,7 +257,7 @@ mod tests {
         std::fs::write(d.join("Job/shots/a.png"), b"x").unwrap();
         // Saved on another machine: the footage sat next to the project in /Users/x/Job.
         let mut s = session_with(&["/Users/x/Job/shots/a.png", "/Users/x/elsewhere/b.png"]);
-        let path = d.join("Job").join("p.ecproj");
+        let path = d.join("Job").join("p.evoeffect");
         s.execute("file.saveAs", json!({"path": path.to_string_lossy()})).unwrap();
         let mut o = Session::default();
         o.execute("file.open", json!({"path": path.to_string_lossy()})).unwrap();
@@ -280,7 +280,7 @@ mod tests {
     #[test]
     fn open_starts_the_check_when_asked() {
         let mut s = session_with(&["/nonexistent/ec/a.mov"]);
-        let path = std::env::temp_dir().join(format!("ec-footage-open-{}.ecproj", std::process::id()));
+        let path = std::env::temp_dir().join(format!("ec-footage-open-{}.evoeffect", std::process::id()));
         s.execute("file.saveAs", json!({"path": path.to_string_lossy()})).unwrap();
         let mut o = Session { check_footage_on_open: true, ..Default::default() };
         o.execute("file.open", json!({"path": path.to_string_lossy()})).unwrap();

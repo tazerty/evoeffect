@@ -1,4 +1,4 @@
-// EffectCraft scripting: an After Effects-style object model over the engine.
+// EvoEffect scripting: an After Effects-style object model over the engine.
 //
 // Written from the behaviour the After Effects Scripting Guide documents (object names,
 // attributes, methods). Reads go through `__query(kind, json)`; every edit runs an engine command
@@ -140,8 +140,8 @@ var $ = {
   level: 0,
   engineName: "boa",
   get fileName() { return __get("app").scriptName; },
-  get os() { return "EffectCraft"; },
-  get version() { return "EffectCraft scripting"; },
+  get os() { return "EvoEffect"; },
+  get version() { return "EvoEffect scripting"; },
   get locale() { return "en_US"; },
   // Evaluates the file in the global scope and returns its last value (`timeout` is ignored).
   evalFile: function (file, timeout) { return __evalFile(__str(file)); },
@@ -150,7 +150,7 @@ var $ = {
 // ------------------------------------------------------------------ BridgeTalk
 
 // Which application a script runs in, for scripts and frameworks that ask during initialisation.
-// EffectCraft names itself rather than posing as another application; messages to other
+// EvoEffect names itself rather than posing as another application; messages to other
 // applications aren't supported.
 function BridgeTalk() {
   if (!(this instanceof BridgeTalk)) return new BridgeTalk();
@@ -166,22 +166,22 @@ function BridgeTalk() {
   this.onTimeout = null;
 }
 BridgeTalk.prototype.send = function () {
-  throw __err("BridgeTalk: sending messages to other applications is not supported in EffectCraft");
+  throw __err("BridgeTalk: sending messages to other applications is not supported in EvoEffect");
 };
 BridgeTalk.prototype.sendResult = BridgeTalk.prototype.send;
 BridgeTalk.prototype.toString = function () { return "[object BridgeTalk]"; };
-BridgeTalk.appName = "effectcraft";
+BridgeTalk.appName = "evoeffect";
 Object.defineProperty(BridgeTalk, "appVersion", { get: function () { return __get("app").buildName; } });
-Object.defineProperty(BridgeTalk, "appSpecifier", { get: function () { return "effectcraft-" + BridgeTalk.appVersion; } });
+Object.defineProperty(BridgeTalk, "appSpecifier", { get: function () { return "evoeffect-" + BridgeTalk.appVersion; } });
 BridgeTalk.appLocale = "en_US";
 BridgeTalk.appInstance = "";
 BridgeTalk.appStatus = "idle";
 BridgeTalk.onReceive = null;
-BridgeTalk.__isSelf = function (spec) { return String(spec === undefined || spec === null ? "" : spec).split("-")[0].toLowerCase() === "effectcraft"; };
+BridgeTalk.__isSelf = function (spec) { return String(spec === undefined || spec === null ? "" : spec).split("-")[0].toLowerCase() === "evoeffect"; };
 BridgeTalk.isRunning = function (spec) { return BridgeTalk.__isSelf(spec); };
 BridgeTalk.launch = function (spec) { return BridgeTalk.__isSelf(spec); };
 BridgeTalk.getSpecifier = function (name) { return BridgeTalk.__isSelf(name) ? BridgeTalk.appSpecifier : null; };
-BridgeTalk.getDisplayName = function (spec) { return BridgeTalk.__isSelf(spec) ? "EffectCraft" : null; };
+BridgeTalk.getDisplayName = function (spec) { return BridgeTalk.__isSelf(spec) ? "EvoEffect" : null; };
 BridgeTalk.getTargets = function () { return [BridgeTalk.appName]; };
 BridgeTalk.getStatus = function (spec) { return spec === undefined || BridgeTalk.__isSelf(spec) ? "IDLE" : "ISNOTINSTALLED"; };
 BridgeTalk.bringToFront = function () {};
@@ -281,7 +281,7 @@ File.openDialog = function () { return null; };
 File.saveDialog = function () { return null; };
 File.decode = function (s) { return decodeURIComponent(s); };
 File.encode = function (s) { return encodeURIComponent(s); };
-File.fs = "EffectCraft";
+File.fs = "EvoEffect";
 
 function Folder(path) {
   if (!(this instanceof Folder)) return new Folder(path);
@@ -944,7 +944,7 @@ Property.prototype.property = function () { return null; };
     return __call(id, params);
   };
   P.removeKey = function (i) { this.__keyCmd(i, "keys.delete"); };
-  // EffectCraft extension: remove an inclusive range with one engine edit instead of
+  // EvoEffect extension: remove an inclusive range with one engine edit instead of
   // cloning the project for every removed key. Indices are one-based as in removeKey.
   P.removeKeys = function (first, last) {
     var keys = this.__keys();
@@ -1614,7 +1614,7 @@ CompItem.prototype.constructor = CompItem;
   };
   P.openInViewer = function () { __call("comp.open", { comp: this.__id }); return null; };
   P.duplicate = function () { return __item(__call("project.duplicate", { items: [this.__id] }).items[0]); };
-  // Essential Graphics (templates are EffectCraft's open .ectemplate files).
+  // Essential Graphics (templates are EvoEffect's open .evoeffecttemplate files).
   P.__eg = function () { return __call("essential.list", { comp: this.__id }); };
   P.__controllers = function () {
     var out = [];
@@ -1655,7 +1655,7 @@ CompItem.prototype.constructor = CompItem;
   P.exportAsMotionGraphicsTemplate = function (overwrite, path) {
     var f = __str(path);
     if (!f) return false;
-    if (!/\.[A-Za-z0-9]+$/.test(f)) f += ".ectemplate";
+    if (!/\.[A-Za-z0-9]+$/.test(f)) f += ".evoeffecttemplate";
     if (!overwrite && JSON.parse(__file("exists", f)) === true) return false;
     if (this.__controllers().length === 0) return false;
     // The file gate applies to templates too.
@@ -2016,7 +2016,7 @@ var app = {
   endSuppressDialogs: function () {},
   purge: function () { __call("edit.purge", { what: "all" }); },
   findMenuCommandId: function (name) {
-    // Well-known After Effects ids must not shift when EffectCraft registers a command.
+    // Well-known After Effects ids must not shift when EvoEffect registers a command.
     if (String(name) === "Undo") return 16;
     return __get("menuCommandId", { name: String(name) });
   },
@@ -2036,7 +2036,7 @@ var app = {
   pauseWatchFolder: function () {},
   endWatchFolder: function () {},
   parseSwatchFile: function () { throw __err("parseSwatchFile is not supported"); },
-  // EffectCraft: run any engine command by id with parameters (see `command.list`).
+  // EvoEffect: run any engine command by id with parameters (see `command.list`).
   run: function (id, params) { return __call(String(id), params || {}); },
   toString: function () { return "[object Application]"; },
 };

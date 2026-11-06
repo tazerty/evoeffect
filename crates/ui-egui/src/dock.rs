@@ -5,7 +5,7 @@
 use egui::{Align2, Rect, Sense, Stroke, pos2, vec2};
 use serde::{Deserialize, Serialize};
 
-use craft_ui::layout::{ResizeHandle, ResizeHandleStyle, SplitAxis, SplitSize as SharedSplitSize, split_rect};
+use evo_ui::layout::{ResizeHandle, ResizeHandleStyle, SplitAxis, SplitSize as SharedSplitSize, split_rect};
 
 use crate::icons::{self, Icon};
 use crate::theme::Tokens;
@@ -629,13 +629,13 @@ pub enum Zone {
 }
 
 impl Zone {
-    pub(crate) fn shared(self) -> craft_ui::docking::Zone {
+    pub(crate) fn shared(self) -> evo_ui::docking::Zone {
         match self {
-            Self::Center => craft_ui::docking::Zone::Center,
-            Self::Left => craft_ui::docking::Zone::Left,
-            Self::Right => craft_ui::docking::Zone::Right,
-            Self::Top => craft_ui::docking::Zone::Top,
-            Self::Bottom => craft_ui::docking::Zone::Bottom,
+            Self::Center => evo_ui::docking::Zone::Center,
+            Self::Left => evo_ui::docking::Zone::Left,
+            Self::Right => evo_ui::docking::Zone::Right,
+            Self::Top => evo_ui::docking::Zone::Top,
+            Self::Bottom => evo_ui::docking::Zone::Bottom,
         }
     }
 
@@ -655,18 +655,18 @@ impl Zone {
 /// strip and the middle of the group are Center; within a quarter of the size from an edge,
 /// the nearest edge.
 pub fn drop_zone(rect: Rect, tab_h: f32, pos: egui::Pos2) -> Zone {
-    match craft_ui::docking::drop_zone(rect, tab_h, pos) {
-        Some(craft_ui::docking::Zone::Left) => Zone::Left,
-        Some(craft_ui::docking::Zone::Right) => Zone::Right,
-        Some(craft_ui::docking::Zone::Top) => Zone::Top,
-        Some(craft_ui::docking::Zone::Bottom) => Zone::Bottom,
+    match evo_ui::docking::drop_zone(rect, tab_h, pos) {
+        Some(evo_ui::docking::Zone::Left) => Zone::Left,
+        Some(evo_ui::docking::Zone::Right) => Zone::Right,
+        Some(evo_ui::docking::Zone::Top) => Zone::Top,
+        Some(evo_ui::docking::Zone::Bottom) => Zone::Bottom,
         _ => Zone::Center,
     }
 }
 
 /// The shared preview region, or an empty rectangle for invalid geometry.
 pub fn zone_rect(rect: Rect, zone: Zone) -> Rect {
-    craft_ui::docking::zone_rect(rect, zone.shared()).unwrap_or(Rect::NOTHING)
+    evo_ui::docking::zone_rect(rect, zone.shared()).unwrap_or(Rect::NOTHING)
 }
 
 /// A panel group floating over the dock (undocked).
@@ -836,11 +836,11 @@ pub struct Layout {
 
 impl Layout {
     /// Apply a shared transaction without replacing the persisted app schema.
-    pub fn apply(&mut self, action: craft_ui::docking::Action<PanelKind>) -> Result<(), String> {
+    pub fn apply(&mut self, action: evo_ui::docking::Action<PanelKind>) -> Result<(), String> {
         crate::dock_shared::encode(&self.root, &self.floating)?.validate().map_err(|error| error.to_string())?;
         let moving_to_float = match &action {
-            craft_ui::docking::Action::Float { panel, .. } => Some(*panel),
-            craft_ui::docking::Action::Move { panel, anchor, .. } if self.floating.iter().any(|group| group.panels.contains(anchor)) => Some(*panel),
+            evo_ui::docking::Action::Float { panel, .. } => Some(*panel),
+            evo_ui::docking::Action::Move { panel, anchor, .. } if self.floating.iter().any(|group| group.panels.contains(anchor)) => Some(*panel),
             _ => None,
         };
         if moving_to_float.is_some_and(|panel| self.root.contains(panel) && self.root.panel_count() <= 1) {
@@ -851,7 +851,7 @@ impl Layout {
 
     /// Undock an existing panel; the final docked panel stays in the workspace.
     pub fn float(&mut self, p: PanelKind, rect: [f32; 4]) -> bool {
-        self.apply(craft_ui::docking::Action::Float { panel: p, rect }).is_ok()
+        self.apply(evo_ui::docking::Action::Float { panel: p, rect }).is_ok()
     }
 
     /// Close an existing floating panel and collapse its empty group.
@@ -864,7 +864,7 @@ impl Layout {
         if !crate::dock_shared::valid_tree(&self.root) {
             return false;
         }
-        self.apply(craft_ui::docking::Action::Move { panel: p, anchor, placement: craft_ui::docking::Placement::Tab { before } }).is_ok()
+        self.apply(evo_ui::docking::Action::Move { panel: p, anchor, placement: evo_ui::docking::Placement::Tab { before } }).is_ok()
     }
 
     /// Dock a panel beside an anchor; floating destinations accept tabs only.
@@ -872,7 +872,7 @@ impl Layout {
         if !crate::dock_shared::valid_tree(&self.root) {
             return false;
         }
-        self.apply(craft_ui::docking::Action::Move { panel: p, anchor, placement: craft_ui::docking::Placement::Split(zone.shared()) }).is_ok()
+        self.apply(evo_ui::docking::Action::Move { panel: p, anchor, placement: evo_ui::docking::Placement::Split(zone.shared()) }).is_ok()
     }
 
     pub fn contains(&self, p: PanelKind) -> bool {
@@ -965,7 +965,7 @@ pub fn layout_with_actions(
     path: &str,
     out: &mut Vec<Group>,
     reg: &mut crate::automation::Registry,
-    actions: &mut Vec<craft_ui::docking::Action<PanelKind>>,
+    actions: &mut Vec<evo_ui::docking::Action<PanelKind>>,
 ) {
     layout_inner(ui, node, rect, t, path, &[], out, reg, actions);
 }
@@ -979,7 +979,7 @@ fn layout_inner(
     tree_path: &[bool],
     out: &mut Vec<Group>,
     reg: &mut crate::automation::Registry,
-    actions: &mut Vec<craft_ui::docking::Action<PanelKind>>,
+    actions: &mut Vec<evo_ui::docking::Action<PanelKind>>,
 ) {
     match node {
         DockNode::Tabs { panels, active } => {
@@ -1020,7 +1020,7 @@ fn layout_inner(
                     if before.height != after.height
                         && let Some(panel) = after.shown()
                     {
-                        actions.push(craft_ui::docking::Action::ResizeStack { panel, height: after.height });
+                        actions.push(evo_ui::docking::Action::ResizeStack { panel, height: after.height });
                     }
                 }
             }
@@ -1033,7 +1033,7 @@ fn layout_inner(
             if response.delta != 0.0
                 && let Some(resized) = split.resized(size.shared(), response.delta, 40.0)
             {
-                actions.push(craft_ui::docking::Action::ResizeSplit { path: tree_path.to_vec(), size: resized });
+                actions.push(evo_ui::docking::Action::ResizeSplit { path: tree_path.to_vec(), size: resized });
             }
             let mut first_path = tree_path.to_vec();
             first_path.push(false);
@@ -1547,7 +1547,7 @@ mod tests {
         assert!(workspace("Color").contains(PanelKind::EffectControls));
         assert!(!workspace_floating("Undocked Panels").is_empty());
         // Every built-in workspace is in Window ▸ Workspace.
-        let menu: Vec<String> = effectcraft_engine::menus::entries()
+        let menu: Vec<String> = evoeffect_engine::menus::entries()
             .into_iter()
             .filter(|(_, e)| e.command == "window.workspace")
             .filter_map(|(_, e)| e.params.get("name").and_then(|v| v.as_str()).map(str::to_string))

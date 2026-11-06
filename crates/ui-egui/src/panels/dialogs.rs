@@ -2,14 +2,14 @@
 //! Composition Settings, Solid Settings and the command palette (Camera/Light Settings live in `dialogs_3d`).
 
 use crate::i18n::{tr, tr_args};
-use effectcraft_engine::project::{ItemId, ItemKind, LayerId, LayerSource};
+use evoeffect_engine::project::{ItemId, ItemKind, LayerId, LayerSource};
 use egui::{Align2, Color32, Rect, Sense, pos2, vec2};
 use serde_json::{Value, json};
 
 pub use super::forms::{Field, form, info, open_form};
 use crate::icons::{self, Icon};
 use crate::theme::Tokens;
-use crate::{Dialog, EffectcraftApp};
+use crate::{Dialog, EvoEffectApp};
 
 pub use super::comp_settings::CompDraft;
 
@@ -38,7 +38,7 @@ pub struct DialogState {
     /// Settings dialog page id (`general`, `appearance`…).
     pub settings_page: String,
     /// Settings when the dialog opened (Cancel restores them).
-    pub prefs_snapshot: Option<effectcraft_engine::prefs::Prefs>,
+    pub prefs_snapshot: Option<evoeffect_engine::prefs::Prefs>,
     /// Keyboard Shortcuts editor.
     pub shortcuts: super::shortcut_editor::EditorState,
     /// The open parameter form.
@@ -70,7 +70,7 @@ pub struct DialogState {
     pub delete_template: Option<(String, String)>,
 }
 
-pub fn open_new_comp(app: &mut EffectcraftApp) {
+pub fn open_new_comp(app: &mut EvoEffectApp) {
     let n = app.session.project.comps().count() + 1;
     let last = app.dialog_state.last_new_comp.clone().unwrap_or_default();
     app.dialog_state.comp =
@@ -79,13 +79,13 @@ pub fn open_new_comp(app: &mut EffectcraftApp) {
     app.dialog = Some(Dialog::NewComp);
 }
 
-pub fn open_comp_settings(app: &mut EffectcraftApp) -> Result<(), String> {
+pub fn open_comp_settings(app: &mut EvoEffectApp) -> Result<(), String> {
     let cid = app.session.active_comp_id().ok_or("no composition is open")?;
     open_comp_settings_for(app, cid)
 }
 
 /// Composition Settings on `cid`, open in the viewer or not.
-pub fn open_comp_settings_for(app: &mut EffectcraftApp, cid: ItemId) -> Result<(), String> {
+pub fn open_comp_settings_for(app: &mut EvoEffectApp, cid: ItemId) -> Result<(), String> {
     let c = app.session.project.comp(cid).ok_or("no composition")?;
     app.dialog_state.comp = CompDraft {
         name: app.session.project.item(cid).map(|i| i.name.clone()).unwrap_or_default(),
@@ -102,7 +102,7 @@ pub fn open_comp_settings_for(app: &mut EffectcraftApp, cid: ItemId) -> Result<(
         adaptive_limit: c.motion_blur_adaptive_limit,
         preserve_frame_rate: c.preserve_frame_rate,
         preserve_resolution: c.preserve_resolution,
-        advanced_3d: c.renderer == effectcraft_engine::project::Renderer::Advanced3D,
+        advanced_3d: c.renderer == evoeffect_engine::project::Renderer::Advanced3D,
         resolution: c.resolution,
         ..Default::default()
     };
@@ -112,9 +112,9 @@ pub fn open_comp_settings_for(app: &mut EffectcraftApp, cid: ItemId) -> Result<(
     Ok(())
 }
 
-pub fn open_new_solid(app: &mut EffectcraftApp) -> Result<(), String> {
+pub fn open_new_solid(app: &mut EvoEffectApp) -> Result<(), String> {
     let c = app.session.active_comp().ok_or("no composition is open")?;
-    let n = app.session.project.items.values().filter(|i| matches!(i.kind, effectcraft_engine::project::ItemKind::Solid(_))).count() + 1;
+    let n = app.session.project.items.values().filter(|i| matches!(i.kind, evoeffect_engine::project::ItemKind::Solid(_))).count() + 1;
     let d = &mut app.dialog_state;
     d.solid_name = format!("Solid {n}");
     d.solid_size = [c.width, c.height];
@@ -128,7 +128,7 @@ pub fn open_new_solid(app: &mut EffectcraftApp) -> Result<(), String> {
 }
 
 /// Layer ▸ Layer Settings on a solid or adjustment layer: Solid Settings on its solid.
-fn open_solid_settings(app: &mut EffectcraftApp, layer: u64, item: ItemId) -> Result<(), String> {
+fn open_solid_settings(app: &mut EvoEffectApp, layer: u64, item: ItemId) -> Result<(), String> {
     let s = &app.session;
     let it = s.project.item(item).ok_or("the layer's solid is missing")?;
     let ItemKind::Solid(so) = &it.kind else { return Err("not a solid".into()) };
@@ -144,7 +144,7 @@ fn open_solid_settings(app: &mut EffectcraftApp, layer: u64, item: ItemId) -> Re
 /// Layer ▸ Layer Settings without parameters: Solid Settings for solids and adjustment layers,
 /// the layer's name for nulls (cameras and lights: `dialogs_3d::route`). Returns true when a
 /// dialog opened.
-pub fn route_layer_settings(app: &mut EffectcraftApp, id: &str, params: &Value) -> Result<bool, String> {
+pub fn route_layer_settings(app: &mut EvoEffectApp, id: &str, params: &Value) -> Result<bool, String> {
     if id != "layer.settings" || !params.as_object().is_none_or(|m| m.keys().all(|k| k == "layer")) {
         return Ok(false);
     }
@@ -234,7 +234,7 @@ pub(crate) fn above_footer(ui: &mut egui::Ui, height: f32, footer: impl FnOnce(&
     (body, body_h)
 }
 
-pub fn show(app: &mut EffectcraftApp, ctx: &egui::Context) {
+pub fn show(app: &mut EvoEffectApp, ctx: &egui::Context) {
     let Some(d) = app.dialog else { return };
     let t = app.tokens;
     match d {
@@ -273,11 +273,11 @@ const ABOUT_TABS: [(&str, &str); 3] = [("About", "about"), ("Contributors", "con
 /// Height of the Contributors / Models tab bodies (they scroll inside it).
 const CREDITS_HEIGHT: f32 = 380.0;
 
-fn about(app: &mut EffectcraftApp, ctx: &egui::Context, t: &Tokens) {
+fn about(app: &mut EvoEffectApp, ctx: &egui::Context, t: &Tokens) {
     let mut close = false;
     let mut cmd: Option<&str> = None;
     let tab_id = egui::Id::new("about_tab");
-    modal(ctx, "About EffectCraft", vec2(680.0, 520.0), t, |ui| {
+    modal(ctx, "About EvoEffect", vec2(680.0, 520.0), t, |ui| {
         let mut tab = ui.data_mut(|d| d.get_temp::<usize>(tab_id)).unwrap_or(0);
         ui.horizontal(|ui| {
             for (i, (label, id)) in ABOUT_TABS.iter().enumerate() {
@@ -324,16 +324,16 @@ fn about(app: &mut EffectcraftApp, ctx: &egui::Context, t: &Tokens) {
     }
 }
 
-/// The About tab: logo, version and blurb. Evora (E1, E7): no ArtCraft name or mark and no
+/// The About tab: logo, version and blurb. Evora (E1, E7): no Upstream name or mark and no
 /// community links (Discord, website, app page, GitHub); the plain-text mention of the upstream
 /// project and its licences lives in the Evora shell's "Mentions et licences" page and in the
 /// LICENSES folder shipped with the build.
-fn about_main(_app: &mut EffectcraftApp, ui: &mut egui::Ui, t: &Tokens, _cmd: &mut Option<&'static str>) {
+fn about_main(_app: &mut EvoEffectApp, ui: &mut egui::Ui, t: &Tokens, _cmd: &mut Option<&'static str>) {
     let (r, _) = ui.allocate_exact_size(vec2(ui.available_width(), 96.0), Sense::hover());
     let p = ui.painter();
     p.rect_filled(r, 10.0, Color32::from_rgb(0x1b, 0x22, 0x3c));
     crate::header::paint_logo(p, Rect::from_min_size(r.min + vec2(18.0, 20.0), vec2(56.0, 56.0)));
-    p.text(r.min + vec2(90.0, 34.0), Align2::LEFT_CENTER, "EffectCraft", Tokens::semibold(24.0), Color32::WHITE);
+    p.text(r.min + vec2(90.0, 34.0), Align2::LEFT_CENTER, "EvoEffect", Tokens::semibold(24.0), Color32::WHITE);
     p.text(
         r.min + vec2(90.0, 62.0),
         Align2::LEFT_CENTER,
@@ -342,10 +342,10 @@ fn about_main(_app: &mut EffectcraftApp, ui: &mut egui::Ui, t: &Tokens, _cmd: &m
         t.text_dim,
     );
     ui.add_space(12.0);
-    ui.label(tr("A clean-room, open-source compositor for motion graphics and visual effects. This modified build is based on EffectCraft (MIT OR Apache-2.0); its licences and notices ship with it."));
+    ui.label(tr("A clean-room, open-source compositor for motion graphics and visual effects. This modified build is based on EvoEffect (MIT OR Apache-2.0); its licences and notices ship with it."));
 }
 
-fn comp_settings(app: &mut EffectcraftApp, ctx: &egui::Context, t: &Tokens, existing: bool) {
+fn comp_settings(app: &mut EvoEffectApp, ctx: &egui::Context, t: &Tokens, existing: bool) {
     let mut d = app.dialog_state.comp.clone();
     let mut result = None;
     let custom = app.session.prefs.comp_presets.clone();
@@ -395,7 +395,7 @@ fn comp_settings(app: &mut EffectcraftApp, ctx: &egui::Context, t: &Tokens, exis
 
 /// The Resolution chosen in Composition Settings, set as the Composition panel's popup sets it:
 /// saved with the project but no undo step, so it stays out of `comp.new` / `comp.settings`.
-fn set_resolution(app: &mut EffectcraftApp, cid: u64, r: effectcraft_engine::project::Resolution) -> effectcraft_engine::Result<Value> {
+fn set_resolution(app: &mut EvoEffectApp, cid: u64, r: evoeffect_engine::project::Resolution) -> evoeffect_engine::Result<Value> {
     match r.factor() {
         None => app.session.execute("view.res.auto", json!({"comp": cid})),
         Some(n) => app.session.execute("view.res.custom", json!({"comp": cid, "factor": n})),
@@ -404,7 +404,7 @@ fn set_resolution(app: &mut EffectcraftApp, cid: u64, r: effectcraft_engine::pro
 
 /// One frame of the open dialog with `key` pressed.
 #[cfg(test)]
-pub(crate) fn press_key(app: &mut EffectcraftApp, ctx: &egui::Context, key: egui::Key, modifiers: egui::Modifiers) {
+pub(crate) fn press_key(app: &mut EvoEffectApp, ctx: &egui::Context, key: egui::Key, modifiers: egui::Modifiers) {
     let mut raw = egui::RawInput::default();
     raw.events.push(egui::Event::Key { key, physical_key: None, pressed: true, repeat: false, modifiers });
     let mut out = ctx.run_ui(raw, |ui| {
@@ -417,7 +417,7 @@ pub(crate) fn press_key(app: &mut EffectcraftApp, ctx: &egui::Context, key: egui
 /// The letter that answers the open confirmation with Cmd (Ctrl elsewhere): Cmd+D is Delete in
 /// Delete Items, Delete Template and Delete Preset, Cmd+R is Revert in Revert Project. The native menu bar hands these keys back
 /// while the prompt is open ([`crate::native_menu::activate`]).
-pub(crate) fn command_key(app: &EffectcraftApp) -> Option<egui::Key> {
+pub(crate) fn command_key(app: &EvoEffectApp) -> Option<egui::Key> {
     match app.dialog? {
         Dialog::DeleteItems | Dialog::DeleteTemplate => Some(egui::Key::D),
         Dialog::Shortcuts if super::shortcut_editor::confirming(app) => Some(egui::Key::D),
@@ -437,7 +437,7 @@ pub(crate) fn ui_enter(ctx: &egui::Context) -> bool {
 }
 
 /// Solid Settings: a new solid (Layer ▸ New ▸ Solid…) or the layer's solid (Layer Settings).
-fn solid(app: &mut EffectcraftApp, ctx: &egui::Context, t: &Tokens) {
+fn solid(app: &mut EvoEffectApp, ctx: &egui::Context, t: &Tokens) {
     let (mut close, mut ok) = (false, false);
     let ds = &app.dialog_state;
     let (mut name, mut color, mut size, mut par, mut affect_all) =
@@ -567,7 +567,7 @@ fn solid_params(d: &DialogState) -> Value {
 }
 
 /// ⌘⇧P: fuzzy search over every command (engine + UI) and effect.
-fn palette(app: &mut EffectcraftApp, ctx: &egui::Context, t: &Tokens) {
+fn palette(app: &mut EvoEffectApp, ctx: &egui::Context, t: &Tokens) {
     let mut q = app.dialog_state.palette_query.clone();
     let mut run: Option<(String, serde_json::Value)> = None;
     let mut close = false;
@@ -577,7 +577,7 @@ fn palette(app: &mut EffectcraftApp, ctx: &egui::Context, t: &Tokens) {
             .filter(|m| m.enabled)
             .map(|m| (m.path.join(" ▸ ") + " ▸ " + &m.label, m.id, if m.params.is_null() { json!({}) } else { m.params }, m.shortcut.unwrap_or_default()))
             .collect();
-        for c in effectcraft_engine::command_specs().iter().filter(|c| c.menu.is_empty() && c.journal && c.params == "{}") {
+        for c in evoeffect_engine::command_specs().iter().filter(|c| c.menu.is_empty() && c.journal && c.params == "{}") {
             if app.session.is_enabled(c.id) {
                 v.push((c.label.to_string(), c.id.to_string(), json!({}), c.shortcut.unwrap_or("").to_string()));
             }
@@ -652,15 +652,15 @@ fn palette(app: &mut EffectcraftApp, ctx: &egui::Context, t: &Tokens) {
 mod tests {
     use super::*;
 
-    fn app() -> (EffectcraftApp, egui::Context) {
+    fn app() -> (EvoEffectApp, egui::Context) {
         let ctx = egui::Context::default();
-        let mut app = EffectcraftApp::new(effectcraft_engine::Session::default());
+        let mut app = EvoEffectApp::new(evoeffect_engine::Session::default());
         crate::theme::install(&ctx, &app.tokens, crate::i18n::language(&app));
         app.session.execute("comp.new", json!({"name": "Main", "width": 640, "height": 360})).unwrap();
         (app, ctx)
     }
 
-    fn frame(app: &mut EffectcraftApp, ctx: &egui::Context) {
+    fn frame(app: &mut EvoEffectApp, ctx: &egui::Context) {
         let mut out = ctx.run_ui(Default::default(), |ui| {
             app.auto.begin_frame();
             show(app, ui.ctx());
@@ -669,7 +669,7 @@ mod tests {
     }
 
     /// One frame with `events` in its input; returns what it asked the platform to do.
-    fn frame_with(app: &mut EffectcraftApp, ctx: &egui::Context, events: Vec<egui::Event>) -> egui::FullOutput {
+    fn frame_with(app: &mut EvoEffectApp, ctx: &egui::Context, events: Vec<egui::Event>) -> egui::FullOutput {
         let input = egui::RawInput { events, ..Default::default() };
         let mut out = ctx.run_ui(input, |ui| {
             app.auto.begin_frame();
@@ -718,7 +718,7 @@ mod tests {
         assert!(frame_with(&mut app, &ctx, vec![]).platform_output.ime.is_some(), "and takes it back");
     }
 
-    fn solid_item(app: &EffectcraftApp, l: u64) -> ItemId {
+    fn solid_item(app: &EvoEffectApp, l: u64) -> ItemId {
         match app.session.active_comp().unwrap().layer(LayerId(l)).unwrap().source {
             LayerSource::Solid { item } => item,
             _ => panic!("not a solid"),
@@ -810,7 +810,7 @@ mod tests {
     }
 
     /// One frame of Composition Settings (or New Composition) with Enter pressed: OK.
-    fn press_ok(app: &mut EffectcraftApp, ctx: &egui::Context, existing: bool) {
+    fn press_ok(app: &mut EvoEffectApp, ctx: &egui::Context, existing: bool) {
         let t = app.tokens;
         let mut out = ctx.run_ui(Default::default(), |ui| {
             app.auto.begin_frame();
@@ -827,7 +827,7 @@ mod tests {
     /// it is no undo step: the settings are one step, and undoing them keeps the Resolution.
     #[test]
     fn composition_settings_resolution_applies_on_ok_outside_the_undo_history() {
-        use effectcraft_engine::project::Resolution;
+        use evoeffect_engine::project::Resolution;
         let (mut app, ctx) = app();
         let cid = app.session.active_comp_id().unwrap();
         app.session.execute("view.res.third", json!({})).unwrap();

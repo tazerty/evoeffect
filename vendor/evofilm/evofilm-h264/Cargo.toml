@@ -1,0 +1,17 @@
+[package]
+name = "evofilm-h264"
+description = "Clean-room pure-Rust H.264/AVC decoder (ITU-T H.264)"
+version = "0.1.1"
+edition = "2024"
+license = "MIT OR Apache-2.0"
+rust-version = "1.95"
+
+[features]
+default = ["threads"]
+threads = ["dep:rayon"]
+
+[dependencies]
+evofilm-bitstream = { path = "../evofilm-bitstream" }
+thiserror = { version = "2" }
+rayon = { version = "1", optional = true }
+

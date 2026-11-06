@@ -1,0 +1,11 @@
+[package]
+name = "evofilm-ac3"
+description = "Clean-room AC-3 (Dolby Digital, ATSC A/52) audio decoder"
+version = "0.1.1"
+edition = "2024"
+license = "MIT OR Apache-2.0"
+rust-version = "1.95"
+
+[dependencies]
+thiserror = { version = "2" }
+

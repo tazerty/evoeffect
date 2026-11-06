@@ -978,29 +978,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "craft-docpath"
-version = "0.1.0"
-source = "git+https://github.com/storytold/craft-libs?rev=82a24b006eefa036b43c09a67fb9a3fbd17ffe63#82a24b006eefa036b43c09a67fb9a3fbd17ffe63"
-
-[[package]]
-name = "craft-pdf"
-version = "0.1.0"
-source = "git+https://github.com/storytold/craft-libs?rev=9f75d3dc19b4b514c4f3d4847ed1ec1b0e86b4ef#9f75d3dc19b4b514c4f3d4847ed1ec1b0e86b4ef"
-dependencies = [
- "hayro-syntax",
- "thiserror 2.0.21",
-]
-
-[[package]]
-name = "craft-ui"
-version = "0.1.0"
-source = "git+https://github.com/storytold/craft-libs?rev=5c874d51eeb3de70e735c8ce87a59a7dedd47675#5c874d51eeb3de70e735c8ce87a59a7dedd47675"
-dependencies = [
- "egui",
- "serde",
-]
-
-[[package]]
 name = "crc32fast"
 version = "1.5.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1168,555 +1145,6 @@ checksum = "0656a7530b9e2841ee7a5f983965bdd9840c32f4012f759cfd44b912cced6b34"
 dependencies = [
  "bytemuck",
  "emath",
-]
-
-[[package]]
-name = "effectcraft"
-version = "0.17.0"
-dependencies = [
- "cpal",
- "effectcraft-engine",
- "effectcraft-host",
- "effectcraft-ui-egui",
- "eframe",
- "egui",
- "fmv-macos-events",
- "log",
- "muda",
- "objc2 0.6.4",
- "objc2-app-kit 0.3.2",
- "objc2-foundation 0.3.2",
- "pollster 0.4.0",
- "rfd",
- "serde",
- "serde_json",
- "winit",
- "winresource",
- "zbus",
-]
-
-[[package]]
-name = "effectcraft-automation"
-version = "0.17.0"
-dependencies = [
- "effectcraft-engine",
- "effectcraft-host",
- "effectcraft-script",
- "image",
- "serde_json",
- "thiserror 2.0.21",
-]
-
-[[package]]
-name = "effectcraft-av1enc"
-version = "0.17.0"
-dependencies = [
- "filmcraft-av1",
-]
-
-[[package]]
-name = "effectcraft-cli"
-version = "0.17.0"
-dependencies = [
- "cpu-time",
- "effectcraft-automation",
- "effectcraft-engine",
- "effectcraft-gpu",
- "effectcraft-host",
- "effectcraft-render",
- "effectcraft-time",
- "effectcraft-ui-egui",
- "image",
- "serde_json",
-]
-
-[[package]]
-name = "effectcraft-color"
-version = "0.17.0"
-dependencies = [
- "proptest",
- "serde",
-]
-
-[[package]]
-name = "effectcraft-effects"
-version = "0.17.0"
-dependencies = [
- "chrono",
- "effectcraft-color",
- "effectcraft-geom",
- "effectcraft-keyframe",
- "effectcraft-project",
- "effectcraft-raster",
- "effectcraft-segment",
- "effectcraft-track",
- "log",
- "rayon",
- "serde",
- "serde_json",
-]
-
-[[package]]
-name = "effectcraft-engine"
-version = "0.17.0"
-dependencies = [
- "chrono",
- "craft-docpath",
- "effectcraft-color",
- "effectcraft-effects",
- "effectcraft-geom",
- "effectcraft-interchange",
- "effectcraft-keyframe",
- "effectcraft-lottie",
- "effectcraft-model",
- "effectcraft-path",
- "effectcraft-pdf",
- "effectcraft-project",
- "effectcraft-psd",
- "effectcraft-raster",
- "effectcraft-render",
- "effectcraft-segment",
- "effectcraft-svg",
- "effectcraft-text",
- "effectcraft-time",
- "effectcraft-track",
- "exr",
- "image",
- "kurbo",
- "log",
- "rayon",
- "serde",
- "serde_json",
- "thiserror 2.0.21",
- "web-time",
-]
-
-[[package]]
-name = "effectcraft-export"
-version = "0.17.0"
-dependencies = [
- "effectcraft-av1enc",
- "effectcraft-color",
- "effectcraft-effects",
- "effectcraft-hevcenc",
- "effectcraft-keyframe",
- "effectcraft-media",
- "effectcraft-opusenc",
- "effectcraft-project",
- "effectcraft-raster",
- "effectcraft-render",
- "effectcraft-time",
- "effectcraft-vp9enc",
- "filmcraft-aac",
- "filmcraft-h264enc",
- "filmcraft-isobmff",
- "filmcraft-opus",
- "filmcraft-prores",
- "filmcraft-vp9",
- "gif",
- "image",
- "log",
- "rayon",
- "thiserror 2.0.21",
- "web-time",
-]
-
-[[package]]
-name = "effectcraft-expr"
-version = "0.17.0"
-dependencies = [
- "boa_engine",
- "effectcraft-color",
- "effectcraft-effects",
- "effectcraft-geom",
- "effectcraft-keyframe",
- "effectcraft-path",
- "effectcraft-project",
- "effectcraft-render",
- "effectcraft-text",
- "effectcraft-time",
- "serde_json",
-]
-
-[[package]]
-name = "effectcraft-geom"
-version = "0.17.0"
-dependencies = [
- "proptest",
- "serde",
-]
-
-[[package]]
-name = "effectcraft-gpu"
-version = "0.17.0"
-dependencies = [
- "bytemuck",
- "effectcraft-color",
- "effectcraft-effects",
- "effectcraft-geom",
- "effectcraft-keyframe",
- "effectcraft-project",
- "effectcraft-raster",
- "effectcraft-render",
- "effectcraft-text",
- "effectcraft-time",
- "js-sys",
- "log",
- "pollster 0.4.0",
- "wasm-bindgen",
- "web-time",
- "wgpu",
-]
-
-[[package]]
-name = "effectcraft-hevcenc"
-version = "0.17.0"
-dependencies = [
- "filmcraft-hevc",
-]
-
-[[package]]
-name = "effectcraft-host"
-version = "0.17.0"
-dependencies = [
- "effectcraft-engine",
- "effectcraft-export",
- "effectcraft-expr",
- "effectcraft-interchange",
- "effectcraft-media",
- "effectcraft-pdf",
- "effectcraft-plugin",
- "effectcraft-project",
- "effectcraft-psd",
- "effectcraft-raster",
- "effectcraft-script",
- "effectcraft-svg",
- "effectcraft-time",
- "exr",
- "gif",
- "image",
- "log",
- "rayon",
- "serde_json",
-]
-
-[[package]]
-name = "effectcraft-interchange"
-version = "0.17.0"
-dependencies = [
- "effectcraft-color",
- "effectcraft-keyframe",
- "effectcraft-project",
- "effectcraft-time",
- "filmcraft-color",
- "filmcraft-geom",
- "filmcraft-interchange",
- "filmcraft-media",
- "filmcraft-project",
- "filmcraft-time",
- "serde",
- "serde_json",
- "thiserror 2.0.21",
-]
-
-[[package]]
-name = "effectcraft-keyframe"
-version = "0.17.0"
-dependencies = [
- "effectcraft-color",
- "effectcraft-geom",
- "effectcraft-time",
- "proptest",
- "serde",
- "serde_json",
-]
-
-[[package]]
-name = "effectcraft-lottie"
-version = "0.17.0"
-dependencies = [
- "craft-docpath",
- "effectcraft-color",
- "effectcraft-effects",
- "effectcraft-keyframe",
- "effectcraft-path",
- "effectcraft-project",
- "effectcraft-render",
- "effectcraft-text",
- "effectcraft-time",
- "kurbo",
- "serde_json",
- "thiserror 2.0.21",
-]
-
-[[package]]
-name = "effectcraft-media"
-version = "0.17.0"
-dependencies = [
- "craft-docpath",
- "effectcraft-model",
- "effectcraft-pdf",
- "effectcraft-project",
- "effectcraft-psd",
- "effectcraft-raster",
- "effectcraft-render",
- "effectcraft-svg",
- "effectcraft-time",
- "exr",
- "filmcraft-codecs",
- "filmcraft-color",
- "filmcraft-frame",
- "filmcraft-isobmff",
- "filmcraft-media",
- "filmcraft-time",
- "gif",
- "image",
- "log",
- "rayon",
- "serde_json",
- "symphonia",
- "thiserror 2.0.21",
-]
-
-[[package]]
-name = "effectcraft-model"
-version = "0.17.0"
-dependencies = [
- "effectcraft-geom",
- "image",
- "miniz_oxide 0.8.9",
- "serde",
- "serde_json",
- "thiserror 2.0.21",
-]
-
-[[package]]
-name = "effectcraft-opusenc"
-version = "0.17.0"
-dependencies = [
- "filmcraft-opus",
-]
-
-[[package]]
-name = "effectcraft-path"
-version = "0.17.0"
-dependencies = [
- "effectcraft-geom",
- "effectcraft-keyframe",
- "effectcraft-raster",
- "kurbo",
- "linesweeper",
- "tiny-skia",
-]
-
-[[package]]
-name = "effectcraft-pdf"
-version = "0.17.0"
-dependencies = [
- "craft-pdf",
- "effectcraft-raster",
- "effectcraft-svg",
- "effectcraft-text",
- "image",
- "kurbo",
- "miniz_oxide 0.8.9",
- "skrifa",
- "wasm-bindgen-test",
- "zune-jpeg",
-]
-
-[[package]]
-name = "effectcraft-plugin"
-version = "0.17.0"
-dependencies = [
- "effectcraft-effects",
- "effectcraft-keyframe",
- "effectcraft-project",
- "effectcraft-raster",
- "serde_json",
- "wasmi",
-]
-
-[[package]]
-name = "effectcraft-project"
-version = "0.17.0"
-dependencies = [
- "effectcraft-color",
- "effectcraft-geom",
- "effectcraft-keyframe",
- "effectcraft-time",
- "serde",
- "serde_json",
- "thiserror 2.0.21",
-]
-
-[[package]]
-name = "effectcraft-psd"
-version = "0.17.0"
-dependencies = [
- "miniz_oxide 0.8.9",
-]
-
-[[package]]
-name = "effectcraft-raster"
-version = "0.17.0"
-dependencies = [
- "effectcraft-color",
- "effectcraft-geom",
- "rayon",
-]
-
-[[package]]
-name = "effectcraft-render"
-version = "0.17.0"
-dependencies = [
- "effectcraft-color",
- "effectcraft-effects",
- "effectcraft-geom",
- "effectcraft-keyframe",
- "effectcraft-model",
- "effectcraft-path",
- "effectcraft-project",
- "effectcraft-raster",
- "effectcraft-text",
- "effectcraft-time",
- "kurbo",
- "log",
- "lz4_flex",
- "rayon",
- "serde",
- "web-time",
-]
-
-[[package]]
-name = "effectcraft-script"
-version = "0.17.0"
-dependencies = [
- "boa_engine",
- "effectcraft-engine",
- "effectcraft-expr",
- "effectcraft-keyframe",
- "effectcraft-path",
- "effectcraft-project",
- "effectcraft-psd",
- "effectcraft-render",
- "effectcraft-time",
- "serde_json",
- "socket2",
- "web-time",
-]
-
-[[package]]
-name = "effectcraft-segment"
-version = "0.17.0"
-dependencies = [
- "miniz_oxide 0.8.9",
- "ndarray",
- "rayon",
-]
-
-[[package]]
-name = "effectcraft-svg"
-version = "0.17.0"
-dependencies = [
- "effectcraft-geom",
- "effectcraft-path",
- "effectcraft-raster",
- "kurbo",
- "rayon",
- "roxmltree",
-]
-
-[[package]]
-name = "effectcraft-text"
-version = "0.17.0"
-dependencies = [
- "effectcraft-keyframe",
- "harfrust",
- "kurbo",
- "skrifa",
- "unicode-bidi",
- "unicode-linebreak",
-]
-
-[[package]]
-name = "effectcraft-time"
-version = "0.17.0"
-dependencies = [
- "proptest",
- "serde",
-]
-
-[[package]]
-name = "effectcraft-track"
-version = "0.17.0"
-dependencies = [
- "effectcraft-raster",
- "effectcraft-segment",
- "rayon",
- "serde",
- "serde_json",
- "web-time",
-]
-
-[[package]]
-name = "effectcraft-ui-egui"
-version = "0.17.0"
-dependencies = [
- "chrono",
- "craft-ui",
- "effectcraft-color",
- "effectcraft-engine",
- "effectcraft-geom",
- "effectcraft-gpu",
- "effectcraft-host",
- "effectcraft-keyframe",
- "effectcraft-path",
- "effectcraft-project",
- "effectcraft-render",
- "effectcraft-text",
- "effectcraft-time",
- "eframe",
- "egui",
- "egui_kittest",
- "exr",
- "image",
- "kurbo",
- "log",
- "pollster 0.4.0",
- "rayon",
- "serde",
- "serde_json",
- "sys-locale",
- "toml",
- "web-time",
-]
-
-[[package]]
-name = "effectcraft-vp9enc"
-version = "0.17.0"
-
-[[package]]
-name = "effectcraft-web"
-version = "0.17.0"
-dependencies = [
- "effectcraft-engine",
- "effectcraft-export",
- "effectcraft-expr",
- "effectcraft-gpu",
- "effectcraft-host",
- "effectcraft-media",
- "effectcraft-ui-egui",
- "eframe",
- "egui",
- "js-sys",
- "log",
- "serde",
- "serde_json",
- "wasm-bindgen",
- "wasm-bindgen-futures",
- "web-sys",
- "web-time",
 ]
 
 [[package]]
@@ -2007,6 +1435,804 @@ dependencies = [
 ]
 
 [[package]]
+name = "evo-docpath"
+version = "0.1.0"
+
+[[package]]
+name = "evo-pdf"
+version = "0.1.0"
+dependencies = [
+ "hayro-syntax",
+ "thiserror 2.0.21",
+]
+
+[[package]]
+name = "evo-ui"
+version = "0.1.0"
+dependencies = [
+ "egui",
+ "serde",
+]
+
+[[package]]
+name = "evoeffect"
+version = "0.17.0"
+dependencies = [
+ "cpal",
+ "eframe",
+ "egui",
+ "evoeffect-engine",
+ "evoeffect-host",
+ "evoeffect-ui-egui",
+ "fmv-macos-events",
+ "log",
+ "muda",
+ "objc2 0.6.4",
+ "objc2-app-kit 0.3.2",
+ "objc2-foundation 0.3.2",
+ "pollster 0.4.0",
+ "rfd",
+ "serde",
+ "serde_json",
+ "winit",
+ "winresource",
+ "zbus",
+]
+
+[[package]]
+name = "evoeffect-automation"
+version = "0.17.0"
+dependencies = [
+ "evoeffect-engine",
+ "evoeffect-host",
+ "evoeffect-script",
+ "image",
+ "serde_json",
+ "thiserror 2.0.21",
+]
+
+[[package]]
+name = "evoeffect-av1enc"
+version = "0.17.0"
+dependencies = [
+ "evofilm-av1",
+]
+
+[[package]]
+name = "evoeffect-cli"
+version = "0.17.0"
+dependencies = [
+ "cpu-time",
+ "evoeffect-automation",
+ "evoeffect-engine",
+ "evoeffect-gpu",
+ "evoeffect-host",
+ "evoeffect-render",
+ "evoeffect-time",
+ "evoeffect-ui-egui",
+ "image",
+ "serde_json",
+]
+
+[[package]]
+name = "evoeffect-color"
+version = "0.17.0"
+dependencies = [
+ "proptest",
+ "serde",
+]
+
+[[package]]
+name = "evoeffect-effects"
+version = "0.17.0"
+dependencies = [
+ "chrono",
+ "evoeffect-color",
+ "evoeffect-geom",
+ "evoeffect-keyframe",
+ "evoeffect-project",
+ "evoeffect-raster",
+ "evoeffect-segment",
+ "evoeffect-track",
+ "log",
+ "rayon",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
+name = "evoeffect-engine"
+version = "0.17.0"
+dependencies = [
+ "chrono",
+ "evo-docpath",
+ "evoeffect-color",
+ "evoeffect-effects",
+ "evoeffect-geom",
+ "evoeffect-interchange",
+ "evoeffect-keyframe",
+ "evoeffect-lottie",
+ "evoeffect-model",
+ "evoeffect-path",
+ "evoeffect-pdf",
+ "evoeffect-project",
+ "evoeffect-psd",
+ "evoeffect-raster",
+ "evoeffect-render",
+ "evoeffect-segment",
+ "evoeffect-svg",
+ "evoeffect-text",
+ "evoeffect-time",
+ "evoeffect-track",
+ "exr",
+ "image",
+ "kurbo",
+ "log",
+ "rayon",
+ "serde",
+ "serde_json",
+ "thiserror 2.0.21",
+ "web-time",
+]
+
+[[package]]
+name = "evoeffect-export"
+version = "0.17.0"
+dependencies = [
+ "evoeffect-av1enc",
+ "evoeffect-color",
+ "evoeffect-effects",
+ "evoeffect-hevcenc",
+ "evoeffect-keyframe",
+ "evoeffect-media",
+ "evoeffect-opusenc",
+ "evoeffect-project",
+ "evoeffect-raster",
+ "evoeffect-render",
+ "evoeffect-time",
+ "evoeffect-vp9enc",
+ "evofilm-aac",
+ "evofilm-h264enc",
+ "evofilm-isobmff",
+ "evofilm-opus",
+ "evofilm-prores",
+ "evofilm-vp9",
+ "gif",
+ "image",
+ "log",
+ "rayon",
+ "thiserror 2.0.21",
+ "web-time",
+]
+
+[[package]]
+name = "evoeffect-expr"
+version = "0.17.0"
+dependencies = [
+ "boa_engine",
+ "evoeffect-color",
+ "evoeffect-effects",
+ "evoeffect-geom",
+ "evoeffect-keyframe",
+ "evoeffect-path",
+ "evoeffect-project",
+ "evoeffect-render",
+ "evoeffect-text",
+ "evoeffect-time",
+ "serde_json",
+]
+
+[[package]]
+name = "evoeffect-geom"
+version = "0.17.0"
+dependencies = [
+ "proptest",
+ "serde",
+]
+
+[[package]]
+name = "evoeffect-gpu"
+version = "0.17.0"
+dependencies = [
+ "bytemuck",
+ "evoeffect-color",
+ "evoeffect-effects",
+ "evoeffect-geom",
+ "evoeffect-keyframe",
+ "evoeffect-project",
+ "evoeffect-raster",
+ "evoeffect-render",
+ "evoeffect-text",
+ "evoeffect-time",
+ "js-sys",
+ "log",
+ "pollster 0.4.0",
+ "wasm-bindgen",
+ "web-time",
+ "wgpu",
+]
+
+[[package]]
+name = "evoeffect-hevcenc"
+version = "0.17.0"
+dependencies = [
+ "evofilm-hevc",
+]
+
+[[package]]
+name = "evoeffect-host"
+version = "0.17.0"
+dependencies = [
+ "evoeffect-engine",
+ "evoeffect-export",
+ "evoeffect-expr",
+ "evoeffect-interchange",
+ "evoeffect-media",
+ "evoeffect-pdf",
+ "evoeffect-plugin",
+ "evoeffect-project",
+ "evoeffect-psd",
+ "evoeffect-raster",
+ "evoeffect-script",
+ "evoeffect-svg",
+ "evoeffect-time",
+ "exr",
+ "gif",
+ "image",
+ "log",
+ "rayon",
+ "serde_json",
+]
+
+[[package]]
+name = "evoeffect-interchange"
+version = "0.17.0"
+dependencies = [
+ "evoeffect-color",
+ "evoeffect-keyframe",
+ "evoeffect-project",
+ "evoeffect-time",
+ "evofilm-color",
+ "evofilm-geom",
+ "evofilm-interchange",
+ "evofilm-media",
+ "evofilm-project",
+ "evofilm-time",
+ "serde",
+ "serde_json",
+ "thiserror 2.0.21",
+]
+
+[[package]]
+name = "evoeffect-keyframe"
+version = "0.17.0"
+dependencies = [
+ "evoeffect-color",
+ "evoeffect-geom",
+ "evoeffect-time",
+ "proptest",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
+name = "evoeffect-lottie"
+version = "0.17.0"
+dependencies = [
+ "evo-docpath",
+ "evoeffect-color",
+ "evoeffect-effects",
+ "evoeffect-keyframe",
+ "evoeffect-path",
+ "evoeffect-project",
+ "evoeffect-render",
+ "evoeffect-text",
+ "evoeffect-time",
+ "kurbo",
+ "serde_json",
+ "thiserror 2.0.21",
+]
+
+[[package]]
+name = "evoeffect-media"
+version = "0.17.0"
+dependencies = [
+ "evo-docpath",
+ "evoeffect-model",
+ "evoeffect-pdf",
+ "evoeffect-project",
+ "evoeffect-psd",
+ "evoeffect-raster",
+ "evoeffect-render",
+ "evoeffect-svg",
+ "evoeffect-time",
+ "evofilm-codecs",
+ "evofilm-color",
+ "evofilm-frame",
+ "evofilm-isobmff",
+ "evofilm-media",
+ "evofilm-time",
+ "exr",
+ "gif",
+ "image",
+ "log",
+ "rayon",
+ "serde_json",
+ "symphonia",
+ "thiserror 2.0.21",
+]
+
+[[package]]
+name = "evoeffect-model"
+version = "0.17.0"
+dependencies = [
+ "evoeffect-geom",
+ "image",
+ "miniz_oxide 0.8.9",
+ "serde",
+ "serde_json",
+ "thiserror 2.0.21",
+]
+
+[[package]]
+name = "evoeffect-opusenc"
+version = "0.17.0"
+dependencies = [
+ "evofilm-opus",
+]
+
+[[package]]
+name = "evoeffect-path"
+version = "0.17.0"
+dependencies = [
+ "evoeffect-geom",
+ "evoeffect-keyframe",
+ "evoeffect-raster",
+ "kurbo",
+ "linesweeper",
+ "tiny-skia",
+]
+
+[[package]]
+name = "evoeffect-pdf"
+version = "0.17.0"
+dependencies = [
+ "evo-pdf",
+ "evoeffect-raster",
+ "evoeffect-svg",
+ "evoeffect-text",
+ "image",
+ "kurbo",
+ "miniz_oxide 0.8.9",
+ "skrifa",
+ "wasm-bindgen-test",
+ "zune-jpeg",
+]
+
+[[package]]
+name = "evoeffect-plugin"
+version = "0.17.0"
+dependencies = [
+ "evoeffect-effects",
+ "evoeffect-keyframe",
+ "evoeffect-project",
+ "evoeffect-raster",
+ "serde_json",
+ "wasmi",
+]
+
+[[package]]
+name = "evoeffect-project"
+version = "0.17.0"
+dependencies = [
+ "evoeffect-color",
+ "evoeffect-geom",
+ "evoeffect-keyframe",
+ "evoeffect-time",
+ "serde",
+ "serde_json",
+ "thiserror 2.0.21",
+]
+
+[[package]]
+name = "evoeffect-psd"
+version = "0.17.0"
+dependencies = [
+ "miniz_oxide 0.8.9",
+]
+
+[[package]]
+name = "evoeffect-raster"
+version = "0.17.0"
+dependencies = [
+ "evoeffect-color",
+ "evoeffect-geom",
+ "rayon",
+]
+
+[[package]]
+name = "evoeffect-render"
+version = "0.17.0"
+dependencies = [
+ "evoeffect-color",
+ "evoeffect-effects",
+ "evoeffect-geom",
+ "evoeffect-keyframe",
+ "evoeffect-model",
+ "evoeffect-path",
+ "evoeffect-project",
+ "evoeffect-raster",
+ "evoeffect-text",
+ "evoeffect-time",
+ "kurbo",
+ "log",
+ "lz4_flex",
+ "rayon",
+ "serde",
+ "web-time",
+]
+
+[[package]]
+name = "evoeffect-script"
+version = "0.17.0"
+dependencies = [
+ "boa_engine",
+ "evoeffect-engine",
+ "evoeffect-expr",
+ "evoeffect-keyframe",
+ "evoeffect-path",
+ "evoeffect-project",
+ "evoeffect-psd",
+ "evoeffect-render",
+ "evoeffect-time",
+ "serde_json",
+ "socket2",
+ "web-time",
+]
+
+[[package]]
+name = "evoeffect-segment"
+version = "0.17.0"
+dependencies = [
+ "miniz_oxide 0.8.9",
+ "ndarray",
+ "rayon",
+]
+
+[[package]]
+name = "evoeffect-svg"
+version = "0.17.0"
+dependencies = [
+ "evoeffect-geom",
+ "evoeffect-path",
+ "evoeffect-raster",
+ "kurbo",
+ "rayon",
+ "roxmltree",
+]
+
+[[package]]
+name = "evoeffect-text"
+version = "0.17.0"
+dependencies = [
+ "evoeffect-keyframe",
+ "harfrust",
+ "kurbo",
+ "skrifa",
+ "unicode-bidi",
+ "unicode-linebreak",
+]
+
+[[package]]
+name = "evoeffect-time"
+version = "0.17.0"
+dependencies = [
+ "proptest",
+ "serde",
+]
+
+[[package]]
+name = "evoeffect-track"
+version = "0.17.0"
+dependencies = [
+ "evoeffect-raster",
+ "evoeffect-segment",
+ "rayon",
+ "serde",
+ "serde_json",
+ "web-time",
+]
+
+[[package]]
+name = "evoeffect-ui-egui"
+version = "0.17.0"
+dependencies = [
+ "chrono",
+ "eframe",
+ "egui",
+ "egui_kittest",
+ "evo-ui",
+ "evoeffect-color",
+ "evoeffect-engine",
+ "evoeffect-geom",
+ "evoeffect-gpu",
+ "evoeffect-host",
+ "evoeffect-keyframe",
+ "evoeffect-path",
+ "evoeffect-project",
+ "evoeffect-render",
+ "evoeffect-text",
+ "evoeffect-time",
+ "exr",
+ "image",
+ "kurbo",
+ "log",
+ "pollster 0.4.0",
+ "rayon",
+ "serde",
+ "serde_json",
+ "sys-locale",
+ "toml",
+ "web-time",
+]
+
+[[package]]
+name = "evoeffect-vp9enc"
+version = "0.17.0"
+
+[[package]]
+name = "evoeffect-web"
+version = "0.17.0"
+dependencies = [
+ "eframe",
+ "egui",
+ "evoeffect-engine",
+ "evoeffect-export",
+ "evoeffect-expr",
+ "evoeffect-gpu",
+ "evoeffect-host",
+ "evoeffect-media",
+ "evoeffect-ui-egui",
+ "js-sys",
+ "log",
+ "serde",
+ "serde_json",
+ "wasm-bindgen",
+ "wasm-bindgen-futures",
+ "web-sys",
+ "web-time",
+]
+
+[[package]]
+name = "evofilm-aac"
+version = "0.1.1"
+dependencies = [
+ "evofilm-bitstream",
+ "thiserror 2.0.21",
+]
+
+[[package]]
+name = "evofilm-ac3"
+version = "0.1.1"
+dependencies = [
+ "thiserror 2.0.21",
+]
+
+[[package]]
+name = "evofilm-av1"
+version = "0.1.1"
+dependencies = [
+ "evofilm-bitstream",
+ "rayon",
+ "thiserror 2.0.21",
+]
+
+[[package]]
+name = "evofilm-bitstream"
+version = "0.1.1"
+
+[[package]]
+name = "evofilm-cfb"
+version = "0.1.1"
+
+[[package]]
+name = "evofilm-codecs"
+version = "0.1.1"
+dependencies = [
+ "evofilm-aac",
+ "evofilm-ac3",
+ "evofilm-av1",
+ "evofilm-bitstream",
+ "evofilm-color",
+ "evofilm-dnx",
+ "evofilm-frame",
+ "evofilm-h264",
+ "evofilm-hevc",
+ "evofilm-isobmff",
+ "evofilm-matroska",
+ "evofilm-media",
+ "evofilm-mpeg2v",
+ "evofilm-mpegts",
+ "evofilm-mxf",
+ "evofilm-ogg",
+ "evofilm-opus",
+ "evofilm-prores",
+ "evofilm-time",
+ "evofilm-vp9",
+ "image",
+ "log",
+ "symphonia",
+ "thiserror 2.0.21",
+ "web-time",
+]
+
+[[package]]
+name = "evofilm-color"
+version = "0.1.1"
+dependencies = [
+ "serde",
+]
+
+[[package]]
+name = "evofilm-dnx"
+version = "0.1.1"
+dependencies = [
+ "evofilm-bitstream",
+ "rayon",
+ "thiserror 2.0.21",
+]
+
+[[package]]
+name = "evofilm-frame"
+version = "0.1.1"
+dependencies = [
+ "evofilm-color",
+ "evofilm-time",
+ "rayon",
+ "serde",
+]
+
+[[package]]
+name = "evofilm-geom"
+version = "0.1.1"
+dependencies = [
+ "serde",
+]
+
+[[package]]
+name = "evofilm-h264"
+version = "0.1.1"
+dependencies = [
+ "evofilm-bitstream",
+ "rayon",
+ "thiserror 2.0.21",
+]
+
+[[package]]
+name = "evofilm-h264enc"
+version = "0.1.1"
+dependencies = [
+ "evofilm-bitstream",
+ "rayon",
+ "thiserror 2.0.21",
+]
+
+[[package]]
+name = "evofilm-hevc"
+version = "0.1.1"
+dependencies = [
+ "evofilm-bitstream",
+ "rayon",
+ "thiserror 2.0.21",
+]
+
+[[package]]
+name = "evofilm-interchange"
+version = "0.1.1"
+dependencies = [
+ "evofilm-cfb",
+ "evofilm-color",
+ "evofilm-geom",
+ "evofilm-media",
+ "evofilm-project",
+ "evofilm-time",
+ "roxmltree",
+ "serde",
+ "serde_json",
+ "thiserror 2.0.21",
+]
+
+[[package]]
+name = "evofilm-isobmff"
+version = "0.1.1"
+dependencies = [
+ "evofilm-bitstream",
+ "thiserror 2.0.21",
+]
+
+[[package]]
+name = "evofilm-matroska"
+version = "0.1.1"
+
+[[package]]
+name = "evofilm-media"
+version = "0.1.1"
+dependencies = [
+ "evofilm-color",
+ "evofilm-frame",
+ "evofilm-time",
+ "image",
+ "rayon",
+ "serde",
+ "thiserror 2.0.21",
+]
+
+[[package]]
+name = "evofilm-mpeg2v"
+version = "0.1.1"
+dependencies = [
+ "rayon",
+ "thiserror 2.0.21",
+]
+
+[[package]]
+name = "evofilm-mpegts"
+version = "0.1.1"
+dependencies = [
+ "thiserror 2.0.21",
+]
+
+[[package]]
+name = "evofilm-mxf"
+version = "0.1.1"
+
+[[package]]
+name = "evofilm-ogg"
+version = "0.1.1"
+
+[[package]]
+name = "evofilm-opus"
+version = "0.1.1"
+
+[[package]]
+name = "evofilm-project"
+version = "0.1.1"
+dependencies = [
+ "evofilm-color",
+ "evofilm-geom",
+ "evofilm-media",
+ "evofilm-time",
+ "serde",
+ "serde_json",
+ "thiserror 2.0.21",
+]
+
+[[package]]
+name = "evofilm-prores"
+version = "0.1.1"
+dependencies = [
+ "evofilm-bitstream",
+ "rayon",
+ "thiserror 2.0.21",
+]
+
+[[package]]
+name = "evofilm-time"
+version = "0.1.1"
+dependencies = [
+ "serde",
+]
+
+[[package]]
+name = "evofilm-vp9"
+version = "0.1.1"
+dependencies = [
+ "evofilm-bitstream",
+ "rayon",
+ "thiserror 2.0.21",
+]
+
+[[package]]
 name = "exr"
 version = "1.74.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2061,261 +2287,6 @@ name = "fearless_simd"
 version = "0.4.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b97b65636e5b9ef369943878ac74335ba1c55c1cb6adbf1e2c293c624248d693"
-
-[[package]]
-name = "filmcraft-aac"
-version = "0.1.1"
-source = "git+https://github.com/storytold/filmcraft?rev=2c5ba7a72619935f0481f99d59409e0d1844b234#2c5ba7a72619935f0481f99d59409e0d1844b234"
-dependencies = [
- "filmcraft-bitstream",
- "thiserror 2.0.21",
-]
-
-[[package]]
-name = "filmcraft-ac3"
-version = "0.1.1"
-source = "git+https://github.com/storytold/filmcraft?rev=2c5ba7a72619935f0481f99d59409e0d1844b234#2c5ba7a72619935f0481f99d59409e0d1844b234"
-dependencies = [
- "thiserror 2.0.21",
-]
-
-[[package]]
-name = "filmcraft-av1"
-version = "0.1.1"
-source = "git+https://github.com/storytold/filmcraft?rev=2c5ba7a72619935f0481f99d59409e0d1844b234#2c5ba7a72619935f0481f99d59409e0d1844b234"
-dependencies = [
- "filmcraft-bitstream",
- "rayon",
- "thiserror 2.0.21",
-]
-
-[[package]]
-name = "filmcraft-bitstream"
-version = "0.1.1"
-source = "git+https://github.com/storytold/filmcraft?rev=2c5ba7a72619935f0481f99d59409e0d1844b234#2c5ba7a72619935f0481f99d59409e0d1844b234"
-
-[[package]]
-name = "filmcraft-cfb"
-version = "0.1.1"
-source = "git+https://github.com/storytold/filmcraft?rev=2c5ba7a72619935f0481f99d59409e0d1844b234#2c5ba7a72619935f0481f99d59409e0d1844b234"
-
-[[package]]
-name = "filmcraft-codecs"
-version = "0.1.1"
-source = "git+https://github.com/storytold/filmcraft?rev=2c5ba7a72619935f0481f99d59409e0d1844b234#2c5ba7a72619935f0481f99d59409e0d1844b234"
-dependencies = [
- "filmcraft-aac",
- "filmcraft-ac3",
- "filmcraft-av1",
- "filmcraft-bitstream",
- "filmcraft-color",
- "filmcraft-dnx",
- "filmcraft-frame",
- "filmcraft-h264",
- "filmcraft-hevc",
- "filmcraft-isobmff",
- "filmcraft-matroska",
- "filmcraft-media",
- "filmcraft-mpeg2v",
- "filmcraft-mpegts",
- "filmcraft-mxf",
- "filmcraft-ogg",
- "filmcraft-opus",
- "filmcraft-prores",
- "filmcraft-time",
- "filmcraft-vp9",
- "image",
- "log",
- "symphonia",
- "thiserror 2.0.21",
- "web-time",
-]
-
-[[package]]
-name = "filmcraft-color"
-version = "0.1.1"
-source = "git+https://github.com/storytold/filmcraft?rev=2c5ba7a72619935f0481f99d59409e0d1844b234#2c5ba7a72619935f0481f99d59409e0d1844b234"
-dependencies = [
- "serde",
-]
-
-[[package]]
-name = "filmcraft-dnx"
-version = "0.1.1"
-source = "git+https://github.com/storytold/filmcraft?rev=2c5ba7a72619935f0481f99d59409e0d1844b234#2c5ba7a72619935f0481f99d59409e0d1844b234"
-dependencies = [
- "filmcraft-bitstream",
- "rayon",
- "thiserror 2.0.21",
-]
-
-[[package]]
-name = "filmcraft-frame"
-version = "0.1.1"
-source = "git+https://github.com/storytold/filmcraft?rev=2c5ba7a72619935f0481f99d59409e0d1844b234#2c5ba7a72619935f0481f99d59409e0d1844b234"
-dependencies = [
- "filmcraft-color",
- "filmcraft-time",
- "rayon",
- "serde",
-]
-
-[[package]]
-name = "filmcraft-geom"
-version = "0.1.1"
-source = "git+https://github.com/storytold/filmcraft?rev=2c5ba7a72619935f0481f99d59409e0d1844b234#2c5ba7a72619935f0481f99d59409e0d1844b234"
-dependencies = [
- "serde",
-]
-
-[[package]]
-name = "filmcraft-h264"
-version = "0.1.1"
-source = "git+https://github.com/storytold/filmcraft?rev=2c5ba7a72619935f0481f99d59409e0d1844b234#2c5ba7a72619935f0481f99d59409e0d1844b234"
-dependencies = [
- "filmcraft-bitstream",
- "rayon",
- "thiserror 2.0.21",
-]
-
-[[package]]
-name = "filmcraft-h264enc"
-version = "0.1.1"
-source = "git+https://github.com/storytold/filmcraft?rev=2c5ba7a72619935f0481f99d59409e0d1844b234#2c5ba7a72619935f0481f99d59409e0d1844b234"
-dependencies = [
- "filmcraft-bitstream",
- "rayon",
- "thiserror 2.0.21",
-]
-
-[[package]]
-name = "filmcraft-hevc"
-version = "0.1.1"
-source = "git+https://github.com/storytold/filmcraft?rev=2c5ba7a72619935f0481f99d59409e0d1844b234#2c5ba7a72619935f0481f99d59409e0d1844b234"
-dependencies = [
- "filmcraft-bitstream",
- "rayon",
- "thiserror 2.0.21",
-]
-
-[[package]]
-name = "filmcraft-interchange"
-version = "0.1.1"
-source = "git+https://github.com/storytold/filmcraft?rev=2c5ba7a72619935f0481f99d59409e0d1844b234#2c5ba7a72619935f0481f99d59409e0d1844b234"
-dependencies = [
- "filmcraft-cfb",
- "filmcraft-color",
- "filmcraft-geom",
- "filmcraft-media",
- "filmcraft-project",
- "filmcraft-time",
- "roxmltree",
- "serde",
- "serde_json",
- "thiserror 2.0.21",
-]
-
-[[package]]
-name = "filmcraft-isobmff"
-version = "0.1.1"
-source = "git+https://github.com/storytold/filmcraft?rev=2c5ba7a72619935f0481f99d59409e0d1844b234#2c5ba7a72619935f0481f99d59409e0d1844b234"
-dependencies = [
- "filmcraft-bitstream",
- "thiserror 2.0.21",
-]
-
-[[package]]
-name = "filmcraft-matroska"
-version = "0.1.1"
-source = "git+https://github.com/storytold/filmcraft?rev=2c5ba7a72619935f0481f99d59409e0d1844b234#2c5ba7a72619935f0481f99d59409e0d1844b234"
-
-[[package]]
-name = "filmcraft-media"
-version = "0.1.1"
-source = "git+https://github.com/storytold/filmcraft?rev=2c5ba7a72619935f0481f99d59409e0d1844b234#2c5ba7a72619935f0481f99d59409e0d1844b234"
-dependencies = [
- "filmcraft-color",
- "filmcraft-frame",
- "filmcraft-time",
- "image",
- "rayon",
- "serde",
- "thiserror 2.0.21",
-]
-
-[[package]]
-name = "filmcraft-mpeg2v"
-version = "0.1.1"
-source = "git+https://github.com/storytold/filmcraft?rev=2c5ba7a72619935f0481f99d59409e0d1844b234#2c5ba7a72619935f0481f99d59409e0d1844b234"
-dependencies = [
- "rayon",
- "thiserror 2.0.21",
-]
-
-[[package]]
-name = "filmcraft-mpegts"
-version = "0.1.1"
-source = "git+https://github.com/storytold/filmcraft?rev=2c5ba7a72619935f0481f99d59409e0d1844b234#2c5ba7a72619935f0481f99d59409e0d1844b234"
-dependencies = [
- "thiserror 2.0.21",
-]
-
-[[package]]
-name = "filmcraft-mxf"
-version = "0.1.1"
-source = "git+https://github.com/storytold/filmcraft?rev=2c5ba7a72619935f0481f99d59409e0d1844b234#2c5ba7a72619935f0481f99d59409e0d1844b234"
-
-[[package]]
-name = "filmcraft-ogg"
-version = "0.1.1"
-source = "git+https://github.com/storytold/filmcraft?rev=2c5ba7a72619935f0481f99d59409e0d1844b234#2c5ba7a72619935f0481f99d59409e0d1844b234"
-
-[[package]]
-name = "filmcraft-opus"
-version = "0.1.1"
-source = "git+https://github.com/storytold/filmcraft?rev=2c5ba7a72619935f0481f99d59409e0d1844b234#2c5ba7a72619935f0481f99d59409e0d1844b234"
-
-[[package]]
-name = "filmcraft-project"
-version = "0.1.1"
-source = "git+https://github.com/storytold/filmcraft?rev=2c5ba7a72619935f0481f99d59409e0d1844b234#2c5ba7a72619935f0481f99d59409e0d1844b234"
-dependencies = [
- "filmcraft-color",
- "filmcraft-geom",
- "filmcraft-media",
- "filmcraft-time",
- "serde",
- "serde_json",
- "thiserror 2.0.21",
-]
-
-[[package]]
-name = "filmcraft-prores"
-version = "0.1.1"
-source = "git+https://github.com/storytold/filmcraft?rev=2c5ba7a72619935f0481f99d59409e0d1844b234#2c5ba7a72619935f0481f99d59409e0d1844b234"
-dependencies = [
- "filmcraft-bitstream",
- "rayon",
- "thiserror 2.0.21",
-]
-
-[[package]]
-name = "filmcraft-time"
-version = "0.1.1"
-source = "git+https://github.com/storytold/filmcraft?rev=2c5ba7a72619935f0481f99d59409e0d1844b234#2c5ba7a72619935f0481f99d59409e0d1844b234"
-dependencies = [
- "serde",
-]
-
-[[package]]
-name = "filmcraft-vp9"
-version = "0.1.1"
-source = "git+https://github.com/storytold/filmcraft?rev=2c5ba7a72619935f0481f99d59409e0d1844b234#2c5ba7a72619935f0481f99d59409e0d1844b234"
-dependencies = [
- "filmcraft-bitstream",
- "rayon",
- "thiserror 2.0.21",
-]
 
 [[package]]
 name = "find-msvc-tools"
@@ -2726,7 +2697,6 @@ checksum = "9f4d0e94ddd48749f06bbe4e5389fb9799a0c45bcaf00495042076ef05e3241a"
 [[package]]
 name = "hayro-jbig2"
 version = "0.3.0"
-source = "git+https://github.com/storytold/craft-libs?rev=9f75d3dc19b4b514c4f3d4847ed1ec1b0e86b4ef#9f75d3dc19b4b514c4f3d4847ed1ec1b0e86b4ef"
 dependencies = [
  "hayro-ccitt",
 ]
@@ -2740,7 +2710,6 @@ checksum = "c75ab947623ef4ccaa7acf0579edf7cbb5a73838e3839a7be73335e522f433a1"
 [[package]]
 name = "hayro-syntax"
 version = "0.7.2"
-source = "git+https://github.com/storytold/craft-libs?rev=9f75d3dc19b4b514c4f3d4847ed1ec1b0e86b4ef#9f75d3dc19b4b514c4f3d4847ed1ec1b0e86b4ef"
 dependencies = [
  "hayro-jbig2",
  "hayro-jpeg2000",

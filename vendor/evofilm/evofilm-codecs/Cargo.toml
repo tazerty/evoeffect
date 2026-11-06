@@ -1,0 +1,35 @@
+[package]
+name = "evofilm-codecs"
+description = "Container + codec hub: MP4/MOV, Matroska, MXF, Ogg and MPEG TS/PS sources, image sequences, GOP-aware seeking, decoder registry, audio decoding"
+version = "0.1.1"
+edition = "2024"
+license = "MIT OR Apache-2.0"
+rust-version = "1.95"
+
+[dependencies]
+evofilm-time = { path = "../evofilm-time" }
+evofilm-color = { path = "../evofilm-color" }
+evofilm-frame = { path = "../evofilm-frame" }
+evofilm-media = { path = "../evofilm-media" }
+evofilm-isobmff = { path = "../evofilm-isobmff" }
+evofilm-matroska = { path = "../evofilm-matroska" }
+evofilm-mxf = { path = "../evofilm-mxf" }
+evofilm-mpegts = { path = "../evofilm-mpegts" }
+evofilm-mpeg2v = { path = "../evofilm-mpeg2v" }
+evofilm-ac3 = { path = "../evofilm-ac3" }
+evofilm-ogg = { path = "../evofilm-ogg" }
+evofilm-bitstream = { path = "../evofilm-bitstream" }
+evofilm-h264 = { path = "../evofilm-h264" }
+evofilm-hevc = { path = "../evofilm-hevc" }
+evofilm-vp9 = { path = "../evofilm-vp9" }
+evofilm-prores = { path = "../evofilm-prores" }
+evofilm-dnx = { path = "../evofilm-dnx" }
+evofilm-av1 = { path = "../evofilm-av1" }
+evofilm-aac = { path = "../evofilm-aac" }
+evofilm-opus = { path = "../evofilm-opus" }
+thiserror = { version = "2" }
+log = { version = "0.4" }
+web-time = { version = "1" }
+image = { version = "0.25", default-features = false, features = ["jpeg"] }
+symphonia = { version = "0.5.5", default-features = false, features = ["aac", "mp1", "mp2", "mp3", "flac", "alac", "pcm", "wav", "ogg", "vorbis", "isomp4"] }
+

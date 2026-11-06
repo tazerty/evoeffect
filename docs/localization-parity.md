@@ -2,7 +2,7 @@
 
 > **Last reviewed:** 2026-10-14 · **Last updated:** 2026-10-23 · **Change:** minor (Georgian: menus, panels and effect names; missing strings show in English; `missing_translations_report` lists them) · **Target:** Adobe After Effects 2026
 
-How much of EffectCraft's interface is translated, language by language, compared with After
+How much of EvoEffect's interface is translated, language by language, compared with After
 Effects. [gaps.md](gaps.md) gap 16 and workstream G9 hold the work;
 [target-app-parity.md](target-app-parity.md) the overall numbers.
 
@@ -14,7 +14,7 @@ Chinese (`zh_CN`) and Traditional Chinese (`zh_TW`). Each translates the whole i
 including effect names and parameters. It ships no Hindi, Arabic, Indonesian or Vietnamese
 interface; Arabic and Hebrew text *in layers* is supported through its Middle Eastern text engine.
 
-## How EffectCraft translates
+## How EvoEffect translates
 
 - **Menus:** `crates/ui-egui/src/i18n.rs`, one catalog per language keyed by
   `(command, English label)` (624 catalog rows each at 470ea7a3, counted). A test
@@ -44,7 +44,7 @@ interface; Arabic and Hebrew text *in layers* is supported through its Middle Ea
   (`crates/ui-egui/src/i18n.rs`) prints, per language, the fixed menu entries, panel strings, effect
   names and effect categories that have no row. It always passes; `cargo xtask ci` runs it with
   `--nocapture`, so the list is in the gate log. Locally:
-  `cargo test -p effectcraft-ui-egui --lib missing_translations_report -- --nocapture`.
+  `cargo test -p evoeffect-ui-egui --lib missing_translations_report -- --nocapture`.
 - **Not translated anywhere yet:** effect *parameter* names (≈ 1,650, `crates/effects`),
   engine-generated text (property names, errors, undo labels), the Home screen's unwrapped
   literals (#574), Learn tutorials and documentation.
@@ -83,7 +83,7 @@ the true percentages are slightly lower.
 | Korean | `ko` | 0 | — | Hangul fallback probe added (#599, closed); not checked on macOS here | no | none | 9–13 h + review |
 | Vietnamese | `vi` | 0 | — | Latin with stacked diacritics; untested | no | none (After Effects: none) | 8–12 h + review |
 
-Other languages EffectCraft ships (4):
+Other languages EvoEffect ships (4):
 
 | Language | Code | UI strings translated | Status | To `full` |
 |---|---|---|---|---|
@@ -92,7 +92,7 @@ Other languages EffectCraft ships (4):
 | Czech | `cs` | 1,125 (≈ 29%): menus 624 rows, panels 501 | Existing catalog entries covered; unwrapped UI, effects and engine text still in English; AI-assisted, not yet native-speaker proofread | Remaining strings + independent native review |
 | Georgian | `ka` | 1,514 (≈ 39%): menus 628 rows, panels 886 (the Chinese catalogs' 695 plus 191 Georgian-only rows: form dialogs, context menus, column headers), effect names 307 + 21 categories; native-speaker reviewed | partial | 5–8 h |
 
-Russian (`ru`) has a menu catalog (624 rows, ≈ 16%); After Effects also ships Italian, which EffectCraft does not (8–12 h).
+Russian (`ru`) has a menu catalog (624 rows, ≈ 16%); After Effects also ships Italian, which EvoEffect does not (8–12 h).
 
 **Overall: ≈ 18%**, the average coverage of After Effects' 10 non-English languages
 (Simplified and Traditional Chinese 29%, Japanese 27%, Brazilian Portuguese 26%, Spanish, French,

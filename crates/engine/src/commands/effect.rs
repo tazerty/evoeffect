@@ -1,8 +1,8 @@
 //! Effect menu and Effect Controls gestures.
 
-use effectcraft_project::build::Ids;
-use effectcraft_project::{GroupKind, Layer, LayerId, PropGroup, Uid};
-use effectcraft_time::Tick;
+use evoeffect_project::build::Ids;
+use evoeffect_project::{GroupKind, Layer, LayerId, PropGroup, Uid};
+use evoeffect_time::Tick;
 use serde_json::{Value, json};
 
 use super::{CommandSpec, b_p, bad, f_p, has_layers, layer_mut, layers_p, str_p};
@@ -10,7 +10,7 @@ use crate::{EngineError, Result, Session, cmd};
 
 /// `effect.plugins.list`: the registered plug-in effects (WebAssembly or Rust).
 fn plugins_list(s: &mut Session, _: &Value) -> Result<Value> {
-    use effectcraft_effects::plugin;
+    use evoeffect_effects::plugin;
     let list: Vec<Value> = plugin::plugins()
         .into_iter()
         .map(|spec| {
@@ -72,14 +72,14 @@ fn plugins_load(s: &mut Session, p: &Value) -> Result<Value> {
 
 fn apply(s: &mut Session, p: &Value) -> Result<Value> {
     let name = str_p(p, "effect").ok_or_else(|| bad("effect.apply", "missing `effect` (id or name)"))?;
-    let spec = effectcraft_effects::lookup(name).ok_or_else(|| bad("effect.apply", format!("unknown effect `{name}`")))?;
+    let spec = evoeffect_effects::lookup(name).ok_or_else(|| bad("effect.apply", format!("unknown effect `{name}`")))?;
     let (cid, ids) = layers_p(s, p)?;
     if ids.is_empty() {
         return Err(bad("effect.apply", "no layer"));
     }
     let sizes: Vec<_> = {
         let comp = s.project.comp(cid).ok_or(EngineError::NoComp)?;
-        ids.iter().filter_map(|id| comp.layer(*id)).map(|l| (l.id, effectcraft_render::effect_bounds(&s.project, comp, l).0)).collect()
+        ids.iter().filter_map(|id| comp.layer(*id)).map(|l| (l.id, evoeffect_render::effect_bounds(&s.project, comp, l).0)).collect()
     };
     let uids = s.edit(&format!("Apply {}", spec.name), None, |proj, st| {
         let mut out = vec![];
@@ -89,7 +89,7 @@ fn apply(s: &mut Session, p: &Value) -> Result<Value> {
             let fx = l.props.sub_mut("effects").ok_or_else(|| bad("effect.apply", "this layer type has no effects"))?;
             let same = fx.groups().filter(|g| g.match_id == spec.id).count();
             let name = if same == 0 { spec.name.to_string() } else { format!("{} {}", spec.name, same + 1) };
-            let g = effectcraft_effects::instantiate(spec, &mut Ids(&mut next), &name, *size);
+            let g = evoeffect_effects::instantiate(spec, &mut Ids(&mut next), &name, *size);
             out.push(g.uid);
             fx.children.push(g.into());
             proj.next_id = next;
@@ -111,7 +111,7 @@ fn apply(s: &mut Session, p: &Value) -> Result<Value> {
     Ok(json!({"effects": uids, "paths": paths, "effect": spec.id}))
 }
 
-fn find_fx(s: &Session, p: &Value, cmd: &str) -> Result<(effectcraft_project::ItemId, effectcraft_project::LayerId, Uid)> {
+fn find_fx(s: &Session, p: &Value, cmd: &str) -> Result<(evoeffect_project::ItemId, evoeffect_project::LayerId, Uid)> {
     let (cid, lid) = super::layer_p(s, p, cmd)?;
     let layer = s.project.comp(cid).and_then(|c| c.layer(lid)).ok_or(EngineError::NoComp)?;
     let fx = layer.effects().ok_or_else(|| bad(cmd, "no effects"))?;
@@ -136,8 +136,8 @@ fn warning(s: &mut Session, p: &Value) -> Result<Value> {
     let layer = comp.layer(lid).ok_or(EngineError::NoComp)?;
     let g = layer.effects().and_then(|fx| fx.groups().find(|g| g.uid == uid)).ok_or_else(|| bad(cmd, "no such effect"))?;
     let t = super::time_p(s, p, Some(comp));
-    let ctx = effectcraft_render::EvalCtx { project: &s.project, comp_id: cid, comp, time: t, expr: s.expr.as_deref(), footage: None };
-    Ok(json!({"effect": uid, "warning": effectcraft_effects::warning(g, &mut |pr| ctx.value(layer, pr))}))
+    let ctx = evoeffect_render::EvalCtx { project: &s.project, comp_id: cid, comp, time: t, expr: s.expr.as_deref(), footage: None };
+    Ok(json!({"effect": uid, "warning": evoeffect_effects::warning(g, &mut |pr| ctx.value(layer, pr))}))
 }
 
 /// A colour parameter's eyedropper on a keyer (Effect Controls): the colour of the effect's input
@@ -157,11 +157,11 @@ fn pick_color(s: &mut Session, p: &Value) -> Result<Value> {
         (None, Some(path)) => g.prop(path),
         _ => return Err(bad(cmd, "missing `param` (e.g. `screenColour`) or `prop` (uid)")),
     }
-    .filter(|pr| pr.ui == effectcraft_project::ParamUi::Color)
+    .filter(|pr| pr.ui == evoeffect_project::ParamUi::Color)
     .ok_or_else(|| bad(cmd, "not a colour parameter of this effect"))?;
     let t = super::time_p(s, p, Some(comp));
-    let ctx = effectcraft_render::EvalCtx { project: &s.project, comp_id: cid, comp, time: t, expr: s.expr.as_deref(), footage: None };
-    let mut r = effectcraft_render::Renderer::new(&s.project, &*s.footage, effectcraft_render::RenderOpts::default());
+    let ctx = evoeffect_render::EvalCtx { project: &s.project, comp_id: cid, comp, time: t, expr: s.expr.as_deref(), footage: None };
+    let mut r = evoeffect_render::Renderer::new(&s.project, &*s.footage, evoeffect_render::RenderOpts::default());
     r.expr = s.expr.as_deref();
     r.cache = Some(&s.layer_cache);
     let buf = r.layer_input(&ctx, layer, index).ok_or_else(|| bad(cmd, "this layer has no pixels"))?;
@@ -189,8 +189,8 @@ fn pick_color(s: &mut Session, p: &Value) -> Result<Value> {
 /// What a Cryptomatte effect has at a layer-space point: the ID with the most coverage in its
 /// Cryptomatte layer, with the aux channels (for the manifest) and the effect's Selection.
 struct CryptoHit {
-    at: (effectcraft_project::ItemId, LayerId, Tick),
-    aux: std::sync::Arc<effectcraft_raster::AuxChannels>,
+    at: (evoeffect_project::ItemId, LayerId, Tick),
+    aux: std::sync::Arc<evoeffect_raster::AuxChannels>,
     layer: String,
     hash: u32,
     selection: String,
@@ -204,7 +204,7 @@ impl CryptoHit {
         self.aux.manifests.iter().find(|(l, _)| *l == self.layer).map(|(_, m)| m.as_slice())
     }
     fn reply(&self, sel: &str) -> Value {
-        let selected = effectcraft_effects::selection_hashes(sel, self.manifest()).contains(&self.hash);
+        let selected = evoeffect_effects::selection_hashes(sel, self.manifest()).contains(&self.hash);
         let name = self.aux.manifest_name(&self.layer, self.hash);
         json!({"name": name, "hash": format!("{:08x}", self.hash), "layer": self.layer, "selected": selected})
     }
@@ -228,11 +228,11 @@ fn crypto_hit(s: &Session, p: &Value, cmd: &str) -> Result<Option<CryptoHit>> {
     let g = fx.groups().nth(pos).ok_or_else(|| bad(cmd, "no such effect"))?;
     let prop = g.prop("selection").filter(|_| g.match_id == "ec.3d.cryptomatte").ok_or_else(|| bad(cmd, "not a Cryptomatte effect"))?;
     let t = super::time_p(s, p, Some(comp));
-    let ctx = effectcraft_render::EvalCtx { project: &s.project, comp_id: cid, comp, time: t, expr: s.expr.as_deref(), footage: None };
-    let params = effectcraft_effects::flatten_params(g, &mut |pr| ctx.value(layer, pr));
-    let r = s.renderer(effectcraft_render::RenderOpts { scale, ..Default::default() });
+    let ctx = evoeffect_render::EvalCtx { project: &s.project, comp_id: cid, comp, time: t, expr: s.expr.as_deref(), footage: None };
+    let params = evoeffect_effects::flatten_params(g, &mut |pr| ctx.value(layer, pr));
+    let r = s.renderer(evoeffect_render::RenderOpts { scale, ..Default::default() });
     let aux = r.layer_aux(&ctx, layer);
-    let want = effectcraft_effects::CRYPTO_LAYERS.get(params.e("layer") as usize).copied().unwrap_or("CryptoAsset");
+    let want = evoeffect_effects::CRYPTO_LAYERS.get(params.e("layer") as usize).copied().unwrap_or("CryptoAsset");
     let Some((aux, layer_name)) = aux.and_then(|a| a.resolve_crypto_layer(want).map(|l| (a, l))) else {
         return Err(bad(cmd, "this layer has no Cryptomatte channels (a multi-layer OpenEXR with Cryptomatte, or a 3D precomp)"));
     };
@@ -241,7 +241,7 @@ fn crypto_hit(s: &Session, p: &Value, cmd: &str) -> Result<Option<CryptoHit>> {
     let b = r.layer_input(&ctx, layer, pos).ok_or_else(|| bad(cmd, "this layer has no pixels"))?;
     let (bs, o) = (b.scale, b.offset);
     // The centre of its pixel under the point, at the aux point the effect reads there.
-    let [ax, ay] = effectcraft_effects::aux_point(bs, o, [(x * bs + o[0]).floor() + 0.5, (y * bs + o[1]).floor() + 0.5]);
+    let [ax, ay] = evoeffect_effects::aux_point(bs, o, [(x * bs + o[0]).floor() + 0.5, (y * bs + o[1]).floor() + 0.5]);
     let Some(hash) = aux.index_at(ax, ay).and_then(|i| aux.crypto_id_at(&layer_name, i)) else { return Ok(None) };
     let (selection, driven) = (params.s("selection").to_string(), prop.expr.as_ref().is_some_and(|e| e.enabled));
     Ok(Some(CryptoHit { at: (cid, lid, t), aux, layer: layer_name, hash, selection, prop: prop.uid, driven }))
@@ -256,7 +256,7 @@ fn crypto_at(s: &mut Session, p: &Value) -> Result<Value> {
 /// The Cryptomatte eyedropper: replace the effect's Selection with the ID under a point, add it
 /// or remove it, in one undo step at the time it was read (none when its meaning stays).
 fn pick_crypto(s: &mut Session, p: &Value) -> Result<Value> {
-    use effectcraft_effects::crypto_select::{PickMode, edit_selection, token_for};
+    use evoeffect_effects::crypto_select::{PickMode, edit_selection, token_for};
     let cmd = "effect.pickCryptomatte";
     let mode = match str_p(p, "mode").unwrap_or("replace") {
         "replace" => PickMode::Replace,
@@ -328,7 +328,7 @@ fn set_label(s: &mut Session, p: &Value) -> Result<Value> {
     let c = "effect.setLabel";
     let (cid, lid, uid) = find_fx(s, p, c)?;
     let lab = match p.get("label") {
-        Some(Value::Number(n)) => n.as_u64().and_then(|i| effectcraft_color::Label::ALL.get(usize::try_from(i).ok()?).copied()),
+        Some(Value::Number(n)) => n.as_u64().and_then(|i| evoeffect_color::Label::ALL.get(usize::try_from(i).ok()?).copied()),
         Some(Value::String(name)) => s.prefs.label_from_name(name),
         _ => None,
     }
@@ -336,7 +336,7 @@ fn set_label(s: &mut Session, p: &Value) -> Result<Value> {
     s.edit("Effect Label", None, |proj, _| {
         let l = layer_mut(proj, cid, lid)?;
         let g = l.props.find_group_mut(uid).ok_or_else(|| bad(c, "gone"))?;
-        g.label = (lab != effectcraft_color::Label::None).then_some(lab);
+        g.label = (lab != evoeffect_color::Label::None).then_some(lab);
         Ok(())
     })?;
     Ok(Value::Null)
@@ -595,11 +595,11 @@ fn reset(s: &mut Session, p: &Value) -> Result<Value> {
     let (cid, lid, uid) = find_fx(s, p, "effect.reset")?;
     let comp = s.project.comp(cid).ok_or(EngineError::NoComp)?;
     let layer = comp.layer(lid).ok_or(EngineError::NoComp)?;
-    let size = effectcraft_render::effect_bounds(&s.project, comp, layer).0;
+    let size = evoeffect_render::effect_bounds(&s.project, comp, layer).0;
     let lt = layer.layer_time(s.time());
     let g = layer.effects().and_then(|fx| fx.groups().find(|g| g.uid == uid)).ok_or_else(|| bad("effect.reset", "gone"))?;
     let spec = match &g.kind {
-        GroupKind::Effect { effect } => effectcraft_effects::find(effect),
+        GroupKind::Effect { effect } => evoeffect_effects::find(effect),
         _ => None,
     }
     .ok_or_else(|| bad("effect.reset", "unknown effect"))?;
@@ -609,7 +609,7 @@ fn reset(s: &mut Session, p: &Value) -> Result<Value> {
         for ps in &spec.params {
             // (`group/param` ids live in twirl-down groups.)
             if let Some(pr) = g.prop_mut(ps.id) {
-                pr.set_value_at(lt, effectcraft_effects::default_value(ps, size));
+                pr.set_value_at(lt, evoeffect_effects::default_value(ps, size));
             }
         }
         Ok(())
@@ -632,7 +632,7 @@ fn swap_tint_colors(s: &mut Session, p: &Value) -> Result<Value> {
     let color = |id| {
         g.prop(id)
             .map(|pr| pr.value_at(lt))
-            .filter(|v| matches!(v, effectcraft_keyframe::Value::Color(_)))
+            .filter(|v| matches!(v, evoeffect_keyframe::Value::Color(_)))
             .ok_or_else(|| bad(cmd, "Tint is missing a colour parameter"))
     };
     let (black, white) = (color("black")?, color("white")?);
@@ -659,20 +659,20 @@ fn last(s: &mut Session, p: &Value) -> Result<Value> {
 
 fn list(_: &mut Session, p: &Value) -> Result<Value> {
     let filter = str_p(p, "filter").map(str::to_lowercase);
-    let v: Vec<Value> = effectcraft_effects::all()
+    let v: Vec<Value> = evoeffect_effects::all()
         .into_iter()
         .filter(|e| {
-            filter.as_ref().is_none_or(|f| effectcraft_effects::name_matches(e, f) || e.id.contains(f.as_str()) || e.category.to_ascii_lowercase().contains(f))
+            filter.as_ref().is_none_or(|f| evoeffect_effects::name_matches(e, f) || e.id.contains(f.as_str()) || e.category.to_ascii_lowercase().contains(f))
         })
         .map(|e| {
             json!({"id": e.id, "name": e.name, "category": e.category, "gpu": e.gpu, "float": e.float, "params": e.params.iter().map(|p| {
                 let mut out = json!({"id": p.id, "name": p.name, "type": p.default.kind_name(), "default": p.default.to_json()});
                 match &p.ui {
-                    effectcraft_project::ParamUi::Popup { options } => {
+                    evoeffect_project::ParamUi::Popup { options } => {
                         // Engine/MCP popup values are zero-based; JSX exposes one-based values.
                         out["options"] = json!(options.iter().enumerate().map(|(value, label)| json!({"value": value, "label": label})).collect::<Vec<_>>());
                     }
-                    effectcraft_project::ParamUi::Slider { min, max, slider_min, slider_max, decimals } => {
+                    evoeffect_project::ParamUi::Slider { min, max, slider_min, slider_max, decimals } => {
                         out["min"] = json!(min);
                         out["max"] = json!(max);
                         out["sliderMin"] = json!(slider_min);
@@ -692,10 +692,10 @@ impl Session {
     /// The named channels of layer `lid` in the active comp at the current time: its
     /// multi-layer OpenEXR footage's layers and channels (`diffuse.R`, `depth.Z`, …), which
     /// EXtractoR and the 3D Channel effects read. `None` for other layers.
-    pub fn layer_channels(&self, lid: LayerId) -> Option<std::sync::Arc<effectcraft_raster::AuxChannels>> {
+    pub fn layer_channels(&self, lid: LayerId) -> Option<std::sync::Arc<evoeffect_raster::AuxChannels>> {
         let layer = self.active_comp()?.layer(lid)?;
-        let effectcraft_project::LayerSource::Footage { item } = layer.source else { return None };
-        let effectcraft_project::ItemKind::Footage(f) = &self.project.item(item)?.kind else { return None };
+        let evoeffect_project::LayerSource::Footage { item } = layer.source else { return None };
+        let evoeffect_project::ItemKind::Footage(f) = &self.project.item(item)?.kind else { return None };
         self.footage.aux(item, f, layer.layer_time(self.time()))
     }
 }

@@ -1,0 +1,17 @@
+[package]
+name = "evofilm-project"
+description = "EvoFilm document model: projects, bins, clips, sequences, tracks, effects, keyframes, markers"
+version = "0.1.1"
+edition = "2024"
+license = "MIT OR Apache-2.0"
+rust-version = "1.95"
+
+[dependencies]
+evofilm-time = { path = "../evofilm-time" }
+evofilm-geom = { path = "../evofilm-geom" }
+evofilm-color = { path = "../evofilm-color" }
+evofilm-media = { path = "../evofilm-media" }
+serde = { version = "1", features = ["derive", "rc"] }
+serde_json = { version = "1" }
+thiserror = { version = "2" }
+

@@ -6,16 +6,16 @@
 
 use std::borrow::Cow;
 
-use effectcraft_color::BlendMode;
-use effectcraft_effects::Buf;
-use effectcraft_geom::{Mat3, Mat4, Vec3, vec2, vec3};
-use effectcraft_keyframe::{Justify, TextDoc, Value};
-use effectcraft_path::{BezPath, FillRule, StrokeStyle};
-use effectcraft_project::{Layer, PropGroup};
-use effectcraft_raster::{Image, Mask};
-use effectcraft_text::path_text::{self, PathMeasure};
-use effectcraft_text::selectors::{self, BasedOn, Mode, Range, Shape, Wiggly};
-use effectcraft_text::{CharGlyph, TextLayout, char_glyph_style, layout_doc};
+use evoeffect_color::BlendMode;
+use evoeffect_effects::Buf;
+use evoeffect_geom::{Mat3, Mat4, Vec3, vec2, vec3};
+use evoeffect_keyframe::{Justify, TextDoc, Value};
+use evoeffect_path::{BezPath, FillRule, StrokeStyle};
+use evoeffect_project::{Layer, PropGroup};
+use evoeffect_raster::{Image, Mask};
+use evoeffect_text::path_text::{self, PathMeasure};
+use evoeffect_text::selectors::{self, BasedOn, Mode, Range, Shape, Wiggly};
+use evoeffect_text::{CharGlyph, TextLayout, char_glyph_style, layout_doc};
 
 use crate::eval::EvalCtx;
 
@@ -59,7 +59,7 @@ pub struct CharXf {
     pub axes: [([u8; 4], f64); 4],
     pub n_axes: u8,
     /// Front / Bevel / Side / Back Color of the extruded character (Advanced 3D), by
-    /// `effectcraft_model::extrude::Surface` index, and the selection each was set with.
+    /// `evoeffect_model::extrude::Surface` index, and the selection each was set with.
     pub surface: [Option<[f32; 4]>; 4],
     pub surface_k: [f32; 4],
 }
@@ -92,7 +92,7 @@ impl CharXf {
 }
 
 /// Animator property match ids of Front / Bevel / Side / Back Color, in
-/// `effectcraft_model::extrude::Surface::ALL` order.
+/// `evoeffect_model::extrude::Surface::ALL` order.
 pub const SURFACE_ANIM_PROPS: [&str; 4] = ["frontColor", "bevelColor", "sideColor", "backColor"];
 
 /// Animator property match id of a Variable Font Axes property (`axis_wght`).
@@ -189,7 +189,7 @@ pub fn range_value_of(f: f64, offset: f64, units_index: bool, n: usize) -> f64 {
 
 /// Whether property `uid` of `layer` is a Range Selector's Start, End or Offset while its Units
 /// are Index: the value is then a count of characters (words, lines), not a percentage.
-pub fn in_index_units(layer: &Layer, uid: effectcraft_project::Uid) -> bool {
+pub fn in_index_units(layer: &Layer, uid: evoeffect_project::Uid) -> bool {
     let Some(sel) = layer.props.parent_of(uid).filter(|g| g.match_id == "rangeSelector") else { return false };
     let is_range_value = sel.props().any(|p| p.uid == uid && matches!(p.match_id.as_str(), "start" | "end" | "offset"));
     is_range_value && sel.prop("advanced/units").is_some_and(|u| u.value == Value::Enum(1))
@@ -507,7 +507,7 @@ impl PlacedGlyph {
     }
     /// Outline in layer space (2D).
     pub fn path(&self) -> BezPath {
-        effectcraft_path::transform(std::slice::from_ref(&self.local), &self.m2()).remove(0)
+        evoeffect_path::transform(std::slice::from_ref(&self.local), &self.m2()).remove(0)
     }
     /// [`Self::bold`] in layer space.
     fn bold_in_layer(&self) -> f64 {
@@ -549,11 +549,11 @@ fn adjust_color(base: [f32; 4], rgb: Option<[f32; 4]>, k: f32, hsb: [f64; 3], op
         None => base,
     };
     if hsb != [0.0; 3] {
-        let (h, s, v) = effectcraft_color::rgb_to_hsv(c[0], c[1], c[2]);
+        let (h, s, v) = evoeffect_color::rgb_to_hsv(c[0], c[1], c[2]);
         let h = h + (hsb[0] / 360.0) as f32;
         let s = (s + (hsb[1] / 100.0) as f32).clamp(0.0, 1.0);
         let v = (v + (hsb[2] / 100.0) as f32).clamp(0.0, 1.0);
-        let (r, g, b) = effectcraft_color::hsv_to_rgb(h, s, v);
+        let (r, g, b) = evoeffect_color::hsv_to_rgb(h, s, v);
         c = [r, g, b, c[3]];
     }
     c[3] *= (opacity / 100.0).clamp(0.0, 1.0) as f32;
@@ -569,7 +569,7 @@ fn text_path(ctx: &EvalCtx, layer: &Layer, text: &PropGroup) -> Option<(PathMeas
     }
     let mask = layer.masks()?.groups().nth(k - 1)?;
     let Some(Value::Path(sp)) = ctx.group_value(layer, mask, "path") else { return None };
-    let bp = effectcraft_path::to_kurbo(&sp);
+    let bp = evoeffect_path::to_kurbo(&sp);
     let pm = PathMeasure::new(&bp, ctx.b(layer, po, "reversePath"));
     if pm.is_empty() {
         return None;
@@ -586,7 +586,7 @@ pub fn caret_maps(ctx: &EvalCtx, layer: &Layer, chars: usize) -> Vec<Mat3> {
     let mut by_char: Vec<Option<Mat3>> = vec![None; chars + 1];
     for g in &geom.glyphs {
         if let Some(slot) = by_char.get_mut(g.char_index) {
-            *slot = Some(g.m2() * Mat3::translate(effectcraft_geom::vec2(-g.rest[0], -g.rest[1])));
+            *slot = Some(g.m2() * Mat3::translate(evoeffect_geom::vec2(-g.rest[0], -g.rest[1])));
         }
     }
     let first = by_char.iter().flatten().next().copied().unwrap_or(Mat3::IDENTITY);
@@ -623,7 +623,7 @@ pub fn text_geom(ctx: &EvalCtx, layer: &Layer) -> Option<TextGeom> {
     let galign = more.map(|m| ctx.v2(layer, m, "groupingAlignment", [0.0; 2])).unwrap_or([0.0; 2]);
     let fill_stroke = more.map(|m| ctx.e(layer, m, "fillStroke")).unwrap_or(0);
     let blend_idx = more.map(|m| ctx.e(layer, m, "interCharBlend")).unwrap_or(0) as usize;
-    let blend = effectcraft_project::build::INTER_CHAR_BLEND_MODES.get(blend_idx).and_then(|n| BlendMode::from_name(n)).unwrap_or_default();
+    let blend = evoeffect_project::build::INTER_CHAR_BLEND_MODES.get(blend_idx).and_then(|n| BlendMode::from_name(n)).unwrap_or_default();
 
     // Character substitutions (Character Offset / Value). Adjust Kerning re-lays out the text.
     let mut subs: Vec<Option<char>> = lay.glyphs.iter().zip(&xfs).map(|(g, x)| substitute(g.ch, x)).collect();
@@ -651,7 +651,7 @@ pub fn text_geom(ctx: &EvalCtx, layer: &Layer) -> Option<TextGeom> {
     let n = lay.glyphs.len();
     let vadv: Vec<f64> = (0..n)
         .map(|gi| match (subs[gi], xfs[gi].axis_deltas()) {
-            (None, d) if !d.is_empty() => effectcraft_text::variable::char_advance_delta(&lay.glyphs[gi], &d).unwrap_or(0.0),
+            (None, d) if !d.is_empty() => evoeffect_text::variable::char_advance_delta(&lay.glyphs[gi], &d).unwrap_or(0.0),
             _ => 0.0,
         })
         .collect();
@@ -770,7 +770,7 @@ pub fn text_geom(ctx: &EvalCtx, layer: &Layer) -> Option<TextGeom> {
             }
             // Variable Font Axes: the outline redrawn at the animated design-space position.
             None => match x.axis_deltas() {
-                d if !d.is_empty() => (effectcraft_text::variable::char_outline_varied(g, &d).unwrap_or_else(|| g.path.clone()), advance(gi)),
+                d if !d.is_empty() => (evoeffect_text::variable::char_outline_varied(g, &d).unwrap_or_else(|| g.path.clone()), advance(gi)),
                 _ => (g.path.clone(), g.advance),
             },
         };
@@ -863,12 +863,12 @@ fn passes(geom: &TextGeom) -> Vec<Pass> {
 /// Coverage of the outline grown by `d` on every side (shrunk when `d` is negative): the fill
 /// merged with, or cut by, a round stroke `2|d|` wide, which keeps the edges anti-aliased.
 fn grown_coverage(paths: &[BezPath], mm: &Mat3, w: u32, h: u32, d: f64) -> Mask {
-    let mut cov = effectcraft_path::fill_coverage(paths, mm, w, h, FillRule::NonZero);
+    let mut cov = evoeffect_path::fill_coverage(paths, mm, w, h, FillRule::NonZero);
     if d.abs() < 1e-9 {
         return cov;
     }
-    let st = StrokeStyle { width: 2.0 * d.abs(), join: effectcraft_path::Join::Round, ..Default::default() };
-    let ring = effectcraft_path::stroke_coverage(paths, &st, mm, w, h);
+    let st = StrokeStyle { width: 2.0 * d.abs(), join: evoeffect_path::Join::Round, ..Default::default() };
+    let ring = evoeffect_path::stroke_coverage(paths, &st, mm, w, h);
     for (c, r) in cov.data.iter_mut().zip(&ring.data) {
         *c = if d > 0.0 { c.max(*r) } else { c.min(1.0 - r) };
     }
@@ -891,8 +891,8 @@ fn raster_pass(g: &PlacedGlyph, stroke: bool, paths: &[BezPath], m: &Mat3, rect:
         }
         outer
     } else if stroke {
-        let st = StrokeStyle { width: g.stroke_width, join: effectcraft_path::Join::Round, ..Default::default() };
-        effectcraft_path::stroke_coverage(paths, &st, &mm, w, h)
+        let st = StrokeStyle { width: g.stroke_width, join: evoeffect_path::Join::Round, ..Default::default() };
+        evoeffect_path::stroke_coverage(paths, &st, &mm, w, h)
     } else {
         grown_coverage(paths, &mm, w, h, bold)
     };
@@ -907,7 +907,7 @@ fn raster_pass(g: &PlacedGlyph, stroke: bool, paths: &[BezPath], m: &Mat3, rect:
         }
     }
     if blur_px[0] > 0.05 || blur_px[1] > 0.05 {
-        img = effectcraft_raster::gaussian_blur(&img, blur_px[0] / 2.0, blur_px[1] / 2.0, false);
+        img = evoeffect_raster::gaussian_blur(&img, blur_px[0] / 2.0, blur_px[1] / 2.0, false);
     }
     img
 }
@@ -928,7 +928,7 @@ fn blit(dst: &mut Image, src: &Image, at: [i64; 2], mode: BlendMode) {
                 continue;
             }
             let d = &mut dst.data[(ty * dst.width as i64 + tx) as usize];
-            *d = effectcraft_color::blend_pixel(mode, *d, s, 0.5);
+            *d = evoeffect_color::blend_pixel(mode, *d, s, 0.5);
         }
     }
 }
@@ -989,13 +989,13 @@ fn draw_glyphs(geom: &TextGeom, img: &mut Image, to_px: &Mat3, s: f64, only: Opt
                 (Cow::Owned(run.iter().map(|&gi| wound(geom.glyphs[gi].path())).collect()), *to_px, g.bold_in_layer())
             }
         };
-        let Some(b) = effectcraft_path::bounds(&paths) else { continue };
+        let Some(b) = evoeffect_path::bounds(&paths) else { continue };
         let blur = [g.xf.blur[0] * s, g.xf.blur[1] * s];
         // Stroke and bold grow the outline in the paths' space: under a non-uniform `m` they reach
         // further along one axis than the other.
         let [px, py] = axis_reach(&m, g.stroke_width + 2.0 * bold);
         let pad = 2.0 + blur[0].max(blur[1]) * 1.5;
-        let r = m.map_rect(&effectcraft_geom::Rect::new(b.x0, b.y0, b.x1, b.y1));
+        let r = m.map_rect(&evoeffect_geom::Rect::new(b.x0, b.y0, b.x1, b.y1));
         let rect = [
             ((r.x0 - px - pad).floor() as i64).max(0),
             ((r.y0 - py - pad).floor() as i64).max(0),
@@ -1016,7 +1016,7 @@ pub fn render(ctx: &EvalCtx, layer: &Layer, s: f64) -> Buf {
     let Some(geom) = text_geom(ctx, layer) else { return empty() };
     let mut bounds: Option<kurbo::Rect> = None;
     for g in &geom.glyphs {
-        if let Some(b) = effectcraft_path::bounds(&[g.path()]) {
+        if let Some(b) = evoeffect_path::bounds(&[g.path()]) {
             let [bx, by] = axis_reach(&g.m2(), 2.0 * g.bold);
             let pad = g.stroke_width + 2.0 + g.xf.blur[0].max(g.xf.blur[1]) * 1.5;
             let b = b.inflate(pad + bx, pad + by);
@@ -1043,7 +1043,7 @@ pub fn per_char_planes(ctx: &EvalCtx, layer: &Layer, s: f64) -> Vec<(Buf, Mat4)>
         if g.xf.opacity <= 0.0 {
             continue;
         }
-        let Some(b) = effectcraft_path::bounds(std::slice::from_ref(&g.local)) else { continue };
+        let Some(b) = evoeffect_path::bounds(std::slice::from_ref(&g.local)) else { continue };
         let pad = g.stroke_width + 2.0 * g.bold + 2.0 + g.xf.blur[0].max(g.xf.blur[1]) * 1.5;
         let b = b.inflate(pad, pad);
         let w = ((b.width() * s).ceil() as u32 + 4).clamp(1, 4096);

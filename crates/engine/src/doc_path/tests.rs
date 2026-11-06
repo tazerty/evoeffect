@@ -1,6 +1,6 @@
 use std::sync::{Arc, Mutex};
 
-use effectcraft_project::{Footage, ItemId, ItemKind};
+use evoeffect_project::{Footage, ItemId, ItemKind};
 use serde_json::json;
 
 use crate::{Event, Services, Session};
@@ -44,7 +44,7 @@ impl crate::Importer for Stills {
         if !std::path::Path::new(path).is_file() {
             return Err(format!("{path}: no such file"));
         }
-        Ok(Footage { path: path.into(), kind: effectcraft_project::FootageKind::Still, width: 64, height: 32, has_video: true, ..Default::default() })
+        Ok(Footage { path: path.into(), kind: evoeffect_project::FootageKind::Still, width: 64, height: 32, has_video: true, ..Default::default() })
     }
 }
 
@@ -82,7 +82,7 @@ fn footage_on_other_computers_is_never_looked_at() {
         let f = Footage { path: path.clone(), width: 64, height: 48, has_video: true, ..Default::default() };
         Arc::make_mut(&mut s.project).add_item(name, crate::color::Label::None, None, ItemKind::Footage(f));
     }
-    let project = dir.join("p.ecproj");
+    let project = dir.join("p.evoeffect");
     s.execute("file.saveAs", json!({"path": project.to_string_lossy()})).unwrap();
 
     let rec = Arc::new(Recording::default());
@@ -145,7 +145,7 @@ fn footage_on_other_computers_is_never_looked_at() {
 
 #[test]
 fn stored_paths_resolve_against_the_project() {
-    let doc = std::env::temp_dir().join("art").join("intro.ecproj");
+    let doc = std::env::temp_dir().join("art").join("intro.evoeffect");
     let doc = doc.to_str().unwrap();
     assert_eq!(super::resolve("clip.mov", Some(doc)), Ok(std::env::temp_dir().join("art").join("clip.mov")));
     assert_eq!(super::resolve("clip.mov", None), Err(super::NotFollowed::NoProjectFolder));
@@ -167,5 +167,5 @@ fn stored_paths_resolve_against_the_project() {
     #[cfg(unix)]
     assert_eq!(super::resolve(r"C:\art\clip.mov", Some(doc)), Err(super::NotFollowed::Refused(super::Refused::Invalid)));
     #[cfg(windows)]
-    assert!(super::resolve(r"\\server\share\x.mov", Some(r"\\SERVER\share\job\intro.ecproj")).is_ok());
+    assert!(super::resolve(r"\\server\share\x.mov", Some(r"\\SERVER\share\job\intro.evoeffect")).is_ok());
 }

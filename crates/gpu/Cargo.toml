@@ -1,5 +1,5 @@
 [package]
-name = "effectcraft-gpu"
+name = "evoeffect-gpu"
 description = "The GPU compositor (wgpu compute): layer transforms, masks/mattes, the 38 blend modes, motion blur, bit-depth quantisation and GPU effects, with the CPU renderer as the reference"
 version.workspace = true
 edition.workspace = true
@@ -10,14 +10,14 @@ rust-version.workspace = true
 workspace = true
 
 [dependencies]
-effectcraft-time = { workspace = true }
-effectcraft-geom = { workspace = true }
-effectcraft-color = { workspace = true }
-effectcraft-project = { workspace = true }
-effectcraft-raster = { workspace = true }
-effectcraft-effects = { workspace = true }
-effectcraft-render = { workspace = true }
-effectcraft-keyframe = { workspace = true }
+evoeffect-time = { workspace = true }
+evoeffect-geom = { workspace = true }
+evoeffect-color = { workspace = true }
+evoeffect-project = { workspace = true }
+evoeffect-raster = { workspace = true }
+evoeffect-effects = { workspace = true }
+evoeffect-render = { workspace = true }
+evoeffect-keyframe = { workspace = true }
 wgpu = { workspace = true }
 bytemuck = { workspace = true }
 log = { workspace = true }
@@ -27,7 +27,7 @@ web-time = { workspace = true }
 pollster = { workspace = true }
 
 [dev-dependencies]
-effectcraft-text = { workspace = true }
+evoeffect-text = { workspace = true }
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
 wasm-bindgen = "=0.2.129"

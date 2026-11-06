@@ -4,7 +4,7 @@
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex, PoisonError};
 
-use effectcraft_engine::{Services, Session};
+use evoeffect_engine::{Services, Session};
 
 use crate::run_code;
 
@@ -39,7 +39,7 @@ fn a_script_opens_a_file_only_the_host_holds() {
     let mut s = Session { services: mem, ..Default::default() };
     crate::install(&mut s);
     // A project in a folder that isn't on disk: scripts may read files next to it.
-    s.path = Some("/browser/project.ecproj".into());
+    s.path = Some("/browser/project.evoeffect".into());
     let out = run_code(
         &mut s,
         r#"var f = new File("/browser/data.txt"); var ok = f.open("r");

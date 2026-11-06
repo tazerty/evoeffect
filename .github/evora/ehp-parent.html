@@ -231,7 +231,7 @@ S.step = {
     S.ids.doc = ulid();
     S.ids.open = ulid();
     const bytes = new TextEncoder().encode(PROJECT).buffer;
-    send({ v: 1, type: "evora:open", id: S.ids.open, payload: { docRef: S.ids.doc, name: "evora-smoke.ecproj", bytes } }, [bytes]);
+    send({ v: 1, type: "evora:open", id: S.ids.open, payload: { docRef: S.ids.doc, name: "evora-smoke.evoeffect", bytes } }, [bytes]);
     return true;
   },
   // The same evora:request-save from two windows that aren't the engine's parent (one on this
@@ -281,7 +281,7 @@ S.step = {
     const bytes = new TextEncoder().encode(text.split(`/evora/${U1}/`).join(`/evora/${U2}/`)).buffer;
     S.ids.doc3 = ulid();
     S.ids.reopen = ulid();
-    send({ v: 1, type: "evora:open", id: S.ids.reopen, payload: { docRef: S.ids.doc3, name: "evora-medias.ecproj", bytes } }, [bytes]);
+    send({ v: 1, type: "evora:open", id: S.ids.reopen, payload: { docRef: S.ids.doc3, name: "evora-medias.evoeffect", bytes } }, [bytes]);
     return true;
   },
   purge: () => request("purge", "evora:purge", { scope: "current" }),

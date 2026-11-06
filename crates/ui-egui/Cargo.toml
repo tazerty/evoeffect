@@ -1,6 +1,6 @@
 [package]
-name = "effectcraft-ui-egui"
-description = "The EffectCraft egui frontend (swappable): docking panels, composition viewer, timeline, effect controls, control channel"
+name = "evoeffect-ui-egui"
+description = "The EvoEffect egui frontend (swappable): docking panels, composition viewer, timeline, effect controls, control channel"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
@@ -10,17 +10,17 @@ rust-version.workspace = true
 workspace = true
 
 [dependencies]
-craft-ui = { workspace = true }
-effectcraft-time = { workspace = true }
-effectcraft-geom = { workspace = true }
-effectcraft-color = { workspace = true }
-effectcraft-keyframe = { workspace = true }
-effectcraft-project = { workspace = true }
-effectcraft-path = { workspace = true }
-effectcraft-text = { workspace = true }
-effectcraft-render = { workspace = true }
-effectcraft-engine = { workspace = true }
-effectcraft-gpu = { workspace = true }
+evo-ui = { workspace = true }
+evoeffect-time = { workspace = true }
+evoeffect-geom = { workspace = true }
+evoeffect-color = { workspace = true }
+evoeffect-keyframe = { workspace = true }
+evoeffect-project = { workspace = true }
+evoeffect-path = { workspace = true }
+evoeffect-text = { workspace = true }
+evoeffect-render = { workspace = true }
+evoeffect-engine = { workspace = true }
+evoeffect-gpu = { workspace = true }
 egui = { workspace = true }
 eframe = { workspace = true, features = ["default_fonts", "wgpu", "accesskit"] }
 serde = { workspace = true }
@@ -38,7 +38,7 @@ sys-locale = { workspace = true }
 [dev-dependencies]
 egui_kittest = { workspace = true, features = ["eframe", "wgpu"] }
 pollster = "0.4"
-effectcraft-host = { workspace = true }
+evoeffect-host = { workspace = true }
 exr = { workspace = true }
 
 [build-dependencies]

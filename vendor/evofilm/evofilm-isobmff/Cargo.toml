@@ -1,0 +1,12 @@
+[package]
+name = "evofilm-isobmff"
+description = "Clean-room ISO BMFF (MP4) and QuickTime (MOV) demuxer and muxer"
+version = "0.1.1"
+edition = "2024"
+license = "MIT OR Apache-2.0"
+rust-version = "1.95"
+
+[dependencies]
+evofilm-bitstream = { path = "../evofilm-bitstream" }
+thiserror = { version = "2" }
+

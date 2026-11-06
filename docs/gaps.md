@@ -1,8 +1,8 @@
-# Where EffectCraft falls short
+# Where EvoEffect falls short
 
 > **Last reviewed:** 2026-10-12 · **Last updated:** 2026-10-13 · **Change:** minor (path-editing layer bounds, #1220; issue, PR and catalog references gap 21: percentage guides and effect colour labels in; earlier change: re-audited against `upstream/main` 470ea7a3; ranked gap list from the 10 October re-measure otherwise unchanged) · **Target:** Adobe After Effects 2026 (26.5.0.89)
 
-An honest assessment of how far EffectCraft is from being a real replacement for After Effects,
+An honest assessment of how far EvoEffect is from being a real replacement for After Effects,
 and the work that closes the gap. This document is meant for contributors and agents choosing
 what to work on. [target-app-parity.md](target-app-parity.md) holds the numbers and how they were
 measured; the [ROADMAP](../ROADMAP.md) summarises both. Estimates marked "≈" are judgements from
@@ -21,7 +21,7 @@ Substance materials, ACES 2.0, Proportional Scrubbing, paste SVG/AI as shapes…
 animation presets, project and template formats, and hardware encoding.
 
 **Ready for real work ≈ 45%** answers *can someone who uses After Effects for a living do real
-work in EffectCraft?* It is still estimated, not measured. Four things hold it back: projects we
+work in EvoEffect?* It is still estimated, not measured. Four things hold it back: projects we
 can't open (`.aep`), behaviour nobody has checked against After Effects (one live comparison so
 far: scalar ease, 168 samples), reliability outside macOS, and the third-party plug-ins and
 presets professional projects depend on. It sits higher than the 5 October estimate (30–50%)
@@ -63,7 +63,7 @@ are grouped by area; the issue tracker has the rest.
 | 4 | **No CI gate on pull requests** | `.github/workflows` has release, packaging-lint, FreeBSD and Windows ARM64 jobs only; `cargo xtask ci` runs locally | Regressions reach main unseen; 49 community PRs landed in one batch (#598) | 4–8 h | G3 · this file |
 | 5 | **Playback and scrubbing feel** | #595 stutter on cached frames (partly addressed: nearest-first RAM preview prefetch, cache bars at 1/3 resolution), #304, #504 / #335 audio late or crackling, #586 puppet lag (maintainers asked for details); #329 slow scrubbing (#784) and #554 closed | Preview is where motion designers spend their day | 25–50 h | G5 · [hardware-parity.md](hardware-parity.md) |
 | 6 | **Linux and Windows interaction bugs** | Open: #488 rename arrows (hardening landed, reporter asked for details), #492 anchor drag, #268 file drops on Wayland (winit), #613 Direct3D 12 compositor. Now closed: #491, #493, #467, #320, #302, #596 | Many reports come from Linux; some Windows GPUs fail to start the compositor | 25–45 h | G2 · [ui-parity.md](ui-parity.md) |
-| 7 | **Animation presets: 54 against 621** | After Effects ships 621 `.ffx` presets (Behaviors, Backgrounds, Shapes, Synthetics, Text, Transitions…); we ship 54 original presets (8 text-animator; 23 Transitions: wipes, clock and fan reveals, blinds, dissolves, card flips, CC wipes, fades, #757; 23 Backgrounds: drifting gradients, fog, cloud and smoke, plasma and magma, cells, hexagons, scrolling grids and checks, pulse rings, bokeh, light sweep, #1096, driven by expressions so they keep moving, not seamless loops) and read only our `.ecpreset`. Missing: Behaviors, Shapes, Synthetics, Image and more Text | Presets are how many designers start; tutorials assume them | 15–35 h (original presets; `.ffx` reading is out of clean-room scope) | G8 · [effects-parity.md](effects-parity.md) |
+| 7 | **Animation presets: 54 against 621** | After Effects ships 621 `.ffx` presets (Behaviors, Backgrounds, Shapes, Synthetics, Text, Transitions…); we ship 54 original presets (8 text-animator; 23 Transitions: wipes, clock and fan reveals, blinds, dissolves, card flips, CC wipes, fades, #757; 23 Backgrounds: drifting gradients, fog, cloud and smoke, plasma and magma, cells, hexagons, scrolling grids and checks, pulse rings, bokeh, light sweep, #1096, driven by expressions so they keep moving, not seamless loops) and read only our `.evoeffectpreset`. Missing: Behaviors, Shapes, Synthetics, Image and more Text | Presets are how many designers start; tutorials assume them | 15–35 h (original presets; `.ffx` reading is out of clean-room scope) | G8 · [effects-parity.md](effects-parity.md) |
 | 8 | **Mask and shape bugs** | Open: #1004 mask vertex multi-select, #999 auto-pan, #1042 / #1033 vertex nodes under the bounding box, #959 / #960 shape group toggles and operators. Now closed: #510, #513, #527, #509, #303, #553, #932 (Convert To Bezier Path on a shape layer's parametric path) | Masks are core compositing | 10–20 h | G2 · [target-app-parity.md](target-app-parity.md) |
 | 9 | **Effect behaviour bugs** | #580, #463 Curl Noise, #369 Motion Tile output size, #943 Turbulent Displace Evolution, #473 Cryptomatte selection (quoted names with commas fixed, 3b7f1ace; UI and GPU time open), #474 multi-layer EXR (decode shared, faffad3a; f16 storage and cache sizing open). Closed: #526, #514, #533–#536 | Each one breaks a look someone built | 10–20 h | G1/G2 · [effects-parity.md](effects-parity.md) |
 | 10 | **Colour pipeline differences** | #340 ProRes 4444 tagged bt709 but sRGB-encoded (open); ACES 2.0 / OCIO 2.5 configs (26.5) missing; now closed: #494 32-bpc blend modes, #495 and #750 Working Gamma 2.4, #546 / #547 viewer colour | Wrong colour in delivery is a client-visible failure | 15–30 h | G1 · [file-format-parity.md](file-format-parity.md) |
@@ -71,15 +71,15 @@ are grouped by area; the issue tracker has the rest.
 | 12 | **3D interaction and depth** | No 3D transform gizmos (#392, #347); camera aperture (#260); reflections (#261); extruded surface materials beyond Front / Bevel / Side / Back Color (fb5a5e9a; #315 closed); #307 reopened (the viewer's renderer button now shows and switches the renderer, #645); Z position (#489) closed | Advanced 3D is After Effects' growth area since 2023 | 20–35 h | G2 · [ui-parity.md](ui-parity.md) |
 | 13 | **3D model formats and materials** | After Effects 26 imports FBX, USD/USDZ, STL besides glTF and OBJ (`usd_plugins`), and Substance 3D materials with mesh displacement (26.0–26.2); we read glTF, OBJ, STL (binary and ASCII, with facet colours) and FBX 7.x (binary and ASCII: meshes, hierarchy, Lambert/Phong materials and textures; no FBX animation or skinning yet) | Product shots and 3D scenes come as FBX/USDZ | 25–45 h | — · [file-format-parity.md](file-format-parity.md) |
 | 14 | **Object Matte** (26.2, disk cache in 26.5) | First slice (#783): the Object Matte effect (Effect ▸ Matte) and `objectMatte.apply` turn a point (and optional box) on a reference frame into a matte and follow the object up to 600 frames each way, or segment every frame on its own; Roto Brush's engine, cache and model (MobileSAM from Settings ▸ Roto Brush, classical graph cut without it). Since then: the Object Matte tool in the viewer (click / drag a box, hover crosshair), the box as the model's box prompt, background tracking with progress and cancel, Freeze, and segmentations kept in the disk cache (26.5). Missing: a comparison with After Effects ([plan](fidelity/object-matte.md)) | The new one-click roto | 10–20 h | G7 · [target-app-parity.md](target-app-parity.md) |
-| 15 | **Hardware video decode and encode** | No VideoToolbox, NVENC, Quick Sync or VA-API; #498 asks for it (answered: CUDA / NVENC need Nvidia's proprietary SDK through FFI, which the no-`unsafe` rule forbids); open PR #819 adds hardware decoding via `filmcraft-platform`; FilmCraft has VideoToolbox / NVENC / VA-API paths to borrow | 4K playback and export speed | 25–45 h | G5/G6 · [hardware-parity.md](hardware-parity.md) |
+| 15 | **Hardware video decode and encode** | No VideoToolbox, NVENC, Quick Sync or VA-API; #498 asks for it (answered: CUDA / NVENC need Nvidia's proprietary SDK through FFI, which the no-`unsafe` rule forbids); open PR #819 adds hardware decoding via `evofilm-platform`; EvoFilm has VideoToolbox / NVENC / VA-API paths to borrow | 4K playback and export speed | 25–45 h | G5/G6 · [hardware-parity.md](hardware-parity.md) |
 | 16 | **Localization depth** | Menus in 11 languages (ja, zh-hans, zh-hant, uk, es, pt-br, ru, fr, de, cs, ka: 628 rows each); panels in 7 (ja, zh-hans, zh-hant, uk, pt-br, cs, ka); effect names translated in Simplified Chinese and Georgian (307, plus the generated Effect menu), their ~1,650 parameter names untranslated; Korean and Italian (After Effects ships them) absent; Hangul probe added (#599 closed) | After Effects is used heavily in Japan, China, Korea, Brazil, Europe | 60–110 h + native review | G9 · [localization-parity.md](localization-parity.md) |
-| 17 | **Media Browser lists files import refuses** | `media_browser.rs` lists AVI; `media::is_importable` has none of them (Targa and Radiance HDR import since #745; DPX and Cineon since #756, log shown as stored: no Cineon Settings conversion yet; MXF OP1a / OP-Atom since #767; FilmCraft has no AVI demuxer); #431 and #324 closed | Confusing failures on common VFX formats | 15–30 h | G6 · [file-format-parity.md](file-format-parity.md) |
+| 17 | **Media Browser lists files import refuses** | `media_browser.rs` lists AVI; `media::is_importable` has none of them (Targa and Radiance HDR import since #745; DPX and Cineon since #756, log shown as stored: no Cineon Settings conversion yet; MXF OP1a / OP-Atom since #767; EvoFilm has no AVI demuxer); #431 and #324 closed | Confusing failures on common VFX formats | 15–30 h | G6 · [file-format-parity.md](file-format-parity.md) |
 | 18 | **Relative paths and relinking** | Projects store absolute footage paths; no relink when a project moves | Moving or sharing a project breaks it | 6–12 h | G4 · [file-format-parity.md](file-format-parity.md) |
 | 19 | **Plug-in ecosystem** | No After Effects SDK hosting (#600, #327 OpenFX, #334, #376 plug-in manager); our WebAssembly API has no third-party plug-ins | Many pro projects depend on Trapcode, Element, Saber… | 40–80 h for API growth; SDK hosting needs an owner decision | G8 · [scripting-parity.md](scripting-parity.md) |
 | 20 | **Multi-monitor and video output** | #486: any panel can move into a native window of its own (panel menu ▸ Move Panel to New Window, `window.panelWindow`) and so onto another screen, restored with the workspace; still missing: dragging tabs between those windows, app shortcuts while one has the focus, named workspaces remembering them, Mercury Transmit to video hardware (we have a second preview window only) | Two-screen setups are standard for professionals | 10–20 h | G2 · [hardware-parity.md](hardware-parity.md) |
 | 21 | **Small 26.x features** | Proportional Scrubbing (26.2), pasting Illustrator's own clipboard data as shapes (26.3; SVG markup on the clipboard pastes as a shape layer, #738), variable-font filter (26.3), the rebuilt Effect Controls (26.5). Percentage guides (View ▸ Add Percentage Guide, Convert Guides to Percentage / Pixels) and effect colour labels (Effect Controls header bar and right-click Label menu, `effect.setLabel`) are in (#1095), built from the release notes' one-line descriptions and never compared with After Effects: the Timeline's effect rows wear the label as a colour bar on the left edge (#1509), but After Effects' exact UI there is unknown | Users of the current version expect them | 10–20 h left | — · [ui-parity.md](ui-parity.md) |
 | 22 | **Encoder efficiency** | HEVC / AV1 have no B-frames, multi-reference or SAO / CDEF; Opus no FEC / DTX; single-file intermediates are 8-bit uncompressed QuickTime only (#372 closed by #778: no 16-bpc, AVI or lossless-compressed codec); #325 render over existing file | Larger files than After Effects + Media Encoder | 20–40 h | G6 · [file-format-parity.md](file-format-parity.md) |
-| 23 | **Essential Graphics interchange** | Templates are `.ectemplate`, not `.mogrt`; #338 and #611 closed | Premiere editors can't use our templates | 15–30 h | — · [file-format-parity.md](file-format-parity.md) |
+| 23 | **Essential Graphics interchange** | Templates are `.evoeffecttemplate`, not `.mogrt`; #338 and #611 closed | Premiere editors can't use our templates | 15–30 h | — · [file-format-parity.md](file-format-parity.md) |
 | 24 | **Timeline depth requests** | #601 expand precomps in place, #602 reorderable render stack, #604 guide-only effects, #425 keyframe confusion (#355 and #428 closed) | Power-user speed | 15–30 h | G2 · [ui-parity.md](ui-parity.md) |
 | 25 | **Accessibility** | AccessKit is enabled in eframe and tests read focus labels; the Project panel has After Effects' arrow-key navigation and named, stateful AccessKit nodes (#776), but the other panels have had no screen-reader pass or keyboard navigation audit, and there is no contrast check | Excludes users; After Effects supports screen readers poorly too | 15–30 h | G9 · [ui-parity.md](ui-parity.md) |
 
@@ -96,7 +96,7 @@ The most important missing piece: it turns every other estimate here into a meas
   blend modes, track mattes, each effect at default and at non-default settings, text animators,
   expressions, 3D, motion blur, time remapping.
 - Drive After Effects through ExtendScript (see CLAUDE.md) to record property values at sampled
-  times and render reference frames; render the same projects in EffectCraft headless.
+  times and render reference frames; render the same projects in EvoEffect headless.
 - Compare values exactly and frames with a perceptual metric; publish a per-feature fidelity
   score and a fidelity column in target-app-parity.md.
 - Clean room: After Effects output stays local in `plan/aftereffects/ref/` (gitignored). Commit
@@ -117,23 +117,23 @@ The most important missing piece: it turns every other estimate here into a meas
 - Path editing (#1220): selected shape and mask paths suppress the layer transform box while
   their points are edited. `ui_viewer` regressions cover Pen-family tools, Selection vertex
   dragging and undo, restoration of layer controls, and layers without visible paths.
-- Regression evidence for [#66](https://github.com/storytold/effectcraft/issues/66): scripted
+- Regression evidence for [#66](https://github.com/tazerty/evoeffect/issues/66): scripted
   pointer tests in `ui_viewer` and `ui_text_edit`, checked headlessly on Linux, cover viewer clicks,
   marquee selection and text picking when layers are hidden or excluded by solo. They also check
   hidden/locked solo layers, and that solo still excludes the other layers while the soloed
   layer is outside its active time range (as in After Effects, so nothing is picked there).
-- Regression evidence for [#67](https://github.com/storytold/effectcraft/issues/67): scripted
+- Regression evidence for [#67](https://github.com/tazerty/evoeffect/issues/67): scripted
   input tests in `ui_project_delete`, checked headlessly on Linux, cover Delete/Backspace on
   Project items, multiple selection and undo. They check that an unrelated Timeline layer stays,
   an empty Project selection does nothing, viewer focus still deletes layers, and typing or
   dialogs do not delete items.
-- Regression evidence for [#484](https://github.com/storytold/effectcraft/issues/484): the
+- Regression evidence for [#484](https://github.com/tazerty/evoeffect/issues/484): the
   `shift_delete_*` input tests in `ui_project_delete`, checked headlessly on Windows, press
   Shift+Delete both as a key and as the Cut event Windows sends for it. Items in use go without
   the prompt, with their layers, in one undo step, for single items, multiple selections and
   folder contents. Nothing happens with an empty selection, in other panels, while typing or with
   a dialog open, and the next Delete still asks.
-- Regression evidence for [#612](https://github.com/storytold/effectcraft/issues/612): the
+- Regression evidence for [#612](https://github.com/tazerty/evoeffect/issues/612): the
   `ui_gradient_value` and `ui_gradient_editor` input tests, checked headlessly on Windows, open
   the Gradient Editor from the Timeline's "Edit Gradient…" on a shape layer's Gradient Fill. They
   check that OK sets the edited stops (added, dragged, recoloured in the picker, down to a single
@@ -149,7 +149,7 @@ The most important missing piece: it turns every other estimate here into a meas
   tests, checked headlessly on Windows, drag a selected Gradient Fill's start and end points in
   the Composition viewer: one undo step, the layer stays, a point inside a moved and scaled group
   converts to the group's space, and the handles show only for a selected gradient.
-- Regression evidence for [#1011](https://github.com/storytold/effectcraft/issues/1011): the
+- Regression evidence for [#1011](https://github.com/tazerty/evoeffect/issues/1011): the
   `ui_text_range_handles` input tests, checked headlessly on macOS, drag a text Range Selector's
   End bar in the Composition viewer: one undo step, Start and the layer stay, and on an animated
   End a keyframe at the current time. The bars show only for a selected selector or a selected
@@ -185,7 +185,7 @@ The most important missing piece: it turns every other estimate here into a meas
 - Regression evidence for the reports of 8 October, checked headlessly on Windows:
   `a_short_project_panel_draws` (#231), `viewer_press_prefers_a_selected_layer_under_the_pointer`
   (#230), `match_system_uses_the_system_language_where_there_is_a_catalog` (#229) and
-  `apps/effectcraft-web/tests/page.mjs` (#226, #225); the #225, #226 and #231 reproductions also
+  `apps/evoeffect-web/tests/page.mjs` (#226, #225); the #225, #226 and #231 reproductions also
   pass in the dev web build in headless Chrome 154 (device pixel ratio 2, a rejected file read,
   `GPUDevice.destroy()`).
 - Regression evidence for the Turbulent Displace, Wave Warp and Bulge pinning of #227:
@@ -200,14 +200,14 @@ The most important missing piece: it turns every other estimate here into a meas
   `effect_points_move_into_effect_space_unless_left_at_their_default` /
   `puppet_paint_liquify_and_roto_data_move_into_effect_space` (effects); see
   [architecture.md](architecture.md) §3 for what the conversion keeps.
-- Regression evidence for the interface items of [#227](https://github.com/storytold/effectcraft/issues/227),
+- Regression evidence for the interface items of [#227](https://github.com/tazerty/evoeffect/issues/227),
   checked headlessly on Windows: `spacebar_taps_preview_and_held_spacebar_pans_the_viewer` and
   `spacebar_drag_scrolls_the_time_graph` (Spacebar previews on its release, held it is the Hand
   tool), `right_click_in_effect_controls_shows_the_effect_menu`,
   `project_items_dropped_on_new_comp_make_a_composition` and
   `dragging_over_layer_switches_sets_them_all`.
 - Regression evidence for the shape layer items of
-  [#227](https://github.com/storytold/effectcraft/issues/227), checked headlessly on Windows:
+  [#227](https://github.com/tazerty/evoeffect/issues/227), checked headlessly on Windows:
   `shape_tools_draw_into_the_selected_shape_layer` and `ui_viewer`
   `shape_tool_draws_into_the_selected_shape_layer` (a shape tool adds a group to the selected
   shape layer), `shape_contents_copy_cut_and_paste_between_shape_layers` and
@@ -233,9 +233,9 @@ Issues #41–#47 (all from the Linux AppImage 0.1.1, 5 October): panning the vie
 - Fuzz the inputs we don't control: project files, imported media and documents, expressions,
   scripts, control-channel and MCP requests. Every crash found becomes a regression test
   (AGENTS.md "Never crash"). Project files are fuzzed (#779): a seeded, dependency-free mutation
-  fuzzer runs in `cargo test -p effectcraft-engine` (`fuzz_file_open_never_crashes`, `.ecproj`
-  JSON and `.ecprojx` XML through File ▸ Open, the first queries and a thumbnail render; longer
-  runs via `EFFECTCRAFT_FUZZ_ITERS` / `EFFECTCRAFT_FUZZ_SECS`). It found one crash, deeply nested
+  fuzzer runs in `cargo test -p evoeffect-engine` (`fuzz_file_open_never_crashes`, `.evoeffect`
+  JSON and `.evoeffectx` XML through File ▸ Open, the first queries and a thumbnail render; longer
+  runs via `EVOEFFECT_FUZZ_ITERS` / `EVOEFFECT_FUZZ_SECS`). It found one crash, deeply nested
   XML overflowing the stack, now refused. Imported media and documents, expressions, scripts and
   control-channel / MCP requests are still to do.
 - Run the gate on every pull request in CI (gap 4): today no workflow runs the tests on PRs.
@@ -251,7 +251,7 @@ Issues #41–#47 (all from the Linux AppImage 0.1.1, 5 October): panning the vie
 - A candidate for that decision (#248): [py-aep](https://github.com/forticheprod/py-aep), an MIT
   licensed Python library that reads and writes `.aep` files, reported by a user as working well.
   It can't be linked into the pure-Rust app. It could run as an external converter (`.aep` to
-  `.ecproj`, the way ffmpeg is used only from outside), or its format knowledge could be ported.
+  `.evoeffect`, the way ffmpeg is used only from outside), or its format knowledge could be ported.
   The second means reading another implementation of the format, which AGENTS.md rules out
   unless the clean-room scope allows it.
 - Also in this area: relative footage paths and relinking when a project moves (gap 18).
@@ -280,7 +280,7 @@ Issues #41–#47 (all from the Linux AppImage 0.1.1, 5 October): panning the vie
 
 - Decided on 5 October 2026 for Roto Brush: licensed weights with pure-Rust inference, if the
   impact on the system is low, in a composable, swappable module. Done in M13.35: the
-  `effectcraft-segment` crate (a `MaskModel` interface, a registry that only accepts
+  `evoeffect-segment` crate (a `MaskModel` interface, a registry that only accepts
   open-source licences, MobileSAM under Apache-2.0), weights downloaded on demand and verified,
   Settings ▸ Roto Brush to choose. Next: measure it against After Effects (G1); faster encoders
   (GPU) for long shots.
@@ -292,10 +292,10 @@ Issues #41–#47 (all from the Linux AppImage 0.1.1, 5 October): panning the vie
 
 ### G8. Plug-in ecosystem
 
-- After Effects SDK plug-ins cannot run in EffectCraft. Our own WebAssembly plug-in API exists
+- After Effects SDK plug-ins cannot run in EvoEffect. Our own WebAssembly plug-in API exists
   ([plugins.md](plugins.md)). Grow it: documentation, examples, and original effects that cover
   what the most common third-party plug-ins are used for (particles, glows, 3D objects, sabers).
-- Features that come from third parties in After Effects are extensions in EffectCraft too, built
+- Features that come from third parties in After Effects are extensions in EvoEffect too, built
   on the same extension points as After Effects: scripts, ScriptUI panels and effect plug-ins
   ([plugins.md](plugins.md#extension-points-compared-with-after-effects) compares them). ScriptUI
   panels in the user's ScriptUI Panels folder are listed in the Window menu, dock like any panel

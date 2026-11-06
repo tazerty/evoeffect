@@ -1,6 +1,6 @@
 # cargo-deny configuration of the Evora fork (written by Evora; the upstream repository has none).
 # Checked by .github/workflows/evora-web.yml: `cargo deny --manifest-path
-# apps/effectcraft-web/Cargo.toml --config deny.toml check advisories bans licenses sources`, i.e.
+# apps/evoeffect-web/Cargo.toml --config deny.toml check advisories bans licenses sources`, i.e.
 # the crate graph of the web build only (the shipped artefact), for the wasm32 target, without
 # dev-dependencies; every category since EVORA-KIN-23 (bans and sources added).
 #
@@ -62,17 +62,13 @@ wildcards = "allow"
 highlight = "all"
 
 [sources]
-# Only crates.io, and the two git repositories upstream depends on, each pinned by revision in
-# Cargo.toml and Cargo.lock (D-19: the filmcraft revision stays the one of the tag):
-# storytold/filmcraft (media codecs and containers, 2c5ba7a7) and storytold/craft-libs
-# (craft-ui 5c874d51; since upstream v0.11.1 also craft-docpath 82a24b00, craft-pdf and its
-# hayro-syntax, ca50d63b at v0.11.1, 9f75d3dc since v0.17.0 with hayro-jbig2, EVORA-KIN-30 and
-# EVORA-KIN-34). Any other registry or git source fails. The CI's witness
-# removes filmcraft from `allow-git` and requires this check to fail on it.
+# Only crates.io. The libraries upstream pulls by git are copied under vendor/ at the exact revision
+# of the tag (D-19): vendor/evofilm (media codecs and containers, 2c5ba7a7) and vendor/evo-libs
+# (evo-ui 5c874d51; evo-docpath 82a24b00; evo-pdf, hayro-syntax and hayro-jbig2 9f75d3dc), so no git
+# source is admitted any more. Any other registry or git source fails. Two CI witnesses keep this
+# true: Cargo.lock holds no git source (and that control must redden on a copy with one planted),
+# and a copy of this file that no longer admits crates.io must make this category fail.
 unknown-registry = "deny"
 unknown-git = "deny"
 allow-registry = ["https://github.com/rust-lang/crates.io-index"]
-allow-git = [
-    "https://github.com/storytold/filmcraft",
-    "https://github.com/storytold/craft-libs",
-]
+allow-git = []

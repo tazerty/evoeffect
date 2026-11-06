@@ -8,7 +8,7 @@
 //! - **CMX 3600 EDL** (`.edl`);
 //! - **AAF** (`.aaf`) and **OMF** (`.omf`) (embedded audio is not extracted).
 //!
-//! Parsing and writing is FilmCraft's `filmcraft-interchange` (our first-party sibling project);
+//! Parsing and writing is EvoFilm's `evofilm-interchange` (our first-party sibling project);
 //! this crate maps its timeline model to compositions and back:
 //!
 //! - [`import`]: sequences → compositions (size, rate, duration, pixel aspect, start timecode,
@@ -20,7 +20,7 @@
 //!   placeholders.
 //! - [`export`]: a composition → one sequence with one track per layer (bottom layer = V1),
 //!   footage clips with their timing, Motion and Opacity; precomps as nested sequences; solids as
-//!   colour mattes; layers only EffectCraft can draw (text, shapes, effects, masks, 3D…) are
+//!   colour mattes; layers only EvoEffect can draw (text, shapes, effects, masks, 3D…) are
 //!   either left out or pre-rendered by the caller (ProRes 4444 with alpha, see
 //!   [`plan_prerender`]) and referenced as media.
 //!
@@ -39,13 +39,13 @@ mod tests;
 pub use export::{ExportOptions, ExportOutput, PrecompMode, PrerenderMode, Prerendered, export, plan_prerender, prerender_reason};
 pub use import::{ImportOptions, ImportResult, import};
 
-pub use filmcraft_geom as fc_geom;
-/// FilmCraft's interchange crate (format readers/writers) and timeline model, re-exported so
+pub use evofilm_geom as fc_geom;
+/// EvoFilm's interchange crate (format readers/writers) and timeline model, re-exported so
 /// tests and tools can build documents in code.
-pub use filmcraft_interchange as fc;
-pub use filmcraft_media as fc_media;
-pub use filmcraft_project as fc_project;
-pub use filmcraft_time as fc_time;
+pub use evofilm_interchange as fc;
+pub use evofilm_media as fc_media;
+pub use evofilm_project as fc_project;
+pub use evofilm_time as fc_time;
 
 use serde::{Deserialize, Serialize};
 
@@ -118,34 +118,34 @@ impl TimelineFormat {
         if ext.contains('/') || ext.contains('\\') {
             return None;
         }
-        filmcraft_interchange::Format::from_extension(ext).map(TimelineFormat::from_fc)
+        evofilm_interchange::Format::from_extension(ext).map(TimelineFormat::from_fc)
     }
 
     /// Sniff a document (bytes first, the extension as a hint for ambiguous `.xml`).
     pub fn detect(bytes: &[u8], path: Option<&str>) -> Option<TimelineFormat> {
         let ext = path.and_then(|p| p.rsplit_once('.')).map(|(_, e)| e);
-        filmcraft_interchange::detect(bytes, ext).map(TimelineFormat::from_fc)
+        evofilm_interchange::detect(bytes, ext).map(TimelineFormat::from_fc)
     }
 
-    pub(crate) fn fc(self) -> filmcraft_interchange::Format {
+    pub(crate) fn fc(self) -> evofilm_interchange::Format {
         match self {
-            TimelineFormat::Fcp7Xml => filmcraft_interchange::Format::Fcp7Xml,
-            TimelineFormat::Fcpxml => filmcraft_interchange::Format::Fcpxml,
-            TimelineFormat::Otio => filmcraft_interchange::Format::Otio,
-            TimelineFormat::Edl => filmcraft_interchange::Format::Edl,
-            TimelineFormat::Aaf => filmcraft_interchange::Format::Aaf,
-            TimelineFormat::Omf => filmcraft_interchange::Format::Omf,
+            TimelineFormat::Fcp7Xml => evofilm_interchange::Format::Fcp7Xml,
+            TimelineFormat::Fcpxml => evofilm_interchange::Format::Fcpxml,
+            TimelineFormat::Otio => evofilm_interchange::Format::Otio,
+            TimelineFormat::Edl => evofilm_interchange::Format::Edl,
+            TimelineFormat::Aaf => evofilm_interchange::Format::Aaf,
+            TimelineFormat::Omf => evofilm_interchange::Format::Omf,
         }
     }
 
-    pub(crate) fn from_fc(f: filmcraft_interchange::Format) -> TimelineFormat {
+    pub(crate) fn from_fc(f: evofilm_interchange::Format) -> TimelineFormat {
         match f {
-            filmcraft_interchange::Format::Fcp7Xml => TimelineFormat::Fcp7Xml,
-            filmcraft_interchange::Format::Fcpxml => TimelineFormat::Fcpxml,
-            filmcraft_interchange::Format::Otio => TimelineFormat::Otio,
-            filmcraft_interchange::Format::Edl => TimelineFormat::Edl,
-            filmcraft_interchange::Format::Aaf => TimelineFormat::Aaf,
-            filmcraft_interchange::Format::Omf => TimelineFormat::Omf,
+            evofilm_interchange::Format::Fcp7Xml => TimelineFormat::Fcp7Xml,
+            evofilm_interchange::Format::Fcpxml => TimelineFormat::Fcpxml,
+            evofilm_interchange::Format::Otio => TimelineFormat::Otio,
+            evofilm_interchange::Format::Edl => TimelineFormat::Edl,
+            evofilm_interchange::Format::Aaf => TimelineFormat::Aaf,
+            evofilm_interchange::Format::Omf => TimelineFormat::Omf,
         }
     }
 }
@@ -153,7 +153,7 @@ impl TimelineFormat {
 #[derive(Debug, thiserror::Error)]
 pub enum Error {
     #[error("{0}")]
-    Interchange(#[from] filmcraft_interchange::Error),
+    Interchange(#[from] evofilm_interchange::Error),
     #[error("not a timeline document (expected Final Cut Pro XML, FCPXML, OpenTimelineIO or EDL)")]
     UnknownFormat,
     #[error("no composition {0}")]
@@ -166,23 +166,23 @@ pub type Result<T> = std::result::Result<T, Error>;
 
 // ---------------------------------------------------------------- shared conversions
 
-pub(crate) fn rate_in(r: filmcraft_time::FrameRate) -> effectcraft_time::FrameRate {
-    if r.num <= 0 || r.den <= 0 { effectcraft_time::FrameRate::new(30, 1) } else { effectcraft_time::FrameRate::new(r.num, r.den) }
+pub(crate) fn rate_in(r: evofilm_time::FrameRate) -> evoeffect_time::FrameRate {
+    if r.num <= 0 || r.den <= 0 { evoeffect_time::FrameRate::new(30, 1) } else { evoeffect_time::FrameRate::new(r.num, r.den) }
 }
 
-pub(crate) fn rate_out(r: effectcraft_time::FrameRate) -> filmcraft_time::FrameRate {
-    filmcraft_time::FrameRate { num: r.num, den: r.den }
+pub(crate) fn rate_out(r: evoeffect_time::FrameRate) -> evofilm_time::FrameRate {
+    evofilm_time::FrameRate { num: r.num, den: r.den }
 }
 
 // Both projects count time in the same ticks (254 016 000 000 per second).
-const _: () = assert!(filmcraft_time::TICKS_PER_SECOND == effectcraft_time::TICKS_PER_SECOND);
+const _: () = assert!(evofilm_time::TICKS_PER_SECOND == evoeffect_time::TICKS_PER_SECOND);
 
-pub(crate) fn tick_in(t: filmcraft_time::Tick) -> effectcraft_time::Tick {
-    effectcraft_time::Tick(t.0)
+pub(crate) fn tick_in(t: evofilm_time::Tick) -> evoeffect_time::Tick {
+    evoeffect_time::Tick(t.0)
 }
 
-pub(crate) fn tick_out(t: effectcraft_time::Tick) -> filmcraft_time::Tick {
-    filmcraft_time::Tick(t.0)
+pub(crate) fn tick_out(t: evoeffect_time::Tick) -> evofilm_time::Tick {
+    evofilm_time::Tick(t.0)
 }
 
 /// A pixel aspect ratio as a small fraction (1.0 → 1:1, 0.9 → 9:10, 1.2121 → 40:33…).

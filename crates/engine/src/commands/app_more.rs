@@ -3,10 +3,10 @@
 //! (Create VR Environment, Extract Cubemap), the "Assign Shortcut to …" submenus, Help ▸ Enable
 //! Logging / Reveal Logging File / System Compatibility Report, and `File.execute()` for scripts.
 
-use effectcraft_color::Label;
-use effectcraft_geom::{Mat4, Vec3, vec3};
-use effectcraft_project::{Comp, FootageKind, ItemId, ItemKind, LayerSource};
-use effectcraft_time::{FrameRate, Tick};
+use evoeffect_color::Label;
+use evoeffect_geom::{Mat4, Vec3, vec3};
+use evoeffect_project::{Comp, FootageKind, ItemId, ItemKind, LayerSource};
+use evoeffect_time::{FrameRate, Tick};
 use serde_json::{Value, json};
 
 use super::{CommandSpec, always, b_p, bad, comp_id, has_comp, has_layers, has_project_selection, str_p};
@@ -129,7 +129,7 @@ fn clear_recent_presets(s: &mut Session, _: &Value) -> Result<Value> {
 // ---------------------------------------------------------------- File menu
 
 fn save_copy_xml(s: &mut Session, p: &Value) -> Result<Value> {
-    let path = str_p(p, "path").ok_or_else(|| bad("file.saveCopyAsXml", "missing `path` (.ecprojx)"))?;
+    let path = str_p(p, "path").ok_or_else(|| bad("file.saveCopyAsXml", "missing `path` (.evoeffectx)"))?;
     let xml = crate::xml_project::to_xml(&s.project.to_file_json_with_view(&s.saved_view())?).map_err(EngineError::Other)?;
     s.services.write_file(path, xml.as_bytes()).map_err(|e| EngineError::Other(format!("cannot write {path}: {e}")))?;
     s.toast(format!("Saved an XML copy to {path}"));
@@ -192,7 +192,7 @@ fn replace_with_precomp(s: &mut Session, p: &Value) -> Result<Value> {
         _ => return Err(bad(CMD, "the item is not visual footage or a solid")),
     };
     // Adjustment layers only borrow a solid for their size; they keep it.
-    let is_user = |l: &effectcraft_project::Layer| {
+    let is_user = |l: &evoeffect_project::Layer| {
         !l.switches.adjustment && matches!(l.source, LayerSource::Footage { item: i } | LayerSource::Solid { item: i } if i == item)
     };
     // The longest stretch of the item's own time any layer shows, and the first comp's rate.
@@ -307,8 +307,8 @@ fn reassign(s: &mut Session, key: &str, slot: &str, cmd: &str) -> Result<Value> 
 }
 
 /// The command id of a 3D view.
-pub(crate) fn view_command(v: effectcraft_render::three_d::View3D) -> &'static str {
-    use effectcraft_render::three_d::View3D::*;
+pub(crate) fn view_command(v: evoeffect_render::three_d::View3D) -> &'static str {
+    use evoeffect_render::three_d::View3D::*;
     match v {
         ActiveCamera => "view.3d.activeCamera",
         Default => "view.3d.default",
@@ -416,7 +416,7 @@ pub fn system_report(s: &Session) -> Value {
         issues.push("Export is not available in this build.".to_string());
     }
     json!({
-        "app": format!("EffectCraft {}", env!("CARGO_PKG_VERSION")),
+        "app": format!("EvoEffect {}", env!("CARGO_PKG_VERSION")),
         "os": crate::sysinfo::os_version(),
         "arch": std::env::consts::ARCH,
         "cpu": crate::sysinfo::cpu_name(),
@@ -561,7 +561,7 @@ fn create_vr_environment(s: &mut Session, p: &Value) -> Result<Value> {
             s.execute("layer.setSwitch", json!({"comp": fc, "layers": [pre], "switch": "collapse", "value": true}))?;
             s.execute("prop.set", json!({"comp": fc, "layer": pre, "path": "transform/anchor", "value": mid}))?;
             s.execute("prop.set", json!({"comp": fc, "layer": pre, "path": "transform/position", "value": mid}))?;
-            let lights: Vec<effectcraft_project::Layer> = src.layers.iter().filter(|l| l.is_light()).cloned().collect();
+            let lights: Vec<evoeffect_project::Layer> = src.layers.iter().filter(|l| l.is_light()).cloned().collect();
             if !lights.is_empty() {
                 s.edit("Create VR Environment", None, |proj, _| {
                     let mut next = proj.next_id;
@@ -669,7 +669,7 @@ pub fn specs() -> Vec<CommandSpec> {
             |s| if s.prefs.recent_presets.is_empty() { Err("no recent animation presets".into()) } else { Ok(()) },
             clear_recent_presets
         ),
-        cmd!("file.saveCopyAsXml", "Save a Copy As XML...", ["File", "Save As"], None, "{path: .ecprojx}", always, save_copy_xml),
+        cmd!("file.saveCopyAsXml", "Save a Copy As XML...", ["File", "Save As"], None, "{path: .evoeffectx}", always, save_copy_xml),
         cmd!("file.replaceWithLayeredComp", "With Layered Comp", ["File", "Replace Footage"], None, "{item?}", has_footage, replace_with_layered_comp),
         cmd!("file.replaceWithPrecomp", "Replace with Precomposition", [], None, "{item?}", has_footage_or_solid, replace_with_precomp),
         cmd!("file.executeFile", "Execute File", [], None, "{path, confirmed?}", always, execute_file),

@@ -1,0 +1,13 @@
+[Desktop Entry]
+Type=Application
+Name=EvoEffect
+GenericName=Motion Graphics Editor
+Comment=Motion graphics and visual effects compositor
+Exec=evoeffect %F
+TryExec=evoeffect
+Icon=ai.storyteller.evoeffect
+Terminal=false
+StartupNotify=true
+StartupWMClass=ai.storyteller.evoeffect
+Categories=AudioVideo;Video;Graphics;2DGraphics;
+Keywords=motion;graphics;animation;compositor;effects;keyframe;vfx;

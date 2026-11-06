@@ -12,9 +12,9 @@
 use std::future::Future;
 use std::task::{Context, Poll, Waker};
 
-use effectcraft_project::ItemId;
-use effectcraft_raster::Image;
-use effectcraft_time::Tick;
+use evoeffect_project::ItemId;
+use evoeffect_raster::Image;
+use evoeffect_time::Tick;
 
 use crate::{Accelerator, AutoKey, Backend, Renderer};
 

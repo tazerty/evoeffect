@@ -7,13 +7,13 @@
   <key>CFBundleDevelopmentRegion</key>
   <string>en</string>
   <key>CFBundleDisplayName</key>
-  <string>EffectCraft</string>
+  <string>EvoEffect</string>
   <key>CFBundleName</key>
-  <string>EffectCraft</string>
+  <string>EvoEffect</string>
   <key>CFBundleExecutable</key>
-  <string>EffectCraft</string>
+  <string>EvoEffect</string>
   <key>CFBundleIdentifier</key>
-  <string>ai.storyteller.effectcraft</string>
+  <string>ai.storyteller.evoeffect</string>
   <key>CFBundleInfoDictionaryVersion</key>
   <string>6.0</string>
   <key>CFBundlePackageType</key>
@@ -24,12 +24,12 @@
   <string>@SHORT_VERSION@</string>
   <key>CFBundleVersion</key>
   <string>@SHORT_VERSION@</string>
-  <key>EffectCraftVersion</key>
+  <key>EvoEffectVersion</key>
   <string>@VERSION@</string>
-  <key>EffectCraftBuildCommit</key>
+  <key>EvoEffectBuildCommit</key>
   <string>@BUILD_SHA@</string>
   <key>CFBundleIconFile</key>
-  <string>EffectCraft</string>
+  <string>EvoEffect</string>
   <key>LSApplicationCategoryType</key>
   <string>public.app-category.graphics-design</string>
   <!-- Must match MACOSX_DEPLOYMENT_TARGET in package.sh. Big Sur is the first release on
@@ -43,48 +43,48 @@
   <key>NSRequiresAquaSystemAppearance</key>
   <false/>
   <key>NSHumanReadableCopyright</key>
-  <string>Copyright © the EffectCraft authors. MIT OR Apache-2.0.</string>
+  <string>Copyright © the EvoEffect authors. MIT OR Apache-2.0.</string>
 
   <!-- Projects open from Finder (double-click, Open With, Dock); src/apple_events.rs. -->
   <key>CFBundleDocumentTypes</key>
   <array>
     <dict>
       <key>CFBundleTypeName</key>
-      <string>EffectCraft Project</string>
+      <string>EvoEffect Project</string>
       <key>CFBundleTypeRole</key>
       <string>Editor</string>
       <key>LSHandlerRank</key>
       <string>Owner</string>
       <key>CFBundleTypeIconFile</key>
-      <string>EffectCraft</string>
+      <string>EvoEffect</string>
       <key>LSItemContentTypes</key>
-      <array><string>ai.storyteller.effectcraft.document</string></array>
+      <array><string>ai.storyteller.evoeffect.document</string></array>
     </dict>
   </array>
-  <!-- EffectCraft's own format: the project (.ecproj) and its XML copy (.ecprojx). -->
+  <!-- EvoEffect's own format: the project (.evoeffect) and its XML copy (.evoeffectx). -->
   <key>UTExportedTypeDeclarations</key>
   <array>
     <dict>
       <key>UTTypeIdentifier</key>
-      <string>ai.storyteller.effectcraft.document</string>
+      <string>ai.storyteller.evoeffect.document</string>
       <key>UTTypeDescription</key>
-      <string>EffectCraft Project</string>
+      <string>EvoEffect Project</string>
       <key>UTTypeConformsTo</key>
       <array>
         <string>public.data</string>
         <string>public.content</string>
       </array>
       <key>UTTypeIconFile</key>
-      <string>EffectCraft</string>
+      <string>EvoEffect</string>
       <key>UTTypeTagSpecification</key>
       <dict>
         <key>public.filename-extension</key>
         <array>
-          <string>ecproj</string>
-          <string>ecprojx</string>
+          <string>evoeffect</string>
+          <string>evoeffectx</string>
         </array>
         <key>public.mime-type</key>
-        <array><string>application/x-effectcraft</string></array>
+        <array><string>application/x-evoeffect</string></array>
       </dict>
     </dict>
   </array>
@@ -109,7 +109,7 @@
     </dict>
     <dict>
       <key>UTTypeIdentifier</key>
-      <string>ai.storyteller.effectcraft.qoi</string>
+      <string>ai.storyteller.evoeffect.qoi</string>
       <key>UTTypeDescription</key>
       <string>QOI Image</string>
       <key>UTTypeConformsTo</key>

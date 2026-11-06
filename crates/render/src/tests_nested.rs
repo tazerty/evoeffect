@@ -1,12 +1,12 @@
 //! Nested compositions: Preserve frame rate when nested or in render queue, Preserve resolution
 //! when nested.
 
-use effectcraft_color::Label;
-use effectcraft_keyframe::{Keyframe, Value};
-use effectcraft_project::build;
-use effectcraft_project::render_queue::RenderSettings;
-use effectcraft_project::{Comp, ItemId, ItemKind, LayerSource, Project, Solid};
-use effectcraft_time::{FrameRate, Tick};
+use evoeffect_color::Label;
+use evoeffect_keyframe::{Keyframe, Value};
+use evoeffect_project::build;
+use evoeffect_project::render_queue::RenderSettings;
+use evoeffect_project::{Comp, ItemId, ItemKind, LayerSource, Project, Solid};
+use evoeffect_time::{FrameRate, Tick};
 
 use crate::render_frame;
 

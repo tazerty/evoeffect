@@ -1,0 +1,10 @@
+[package]
+name = "evofilm-ogg"
+description = "Clean-room Ogg (RFC 3533) demuxer with Ogg Opus (RFC 7845) and Ogg Vorbis stream mapping"
+version = "0.1.1"
+edition = "2024"
+license = "MIT OR Apache-2.0"
+rust-version = "1.95"
+
+[dependencies]
+

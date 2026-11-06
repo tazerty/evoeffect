@@ -7,12 +7,12 @@
 
 use std::sync::Arc;
 
-use effectcraft_color::BlendMode;
-use effectcraft_effects::Buf;
-use effectcraft_project::{ItemId, Layer, Quality};
-use effectcraft_raster::Image;
-use effectcraft_render::{EvalCtx, Renderer, styles};
-use effectcraft_time::Tick;
+use evoeffect_color::BlendMode;
+use evoeffect_effects::Buf;
+use evoeffect_project::{ItemId, Layer, Quality};
+use evoeffect_raster::Image;
+use evoeffect_render::{EvalCtx, Renderer, styles};
+use evoeffect_time::Tick;
 
 use crate::context::{Enc, GpuImage};
 use crate::ops;
@@ -26,7 +26,7 @@ pub(crate) fn render<'g>(e: &mut Enc<'g>, r: &Renderer, comp_id: ItemId, t: Tick
         return None;
     }
     let ctx = r.eval_ctx(comp_id, t)?;
-    let (w, h) = effectcraft_render::frame_size(ctx.comp.width, ctx.comp.height, r.opts.scale);
+    let (w, h) = evoeffect_render::frame_size(ctx.comp.width, ctx.comp.height, r.opts.scale);
     if r.depth() > 16 || !e.g.fits(w, h) {
         return None;
     }
@@ -51,7 +51,7 @@ pub(crate) fn render<'g>(e: &mut Enc<'g>, r: &Renderer, comp_id: ItemId, t: Tick
         && let Some((lin, mode, enc)) = pipe.output_hdr()
     {
         on_cpu(e, &mut canvas, |img| {
-            effectcraft_render::color::output_hdr(img, lin, mode, enc);
+            evoeffect_render::color::output_hdr(img, lin, mode, enc);
             pipe.quantize(img);
         })?;
     }
@@ -147,7 +147,7 @@ fn draw_3d<'a>(e: &mut Enc, r: &Renderer<'a>, ctx: &EvalCtx<'a>, run: &[&'a Laye
 /// the canvas, then each special layer (far to near) rendered alone, hidden where the main
 /// scene is nearer, matted (a 3D matte through the camera, else the 2D placement), Preserve
 /// Transparency and blended. `None` = render the run on the CPU.
-fn draw_split(e: &mut Enc, r: &Renderer, ctx: &EvalCtx, split: &effectcraft_render::three_d::adv::SplitRun, canvas: &GpuImage) -> Option<GpuImage> {
+fn draw_split(e: &mut Enc, r: &Renderer, ctx: &EvalCtx, split: &evoeffect_render::three_d::adv::SplitRun, canvas: &GpuImage) -> Option<GpuImage> {
     let (w, h) = (canvas.width, canvas.height);
     let main_prep = split.main();
     if main_prep.out != (w, h) {
@@ -357,7 +357,7 @@ fn draw_adjustment(e: &mut Enc, r: &Renderer, ctx: &EvalCtx, layer: &Layer, canv
     r.run_effects_on(ctx, layer, true, &mut fx);
     let (mut adjusted, offset, _) = fx.finish()?;
     // An effect that changed the frame (Motion Tile's Output size): back onto the canvas.
-    if let Some((dx, dy)) = effectcraft_effects::adjustment_crop(offset, [0.0; 2], (adjusted.width, adjusted.height), (w, h)) {
+    if let Some((dx, dy)) = evoeffect_effects::adjustment_crop(offset, [0.0; 2], (adjusted.width, adjusted.height), (w, h)) {
         adjusted = e.crop(&adjusted, dx, dy, w, h);
     }
     if adjusted.width != w || adjusted.height != h {

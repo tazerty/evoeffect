@@ -1,6 +1,6 @@
 //! The Settings dialog (After Effects' Preferences): the page list on the left, the page on the
 //! right, OK / Cancel / Previous / Next. Pages are built from the engine's schema
-//! (`effectcraft_engine::prefs::pages`), so the dialog, `prefs.pages` and the docs agree. Edits
+//! (`evoeffect_engine::prefs::pages`), so the dialog, `prefs.pages` and the docs agree. Edits
 //! apply live; Cancel restores the settings from when the dialog opened, OK saves them.
 //!
 //! Automation ids: `settings.page.<id>`, `settings.<key>` (e.g. `settings.general.undoLevels`),
@@ -8,16 +8,16 @@
 //! `settings.cancel`, `settings.previous`, `settings.next`.
 
 use crate::i18n::{tr, tr_args};
-use effectcraft_engine::prefs::{APPEARANCE_MODES, DARK_THEMES, Item, Kind, LIGHT_THEMES, Page, pages};
-use effectcraft_engine::segment::Task;
+use evoeffect_engine::prefs::{APPEARANCE_MODES, DARK_THEMES, Item, Kind, LIGHT_THEMES, Page, pages};
+use evoeffect_engine::segment::Task;
 use egui::{Color32, RichText, vec2};
 use serde_json::{Value, json};
 
 use crate::theme::{ThemeKind, Tokens};
-use crate::{Dialog, EffectcraftApp};
+use crate::{Dialog, EvoEffectApp};
 
 /// Open the dialog on a page, remembering the settings for Cancel.
-pub fn open(app: &mut EffectcraftApp, page: &str) {
+pub fn open(app: &mut EvoEffectApp, page: &str) {
     if app.dialog != Some(Dialog::Settings) {
         app.dialog_state.prefs_snapshot = Some(app.session.prefs.clone());
     }
@@ -44,12 +44,12 @@ fn srgb_bytes(c: [f32; 3]) -> [u8; 3] {
     [col.r(), col.g(), col.b()]
 }
 
-fn reg(app: &mut EffectcraftApp, id: &str, r: &egui::Response, label: &str) {
+fn reg(app: &mut EvoEffectApp, id: &str, r: &egui::Response, label: &str) {
     app.auto.add(id, r.rect, label);
 }
 
 /// One page's rows.
-fn page_ui(app: &mut EffectcraftApp, ui: &mut egui::Ui, page: &Page, cur: &Value, t: &Tokens, acts: &mut Vec<Act>) {
+fn page_ui(app: &mut EvoEffectApp, ui: &mut egui::Ui, page: &Page, cur: &Value, t: &Tokens, acts: &mut Vec<Act>) {
     let get = |key: &str| cur.pointer(&format!("/{}", key.replace('.', "/"))).cloned().unwrap_or(Value::Null);
     let label_w = 250.0;
     for item in &page.items {
@@ -101,7 +101,7 @@ fn page_ui(app: &mut EffectcraftApp, ui: &mut egui::Ui, page: &Page, cur: &Value
             Item::Setting { key, label, kind, live } => {
                 let v = get(key);
                 let id = format!("settings.{key}");
-                let tip = (!live).then(|| tr("Stored, but not used by EffectCraft yet"));
+                let tip = (!live).then(|| tr("Stored, but not used by EvoEffect yet"));
                 let mut resp: Option<egui::Response> = None;
                 match kind {
                     Kind::Bool => {
@@ -214,7 +214,7 @@ fn page_ui(app: &mut EffectcraftApp, ui: &mut egui::Ui, page: &Page, cur: &Value
     }
 }
 
-/// A small EffectCraft window painted with theme `kind`'s tokens: the Tools bar, the Project
+/// A small EvoEffect window painted with theme `kind`'s tokens: the Tools bar, the Project
 /// panel, the Composition panel, the Preview and Properties column and the Timeline with its
 /// layer bars.
 fn theme_preview(ui: &mut egui::Ui, kind: ThemeKind, width: f32) {
@@ -305,7 +305,7 @@ fn theme_preview(ui: &mut egui::Ui, kind: ThemeKind, width: f32) {
 /// One theme family's card: its (translated) name, Active when the appearance shows it now, a preview of the
 /// chosen theme and a radio button per theme.
 fn theme_card(
-    app: &mut EffectcraftApp,
+    app: &mut EvoEffectApp,
     ui: &mut egui::Ui,
     t: &Tokens,
     key: &str,
@@ -372,7 +372,7 @@ fn theme_card(
 
 /// Settings ▸ Appearance: Appearance Mode (Sync with System, Dark, Light) above the light and dark
 /// theme cards.
-fn appearance_ui(app: &mut EffectcraftApp, ui: &mut egui::Ui, cur: &Value, t: &Tokens, acts: &mut Vec<Act>) {
+fn appearance_ui(app: &mut EvoEffectApp, ui: &mut egui::Ui, cur: &Value, t: &Tokens, acts: &mut Vec<Act>) {
     let get = |key: &str| cur.pointer(&format!("/appearance/{key}")).and_then(Value::as_str).unwrap_or_default().to_string();
     let (mode, light, dark) = (get("appearanceMode"), get("lightTheme"), get("darkTheme"));
     ui.horizontal(|ui| {
@@ -417,7 +417,7 @@ pub fn human_bytes(b: u64) -> String {
 /// Settings ▸ Roto Brush and Settings ▸ Face Tracking: a task's models (`roto.models`,
 /// `face.models`): choose one; download, install from a file or remove the trained ones; who made
 /// them, their licence, size and source.
-fn models_ui(app: &mut EffectcraftApp, ui: &mut egui::Ui, t: &Tokens, acts: &mut Vec<Act>, task: Task) {
+fn models_ui(app: &mut EvoEffectApp, ui: &mut egui::Ui, t: &Tokens, acts: &mut Vec<Act>, task: Task) {
     let (prefix, user) = match task {
         Task::Mask => ("roto", "Roto Brush"),
         Task::Face => ("face", "Face tracking"),
@@ -428,7 +428,7 @@ fn models_ui(app: &mut EffectcraftApp, ui: &mut egui::Ui, t: &Tokens, acts: &mut
     for m in info["models"].as_array().into_iter().flatten() {
         let id = m["id"].as_str().unwrap_or_default().to_string();
         let name = m["name"].as_str().unwrap_or_default();
-        let classic = id == effectcraft_engine::segment::CLASSICAL;
+        let classic = id == evoeffect_engine::segment::CLASSICAL;
         let (installed, selected, active) =
             (m["installed"].as_bool().unwrap_or(false), m["selected"].as_bool().unwrap_or(false), m["active"].as_bool().unwrap_or(false));
         ui.add_space(6.0);
@@ -515,7 +515,7 @@ fn models_ui(app: &mut EffectcraftApp, ui: &mut egui::Ui, t: &Tokens, acts: &mut
 
 /// Settings ▸ Disk ▸ Browser Storage (the web app's storage manager, `storage.*`): where the
 /// data lives, the origin's usage and quota, persistent storage, and Clear buttons.
-fn browser_storage_ui(app: &mut EffectcraftApp, ui: &mut egui::Ui, t: &Tokens, acts: &mut Vec<Act>) {
+fn browser_storage_ui(app: &mut EvoEffectApp, ui: &mut egui::Ui, t: &Tokens, acts: &mut Vec<Act>) {
     let Some(host) = app.session.storage.clone() else { return };
     let info = host.info();
     let u = |v: &Value| v.as_u64().unwrap_or(0);
@@ -590,7 +590,7 @@ fn browser_storage_ui(app: &mut EffectcraftApp, ui: &mut egui::Ui, t: &Tokens, a
 }
 
 /// Draw the editable label colors and names in Settings.
-fn labels_ui(app: &mut EffectcraftApp, ui: &mut egui::Ui, cur: &Value, acts: &mut Vec<Act>) {
+fn labels_ui(app: &mut EvoEffectApp, ui: &mut egui::Ui, cur: &Value, acts: &mut Vec<Act>) {
     ui.label(tr("Label Colors and Names:"));
     ui.add_space(4.0);
     let labels = cur.get("labels").and_then(Value::as_array).cloned().unwrap_or_default();
@@ -624,7 +624,7 @@ fn labels_ui(app: &mut EffectcraftApp, ui: &mut egui::Ui, cur: &Value, acts: &mu
 }
 
 /// Draw the Settings dialog, including its translated page list and the selected page's controls.
-pub fn show(app: &mut EffectcraftApp, ctx: &egui::Context, t: &Tokens) {
+pub fn show(app: &mut EvoEffectApp, ctx: &egui::Context, t: &Tokens) {
     let all = pages();
     let mut page = app.dialog_state.settings_page.clone();
     if !all.iter().any(|p| p.id == page) {
@@ -746,7 +746,7 @@ pub fn show(app: &mut EffectcraftApp, ctx: &egui::Context, t: &Tokens) {
             }
             Act::PickModel(task) => {
                 // The registry's file types for the task (`.pt`, `.task`).
-                let mut exts: Vec<&str> = effectcraft_engine::segment::models(task).filter_map(|m| m.file_name.rsplit_once('.').map(|x| x.1)).collect();
+                let mut exts: Vec<&str> = evoeffect_engine::segment::models(task).filter_map(|m| m.file_name.rsplit_once('.').map(|x| x.1)).collect();
                 exts.dedup();
                 let picked = app.hooks.pick_files.as_ref().map(|f| f(&exts)).unwrap_or_default();
                 let cmd = if task == Task::Face { "face.model.install" } else { "roto.model.install" };
@@ -772,14 +772,14 @@ pub fn show(app: &mut EffectcraftApp, ctx: &egui::Context, t: &Tokens) {
 }
 
 /// Crash recovery: the previous session didn't exit cleanly; offer its latest auto-save.
-pub fn recovery(app: &mut EffectcraftApp, ctx: &egui::Context, t: &Tokens) {
+pub fn recovery(app: &mut EvoEffectApp, ctx: &egui::Context, t: &Tokens) {
     let Some(r) = app.recovery.clone() else {
         app.dialog = None;
         return;
     };
     let mut choice: Option<&str> = None;
     super::dialogs::modal(ctx, "Recover Project", vec2(560.0, 230.0), t, |ui| {
-        ui.label(tr("EffectCraft didn't quit normally last time."));
+        ui.label(tr("EvoEffect didn't quit normally last time."));
         ui.add_space(6.0);
         if let Some(p) = &r.project {
             ui.label(tr_args("Project: {}", &[&p]));

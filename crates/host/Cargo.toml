@@ -1,6 +1,6 @@
 [package]
-name = "effectcraft-host"
-description = "Builds a fully wired EffectCraft session: media decoding (FilmCraft codecs), importer, the expression engine and scripting"
+name = "evoeffect-host"
+description = "Builds a fully wired EvoEffect session: media decoding (EvoFilm codecs), importer, the expression engine and scripting"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
@@ -10,27 +10,27 @@ rust-version.workspace = true
 workspace = true
 
 [dependencies]
-effectcraft-engine = { workspace = true }
-effectcraft-project = { workspace = true }
+evoeffect-engine = { workspace = true }
+evoeffect-project = { workspace = true }
 log = { workspace = true }
-effectcraft-media = { workspace = true }
-effectcraft-expr = { workspace = true }
-effectcraft-script = { workspace = true }
-effectcraft-export = { workspace = true }
-effectcraft-plugin = { workspace = true }
+evoeffect-media = { workspace = true }
+evoeffect-expr = { workspace = true }
+evoeffect-script = { workspace = true }
+evoeffect-export = { workspace = true }
+evoeffect-plugin = { workspace = true }
 
 # WebAssembly effect plug-ins run in wasmi on native builds.
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
-effectcraft-plugin = { workspace = true, features = ["wasm"] }
+evoeffect-plugin = { workspace = true, features = ["wasm"] }
 
 [dev-dependencies]
 serde_json = { workspace = true }
-effectcraft-psd = { workspace = true }
-effectcraft-svg = { workspace = true }
-effectcraft-pdf = { workspace = true }
-effectcraft-raster = { workspace = true }
-effectcraft-time = { workspace = true }
-effectcraft-interchange = { workspace = true }
+evoeffect-psd = { workspace = true }
+evoeffect-svg = { workspace = true }
+evoeffect-pdf = { workspace = true }
+evoeffect-raster = { workspace = true }
+evoeffect-time = { workspace = true }
+evoeffect-interchange = { workspace = true }
 image = { workspace = true }
 gif = { workspace = true }
 exr = { workspace = true }

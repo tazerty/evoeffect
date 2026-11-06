@@ -1,6 +1,6 @@
 [package]
-name = "effectcraft-project"
-description = "The EffectCraft document: project items, compositions, layers and the After-Effects-style property tree"
+name = "evoeffect-project"
+description = "The EvoEffect document: project items, compositions, layers and the After-Effects-style property tree"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
@@ -10,10 +10,10 @@ rust-version.workspace = true
 workspace = true
 
 [dependencies]
-effectcraft-time = { workspace = true }
-effectcraft-geom = { workspace = true }
-effectcraft-color = { workspace = true }
-effectcraft-keyframe = { workspace = true }
+evoeffect-time = { workspace = true }
+evoeffect-geom = { workspace = true }
+evoeffect-color = { workspace = true }
+evoeffect-keyframe = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
 thiserror = { workspace = true }

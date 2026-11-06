@@ -1,7 +1,7 @@
 //! Effect names in the interface language, keyed by effect id (#821).
 //!
 //! The generated Effect menu, Effect Controls, the Timeline and Effects & Presets draw an
-//! effect's name. The registry (`effectcraft_effects`) keeps the English name: scripts,
+//! effect's name. The registry (`evoeffect_effects`) keeps the English name: scripts,
 //! expressions, MCP and the control channel match on it, and the property tree stores it as the
 //! effect group's name. Only the *drawing* goes through this catalog, so a project file stays
 //! identical whichever interface language opens it.
@@ -27,7 +27,7 @@
 //! The Simplified Chinese names come from the installed After Effects 2026 (26.5.0.89)
 //! Simplified Chinese interface, its 21 category folder names included; `Cryptomatte`,
 //! `EXtractoR`, `IDentifier`, `Key Light` and `Unmult` stay in English as brand names, and
-//! `Face Measurements` / `Face Track Points` are EffectCraft's own effects, so their wording is
+//! `Face Measurements` / `Face Track Points` are EvoEffect's own effects, so their wording is
 //! ours.
 
 use std::collections::HashMap;
@@ -125,8 +125,8 @@ pub(crate) fn matches(id: &str, english: &str, query: &str) -> bool {
 #[cfg(test)]
 pub(super) fn missing(language: &str) -> Vec<String> {
     let table = catalog(language);
-    let effects = effectcraft_engine::effects::registry().iter().filter(|spec| table.and_then(|c| c.row(spec.id)).is_none()).map(|spec| spec.name.to_string());
-    let categories = effectcraft_engine::effects::categories()
+    let effects = evoeffect_engine::effects::registry().iter().filter(|spec| table.and_then(|c| c.row(spec.id)).is_none()).map(|spec| spec.name.to_string());
+    let categories = evoeffect_engine::effects::categories()
         .into_iter()
         .filter(|source| table.and_then(|c| c.category(source)).is_none())
         .map(|source| format!("{source} (category)"));
@@ -452,7 +452,7 @@ const TRADITIONAL_CHINESE: &[Row] = &[];
 /// one catalog instead of inventing a second mechanism. A translator fills one row per effect,
 /// ids from [`SIMPLIFIED_CHINESE`]; the names Adobe's Japanese interface leaves in English (the
 /// `CC` series, the `VR` set, the `OCIO` set, `Cryptomatte`, `EXtractoR`, `IDentifier`,
-/// `Key Light`, `Unmult`, `Twirl (Legacy)` and the two EffectCraft-only effects) repeat that
+/// `Key Light`, `Unmult`, `Twirl (Legacy)` and the two EvoEffect-only effects) repeat that
 /// English name here rather than being left out.
 ///
 /// The rows below were read from the installed After Effects 2026 (26.5) Japanese interface
@@ -506,7 +506,7 @@ const JAPANESE_CATEGORIES: &[(&str, &str)] = &[
 ];
 
 /// Georgian (`ka`): one row per effect, ids from [`SIMPLIFIED_CHINESE`]. Written from the meaning
-/// of the English names, with the terms the Georgian menus and panels use (FilmCraft's Georgian
+/// of the English names, with the terms the Georgian menus and panels use (EvoFilm's Georgian
 /// for the effects the two apps share). The `CC` series and the brand names (`Cryptomatte`,
 /// `EXtractoR`, `IDentifier`, `Key Light`, `Unmult`, `Lumetri Color`) stay in English, as
 /// Adobe's Japanese interface keeps the `CC` series; `VR` and `OCIO` keep their prefix.
@@ -877,7 +877,7 @@ const SIMPLIFIED_CHINESE_CATEGORIES: &[(&str, &str)] = &[
 mod tests {
     use super::*;
     use crate::i18n::set_current;
-    use effectcraft_engine::effects;
+    use evoeffect_engine::effects;
 
     /// Every row names an effect in the registry and still carries its English name, so a rename
     /// or a removal fails here rather than attaching a translation to a different effect.

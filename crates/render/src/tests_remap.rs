@@ -1,10 +1,10 @@
 //! Time remapping and separated Position dimensions.
 
-use effectcraft_color::Label;
-use effectcraft_keyframe::{Keyframe, Value};
-use effectcraft_project::build::{self, Ids};
-use effectcraft_project::{Comp, ItemKind, LayerSource, Node, Project, Solid};
-use effectcraft_time::{FrameRate, Tick};
+use evoeffect_color::Label;
+use evoeffect_keyframe::{Keyframe, Value};
+use evoeffect_project::build::{self, Ids};
+use evoeffect_project::{Comp, ItemKind, LayerSource, Node, Project, Solid};
+use evoeffect_time::{FrameRate, Tick};
 
 use crate::render_frame;
 

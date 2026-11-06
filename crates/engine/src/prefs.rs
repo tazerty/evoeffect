@@ -12,8 +12,8 @@
 
 use std::collections::BTreeMap;
 
-use effectcraft_color::Label;
-use effectcraft_time::Tick;
+use evoeffect_color::Label;
+use evoeffect_time::Tick;
 use serde::{Deserialize, Serialize};
 use serde_json::{Map, Value, json};
 
@@ -96,7 +96,7 @@ macro_rules! page {
 }
 
 page!(General {
-    /// Interface language: `system` (the operating system's, where EffectCraft has it, else
+    /// Interface language: `system` (the operating system's, where EvoEffect has it, else
     /// English), or a language code from `LANGUAGES`.
     language: String = "system".into(),
     /// Levels of Undo (1–99).
@@ -141,7 +141,7 @@ page!(AutoSave {
     enabled: bool = true,
     interval_minutes: u32 = 20,
     max_versions: u32 = 5,
-    /// `nextToProject` (an "EffectCraft Auto-Save" folder beside the project) or `custom`.
+    /// `nextToProject` (an "EvoEffect Auto-Save" folder beside the project) or `custom`.
     location: String = "nextToProject".into(),
     folder: String = String::new(),
     save_on_render_start: bool = false,
@@ -289,7 +289,7 @@ page!(
     /// Settings ▸ Roto Brush.
     RotoPrefs {
         /// The segmentation model Roto Brush 2.0 / 3.0 use: `classical` (built in) or a model id
-        /// from `effectcraft_segment::MODELS` (once installed).
+        /// from `evoeffect_segment::MODELS` (once installed).
         model: String = "classical".into(),
     }
 );
@@ -298,7 +298,7 @@ page!(
     /// Settings ▸ Face Tracking.
     FacePrefs {
         /// The model Track Mask ▸ Face Tracking uses: `classical` (built in) or a model id from
-        /// `effectcraft_segment::MODELS` (once installed).
+        /// `evoeffect_segment::MODELS` (once installed).
         model: String = "classical".into(),
     }
 );
@@ -427,7 +427,7 @@ pub struct Prefs {
     pub recent_projects: Vec<String>,
     /// File ▸ Import Recent Footage, newest first.
     pub recent_footage: Vec<String>,
-    /// Animation ▸ Recent Animation Presets (`.ecpreset` paths or built-in preset ids), newest
+    /// Animation ▸ Recent Animation Presets (`.evoeffectpreset` paths or built-in preset ids), newest
     /// first.
     pub recent_presets: Vec<String>,
     /// Character panel: recently used font families, newest first.
@@ -862,8 +862,8 @@ impl Prefs {
     /// doesn't state how it is stored. `None` = Ask User (keep straight and open Interpret
     /// Footage); `guess` takes premultiplied for movies (codecs with alpha are usually written
     /// premultiplied) and straight for stills.
-    pub fn unlabeled_alpha(&self, movie: bool) -> Option<effectcraft_project::AlphaMode> {
-        use effectcraft_project::AlphaMode::*;
+    pub fn unlabeled_alpha(&self, movie: bool) -> Option<evoeffect_project::AlphaMode> {
+        use evoeffect_project::AlphaMode::*;
         Some(match self.import.unlabeled_alpha.as_str() {
             "ignore" => Ignore,
             "straight" => Straight,
@@ -971,7 +971,7 @@ fn push_mru(list: &mut Vec<String>, v: &str, max: usize) {
 }
 
 /// The most the layer cache holds in the browser. A wasm32 page addresses at most 4 GiB, which
-/// these caches share with the app and with the decoders' own decoded frames (FilmCraft keeps
+/// these caches share with the app and with the decoders' own decoded frames (EvoFilm keeps
 /// up to 384 MB per open movie): with the desktop's 1 GB defaults, eight stacked 1080p clips ran
 /// the page out of memory a few seconds into playback.
 pub const WEB_LAYER_CACHE: u64 = 512 << 20;
@@ -994,7 +994,7 @@ pub struct CacheBudgets {
 /// Colour of the `k`-th mask of a layer: Appearance ▸ Cycle Mask Colors cycles through the mask
 /// colours, otherwise every new mask takes the first one.
 pub fn mask_color(cycle: bool, k: usize) -> [u8; 3] {
-    use effectcraft_project::build::MASK_COLORS;
+    use evoeffect_project::build::MASK_COLORS;
     if cycle { MASK_COLORS[k % MASK_COLORS.len()] } else { MASK_COLORS[0] }
 }
 
@@ -1142,7 +1142,7 @@ pub enum Item {
     BrowserStorage,
     /// A task's trained models (`roto.models`, `face.models`): authors, licence, size, install,
     /// choose.
-    Models(effectcraft_segment::Task),
+    Models(evoeffect_segment::Task),
 }
 
 /// One page of the Settings dialog.
@@ -1183,7 +1183,7 @@ pub fn pages() -> Vec<Page> {
                 s("general.expressionPickWhipCompact", "Expression Pick Whip Writes Compact English", B, true),
                 s("general.createSplitLayersAbove", "Create Split Layers Above Original Layer", B, true),
                 s("general.useSystemColorPicker", "Use System Color Picker", B, false),
-                Note("EffectCraft always uses its own colour picker (the same on every platform and the web)."),
+                Note("EvoEffect always uses its own colour picker (the same on every platform and the web)."),
             ],
         },
         Page {
@@ -1195,7 +1195,7 @@ pub fn pages() -> Vec<Page> {
                 s("startup.offerCrashRecovery", "Offer to Open the Latest Auto-Save After a Crash", B, true),
                 s("startup.windowGraphics", "Window Graphics", Kind::Choice(WINDOW_GRAPHICS), true),
                 Note(
-                    "Window Graphics applies from the next launch. When the graphics driver stops EffectCraft as its window opens, the next launch switches to OpenGL.",
+                    "Window Graphics applies from the next launch. When the graphics driver stops EvoEffect as its window opens, the next launch switches to OpenGL.",
                 ),
                 Section("Repair"),
                 Button { label: "Reset Settings", command: "prefs.reset", params: "{}" },
@@ -1439,7 +1439,7 @@ pub fn pages() -> Vec<Page> {
                 Note(
                     "Roto Brush 2.0 and 3.0 use the model chosen here (Version 1.0 always uses the classic engine). Models are open source, downloaded only when you ask, and checked against their published SHA-256.",
                 ),
-                Models(effectcraft_segment::Task::Mask),
+                Models(evoeffect_segment::Task::Mask),
             ],
         },
         Page {
@@ -1450,7 +1450,7 @@ pub fn pages() -> Vec<Page> {
                 Note(
                     "Face tracking in the Tracker panel (Outline Only and Detailed Features) uses the model chosen here. Models are open source, downloaded only when you ask, and checked against their published SHA-256.",
                 ),
-                Models(effectcraft_segment::Task::Face),
+                Models(evoeffect_segment::Task::Face),
             ],
         },
     ]
@@ -1506,7 +1506,7 @@ pub fn pages_json() -> Value {
                     Item::Note(t) => json!({"note": t}),
                     Item::BrowserStorage => json!({"browserStorage": "storage.info / storage.persist / storage.clear (web app)"}),
                     Item::Models(task) => {
-                        let p = if *task == effectcraft_segment::Task::Face { "face" } else { "roto" };
+                        let p = if *task == evoeffect_segment::Task::Face { "face" } else { "roto" };
                         json!({"models": format!("{p}.models / {p}.model.select / {p}.model.download / {p}.model.install / {p}.model.remove"), "key": format!("{p}.model")})
                     }
                 })

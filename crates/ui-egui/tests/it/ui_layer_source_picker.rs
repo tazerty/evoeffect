@@ -3,18 +3,18 @@
 //! Effect Controls' layer parameters (a Displacement Map's layer) pick through the same widget,
 //! and both write an undoable `prop.set`.
 
-use effectcraft_engine::Session;
-use effectcraft_engine::keyframe::Value;
-use effectcraft_engine::project::LayerId;
-use effectcraft_ui_egui::EffectcraftApp;
-use effectcraft_ui_egui::dock::PanelKind;
+use evoeffect_engine::Session;
+use evoeffect_engine::keyframe::Value;
+use evoeffect_engine::project::LayerId;
+use evoeffect_ui_egui::EvoEffectApp;
+use evoeffect_ui_egui::dock::PanelKind;
 use egui::{Pos2, Rect, pos2, vec2};
 use egui_kittest::Harness;
 use egui_kittest::kittest::NodeT;
 use egui_kittest::kittest::Queryable;
 use serde_json::json;
 
-fn click(h: &mut Harness<'_, EffectcraftApp>, at: Pos2) {
+fn click(h: &mut Harness<'_, EvoEffectApp>, at: Pos2) {
     h.event(egui::Event::PointerMoved(at));
     h.step();
     h.event(egui::Event::PointerButton { pos: at, button: egui::PointerButton::Primary, pressed: true, modifiers: Default::default() });
@@ -23,13 +23,13 @@ fn click(h: &mut Harness<'_, EffectcraftApp>, at: Pos2) {
     h.run_steps(3);
 }
 
-fn rect_of(h: &Harness<'_, EffectcraftApp>, id: &str) -> Rect {
+fn rect_of(h: &Harness<'_, EvoEffectApp>, id: &str) -> Rect {
     let e = h.state().auto.find(id).unwrap_or_else(|| panic!("no automation element {id}")).clone();
     Rect::from_min_size(pos2(e.rect[0], e.rect[1]), vec2(e.rect[2], e.rect[3]))
 }
 
 /// Whether `want` is painted inside `row` (the drop-down's current-value text).
-fn painted_in(h: &Harness<'_, EffectcraftApp>, row: Rect, want: &str) -> bool {
+fn painted_in(h: &Harness<'_, EvoEffectApp>, row: Rect, want: &str) -> bool {
     h.output().shapes.iter().any(|c| match &c.shape {
         egui::Shape::Text(t) => t.galley.text() == want && row.expand(3.0).contains(t.pos),
         _ => false,
@@ -37,7 +37,7 @@ fn painted_in(h: &Harness<'_, EffectcraftApp>, row: Rect, want: &str) -> bool {
 }
 
 /// The current value of a layer-valued property, by uid.
-fn layer_value(h: &Harness<'_, EffectcraftApp>, layer: u64, prop: u64) -> Option<u64> {
+fn layer_value(h: &Harness<'_, EvoEffectApp>, layer: u64, prop: u64) -> Option<u64> {
     let comp = h.state().session.active_comp().unwrap();
     match &comp.layer(LayerId(layer)).unwrap().props.find(prop).unwrap().value {
         Value::Layer(v) => *v,
@@ -46,7 +46,7 @@ fn layer_value(h: &Harness<'_, EffectcraftApp>, layer: u64, prop: u64) -> Option
 }
 
 /// The "N. name" a drop-down shows for a layer.
-fn entry_for(h: &Harness<'_, EffectcraftApp>, layer: u64) -> String {
+fn entry_for(h: &Harness<'_, EvoEffectApp>, layer: u64) -> String {
     let comp = h.state().session.active_comp().unwrap();
     let i = comp.layers.iter().position(|l| l.id.0 == layer).unwrap();
     format!("{}. {}", i + 1, comp.layers[i].name)
@@ -56,7 +56,7 @@ fn entry_for(h: &Harness<'_, EffectcraftApp>, layer: u64) -> String {
 /// so the pick below records its own step instead of folding into a picker write), picks `none`
 /// from the drop-down at `value_id`, and checks the clear takes one undo step that restores `value`.
 #[track_caller]
-fn none_pick_clears(h: &mut Harness<'_, EffectcraftApp>, value_id: &str, none: &str, layer: u64, prop: u64, value: u64) {
+fn none_pick_clears(h: &mut Harness<'_, EvoEffectApp>, value_id: &str, none: &str, layer: u64, prop: u64, value: u64) {
     h.state_mut().session.execute("prop.set", json!({"layer": layer, "prop": prop, "value": value})).unwrap();
     h.run_steps(2);
     assert_eq!(layer_value(h, layer, prop), Some(value));
@@ -86,7 +86,7 @@ fn timeline_source_drop_down_picks_the_layer_and_undo_restores_none() {
         let opts = comp.layer(LayerId(light)).unwrap().props.sub("lightOptions").unwrap();
         (opts.uid, opts.get("source").unwrap().uid)
     };
-    let mut app = EffectcraftApp::new(s);
+    let mut app = EvoEffectApp::new(s);
     app.ui.timeline.open_layers.insert(light);
     app.ui.timeline.open_groups.insert(group);
     let mut h = Harness::builder().with_size(vec2(1600.0, 1000.0)).build_eframe(|_| app);
@@ -145,7 +145,7 @@ fn effect_controls_layer_param_picks_through_the_shared_widget() {
         comp.layer(LayerId(base)).unwrap().effects().unwrap().find_group(fx).unwrap().get("displacementMapLayer").unwrap().uid
     };
     s.state.selected_layers = vec![LayerId(base)];
-    let mut app = EffectcraftApp::new(s);
+    let mut app = EvoEffectApp::new(s);
     app.show_panel(PanelKind::EffectControls);
     let mut h = Harness::builder().with_size(vec2(1600.0, 1100.0)).build_eframe(|_| app);
     h.run_steps(4);
@@ -171,7 +171,7 @@ fn effect_controls_layer_param_picks_through_the_shared_widget() {
 
 /// The visual record (the `ui_3d` ignored-snapshot convention): the Source drop-down open over
 /// the layer list, and the row after a layer is chosen. Renders with wgpu when `EC_SNAPSHOT_DIR`
-/// is set: `EC_SNAPSHOT_DIR=shots cargo test -p effectcraft-ui-egui --test it ui_layer_source_picker:: -- --ignored`.
+/// is set: `EC_SNAPSHOT_DIR=shots cargo test -p evoeffect-ui-egui --test it ui_layer_source_picker:: -- --ignored`.
 #[test]
 #[ignore = "renders with wgpu; run with --ignored (set EC_SNAPSHOT_DIR to keep PNGs)"]
 fn snapshot_source_dropdown_open_and_chosen() {
@@ -185,12 +185,12 @@ fn snapshot_source_dropdown_open_and_chosen() {
         let opts = comp.layer(LayerId(light)).unwrap().props.sub("lightOptions").unwrap();
         (opts.uid, opts.get("source").unwrap().uid)
     };
-    let mut app = EffectcraftApp::new(s);
+    let mut app = EvoEffectApp::new(s);
     app.ui.timeline.open_layers.insert(light);
     app.ui.timeline.open_groups.insert(group);
     let mut h = Harness::builder().with_size(vec2(1600.0, 1000.0)).with_pixels_per_point(2.0).wgpu().build_eframe(|_| app);
     h.run_steps(4);
-    let save = |h: &mut Harness<'_, EffectcraftApp>, name: &str| {
+    let save = |h: &mut Harness<'_, EvoEffectApp>, name: &str| {
         if let Ok(dir) = std::env::var("EC_SNAPSHOT_DIR") {
             h.render().expect("render").save(format!("{dir}/{name}")).expect("save");
         }
