@@ -4,7 +4,7 @@
 //! sequences of fillers, source clips and transitions, where a transition *overlaps* the end of
 //! the segment before it and the start of the segment after it (the sequence's length is the sum of
 //! its segment lengths minus its transition lengths). Source clips reference media through master
-//! mobs and file source mobs. [`from_project`] turns a EvoFilm sequence into that shape;
+//! mobs and file source mobs. [`from_project`] turns an EvoFilm sequence into that shape;
 //! [`to_project`] builds EvoFilm sequences and media from it. All times are ticks; the format
 //! serialisers convert to and from edit units.
 

@@ -213,7 +213,7 @@ pub enum TemplateError {
         "this file is a ZIP archive (an Adobe .mogrt or another application's package?): EvoFilm does not read motion graphics templates from other applications, only its own .fcgt graphics templates"
     )]
     ForeignPackage,
-    #[error("not a EvoFilm graphics template: {0}")]
+    #[error("not an EvoFilm graphics template: {0}")]
     NotTemplate(String),
     #[error("this graphics template was made by a newer EvoFilm (format version {0}; this build reads up to {TEMPLATE_VERSION})")]
     TooNew(u32),

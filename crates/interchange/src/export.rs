@@ -648,7 +648,7 @@ fn set_effect(ti: &mut fp::TrackItem, e: fp::EffectInstance) {
     }
 }
 
-/// A property → a EvoFilm parameter (layer-time keys → clip-time keys).
+/// A property → an EvoFilm parameter (layer-time keys → clip-time keys).
 fn param_out(p: &Property, to_clip: &impl Fn(Tick) -> evofilm_time::Tick, conv: impl Fn(&Value) -> fp::ParamValue) -> fp::Param {
     let mut out = fp::Param::new(conv(&p.value));
     for k in &p.keys {

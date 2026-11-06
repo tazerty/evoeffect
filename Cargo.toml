@@ -116,7 +116,7 @@ cpal = "0.16"
 # The operating system's interface language (MIT/Apache-2.0, no dependencies on desktop).
 sys-locale = "0.3"
 
-# Local co-development against a EvoFilm checkout next to this repo: uncomment.
+# Local co-development against an EvoFilm checkout next to this repo: uncomment.
 # [patch."https://github.com/tazerty/evofilm"]
 # evofilm-codecs = { path = "../evofilm/crates/codecs" }
 # evofilm-media = { path = "../evofilm/crates/media" }

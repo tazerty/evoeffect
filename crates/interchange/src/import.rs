@@ -633,7 +633,7 @@ fn interp_in(k: Keyframe, i: fp::Interpolation) -> Keyframe {
     }
 }
 
-/// Copy a EvoFilm parameter (static value or clip-time keyframes) to a property.
+/// Copy an EvoFilm parameter (static value or clip-time keyframes) to a property.
 fn set_prop(
     dp: &mut Property,
     p: &fp::Param,

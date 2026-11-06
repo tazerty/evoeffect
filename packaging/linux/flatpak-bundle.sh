@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Repackage a EvoEffect Linux tarball as a single-file Flatpak bundle:
+# Repackage an EvoEffect Linux tarball as a single-file Flatpak bundle:
 #
 #   $DIST/evoeffect-<version>-linux-<arch>.flatpak
 #
