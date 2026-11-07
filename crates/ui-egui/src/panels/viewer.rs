@@ -1210,7 +1210,7 @@ pub fn show(app: &mut EvoEffectApp, ui: &mut egui::Ui, rect: Rect) {
         let (w, h) = evoeffect_engine::render::source_size(&app.session.project, layer);
         let c = m.apply(evoeffect_engine::geom::vec2(w as f64 / 2.0, h as f64 / 2.0));
         let at = map.to_screen([c.x, c.y]);
-        let text = format!("{}: {}", layer.name, why);
+        let text = format!("{}: {}", layer.name, crate::i18n::neutral(&why));
         let galley = painter.layout(text.clone(), Tokens::medium(12.0), Color32::WHITE, (map.area.width() - 40.0).clamp(80.0, 420.0));
         let r = Rect::from_center_size(at + vec2(0.0, notices as f32 * 4.0), galley.size() + vec2(24.0, 16.0)).intersect(map.area);
         painter.rect_filled(r, 3.0, Color32::from_rgba_unmultiplied(0x4a, 0x1a, 0x14, 0xe6));

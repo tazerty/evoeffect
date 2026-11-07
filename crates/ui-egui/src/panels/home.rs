@@ -389,7 +389,7 @@ fn home_page(
         if r.min.y > area.max.y {
             break;
         }
-        let resp = ui.interact(r, egui::Id::new(("home-recent", e.index)), Sense::click()).on_hover_text(&e.path);
+        let resp = ui.interact(r, egui::Id::new(("home-recent", e.index)), Sense::click()).on_hover_text(crate::i18n::neutral(&e.path).into_owned());
         if resp.hovered() {
             p.rect_filled(r, 6.0, t.hover);
         }
@@ -413,7 +413,8 @@ fn home_page(
             if e.exists { t.tab_text_active } else { t.text_dim },
         );
         let sub = if e.exists { e.folder.clone() } else { format!("{} {}", e.folder, crate::i18n::tr("(missing)")) };
-        name_clip.text(pos2(tr.max.x + 6.0, r.center().y + 9.0), Align2::LEFT_CENTER, sub, Tokens::ui(11.0), t.text_faint);
+        // Evora (EVORA-KIN-58): the auto-save folder names the engine.
+        name_clip.text(pos2(tr.max.x + 6.0, r.center().y + 9.0), Align2::LEFT_CENTER, crate::i18n::neutral_owned(sub), Tokens::ui(11.0), t.text_faint);
         let cell = |x: f32, x1: f32, text: String| {
             p.with_clip_rect(Rect::from_min_max(pos2(x, r.min.y), pos2(x1 - 8.0, r.max.y))).text(
                 pos2(x, r.center().y),
@@ -516,7 +517,7 @@ mod tests {
         assert_eq!(format_ago(now, now - 30 * 86_400), "2026-08-22");
         assert_eq!(format_ago(now, now + 100), "Just now");
         assert_eq!((format_size(900), format_size(13_000), format_size(3_500_000)), ("900 B".into(), "13 KB".into(), "3.3 MB".into()));
-        assert_eq!((kind_of("/a/B.evoeffect"), kind_of("c.AEP"), kind_of("x")), ("EvoEffect project", "After Effects project", "Project"));
+        assert_eq!((kind_of("/a/B.evoeffect"), kind_of("c.AEP"), kind_of("x")), ("Kinetika project", "After Effects project", "Project"));
         // After a week it is the date, whole even for a five-digit year.
         assert_eq!(format_ago(i64::MAX, 253_402_300_800), "10000-01-01");
     }

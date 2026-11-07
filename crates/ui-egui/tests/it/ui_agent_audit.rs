@@ -128,10 +128,10 @@ fn every_panel_registers_automation_ids_for_its_widgets() {
     let mut s = session();
     // Content for the selection-driven panels: the title (text with effects), a Render Queue
     // item, a comp marker.
-    s.execute("layer.select", json!({"layers": ["EVOEFFECT"]})).unwrap();
+    s.execute("layer.select", json!({"layers": ["KINETIKA"]})).unwrap();
     s.execute("renderQueue.add", json!({"format": "png", "output": "/tmp/ec-audit-[#####].png"})).unwrap();
     s.execute("markers.add", json!({})).ok();
-    let title = s.active_comp().unwrap().layers.iter().find(|l| l.name == "EVOEFFECT").map(|l| l.id.0).unwrap();
+    let title = s.active_comp().unwrap().layers.iter().find(|l| l.name == "KINETIKA").map(|l| l.id.0).unwrap();
     let mut h = harness(s);
     h.state_mut().ui.layer_panel = Some(title);
     // egui records widget types (to tell labels from controls) with this debug option, which

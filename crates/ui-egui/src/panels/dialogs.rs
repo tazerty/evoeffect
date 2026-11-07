@@ -333,7 +333,7 @@ fn about_main(_app: &mut EvoEffectApp, ui: &mut egui::Ui, t: &Tokens, _cmd: &mut
     let p = ui.painter();
     p.rect_filled(r, 10.0, Color32::from_rgb(0x1b, 0x22, 0x3c));
     crate::header::paint_logo(p, Rect::from_min_size(r.min + vec2(18.0, 20.0), vec2(56.0, 56.0)));
-    p.text(r.min + vec2(90.0, 34.0), Align2::LEFT_CENTER, "EvoEffect", Tokens::semibold(24.0), Color32::WHITE);
+    p.text(r.min + vec2(90.0, 34.0), Align2::LEFT_CENTER, crate::i18n::neutral("EvoEffect"), Tokens::semibold(24.0), Color32::WHITE);
     p.text(
         r.min + vec2(90.0, 62.0),
         Align2::LEFT_CENTER,
@@ -579,7 +579,7 @@ fn palette(app: &mut EvoEffectApp, ctx: &egui::Context, t: &Tokens) {
             .collect();
         for c in evoeffect_engine::command_specs().iter().filter(|c| c.menu.is_empty() && c.journal && c.params == "{}") {
             if app.session.is_enabled(c.id) {
-                v.push((c.label.to_string(), c.id.to_string(), json!({}), c.shortcut.unwrap_or("").to_string()));
+                v.push((crate::i18n::neutral(c.label).into_owned(), c.id.to_string(), json!({}), c.shortcut.unwrap_or("").to_string()));
             }
         }
         v

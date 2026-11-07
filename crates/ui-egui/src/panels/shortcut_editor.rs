@@ -264,9 +264,9 @@ pub fn show(app: &mut EvoEffectApp, ctx: &egui::Context, t: &Tokens) {
         // ---- preset bar
         ui.horizontal(|ui| {
             ui.label(tr("Preset:"));
-            let r = egui::ComboBox::from_id_salt("sc-preset").selected_text(&active).width(220.0).show_ui(ui, |ui| {
+            let r = egui::ComboBox::from_id_salt("sc-preset").selected_text(crate::i18n::neutral(&active).into_owned()).width(220.0).show_ui(ui, |ui| {
                 for n in &presets {
-                    if ui.selectable_label(*n == active, n).clicked() {
+                    if ui.selectable_label(*n == active, &*crate::i18n::neutral(n)).clicked() {
                         run.push(("shortcuts.preset".into(), json!({"op": "select", "name": n})));
                     }
                 }
@@ -399,7 +399,7 @@ pub fn show(app: &mut EvoEffectApp, ctx: &egui::Context, t: &Tokens) {
                 let who: Vec<String> =
                     table.bindings().into_iter().filter(|(sc, _)| split(sc) == (mods, name.to_string())).map(|(_, b)| b.label.clone()).collect();
                 if !who.is_empty() {
-                    resp.on_hover_text(who.join("\n"));
+                    resp.on_hover_text(crate::i18n::neutral_owned(who.join("\n")));
                 }
             }
         };
@@ -437,7 +437,7 @@ pub fn show(app: &mut EvoEffectApp, ctx: &egui::Context, t: &Tokens) {
             for (sc, label, scope) in list.into_iter().take(9) {
                 let col = if scope == APP_SCOPE { APP_COLOR } else { PANEL_COLOR };
                 p.text(pos2(info.min.x + 8.0, yy), Align2::LEFT_TOP, crate::menus::shortcut_text(&sc), Tokens::ui(11.5), col);
-                p.text(pos2(info.min.x + 78.0, yy), Align2::LEFT_TOP, label, Tokens::ui(11.5), t.text);
+                p.text(pos2(info.min.x + 78.0, yy), Align2::LEFT_TOP, crate::i18n::neutral(&label), Tokens::ui(11.5), t.text);
                 yy += 17.0;
             }
         } else {
@@ -460,7 +460,7 @@ pub fn show(app: &mut EvoEffectApp, ctx: &egui::Context, t: &Tokens) {
                     return true;
                 }
                 let keys = table.keys.get(&b.key).map(|k| k.join(" ")).unwrap_or_default();
-                let hay = format!("{} {} {} {}", b.label, b.command, b.path.join(" "), keys).to_lowercase();
+                let hay = format!("{} {} {} {}", crate::i18n::neutral(&b.label), b.command, b.path.join(" "), keys).to_lowercase();
                 q.split_whitespace().all(|w| hay.contains(w))
             })
             .collect();
@@ -488,8 +488,8 @@ pub fn show(app: &mut EvoEffectApp, ctx: &egui::Context, t: &Tokens) {
                                 ui.painter().rect_filled(r, 0.0, t.row_alt);
                             }
                             let pp = ui.painter();
-                            pp.text(pos2(r.min.x + 6.0, r.center().y), Align2::LEFT_CENTER, &b.label, Tokens::ui(11.5), t.text);
-                            pp.text(pos2(r.min.x + 230.0, r.center().y), Align2::LEFT_CENTER, b.path.join(" > "), Tokens::ui(10.5), t.text_faint);
+                            pp.text(pos2(r.min.x + 6.0, r.center().y), Align2::LEFT_CENTER, crate::i18n::neutral(&b.label), Tokens::ui(11.5), t.text);
+                            pp.text(pos2(r.min.x + 230.0, r.center().y), Align2::LEFT_CENTER, crate::i18n::neutral_owned(b.path.join(" > ")), Tokens::ui(10.5), t.text_faint);
                             let ks: Vec<String> = keys.iter().map(|k| crate::menus::shortcut_text(k)).collect();
                             let col = if b.scope == APP_SCOPE { APP_COLOR } else { PANEL_COLOR };
                             pp.text(
@@ -517,7 +517,7 @@ pub fn show(app: &mut EvoEffectApp, ctx: &egui::Context, t: &Tokens) {
                     ui.label(RichText::new(tr("Select a command to change its shortcut.")).color(t.text_dim));
                     return;
                 };
-                ui.label(RichText::new(&b.label).font(Tokens::semibold(13.0)).color(t.tab_text_active));
+                ui.label(RichText::new(crate::i18n::neutral(&b.label)).font(Tokens::semibold(13.0)).color(t.tab_text_active));
                 ui.label(RichText::new(format!("{} • {}", b.command, b.scope)).color(t.text_faint));
                 ui.add_space(6.0);
                 let keys = table.keys.get(&b.key).cloned().unwrap_or_default();
@@ -566,7 +566,7 @@ pub fn show(app: &mut EvoEffectApp, ctx: &egui::Context, t: &Tokens) {
                         ui.add_space(4.0);
                         ui.label(RichText::new(tr_args("⚠ {} is used by:", &[&(crate::menus::shortcut_text(&k))])).color(t.warning));
                         for c in conflicts.iter().take(4) {
-                            ui.label(RichText::new(format!("   {} ({})", c.label, c.scope)).color(t.warning));
+                            ui.label(RichText::new(format!("   {} ({})", crate::i18n::neutral(&c.label), c.scope)).color(t.warning));
                         }
                     }
                 }
@@ -601,7 +601,7 @@ pub fn show(app: &mut EvoEffectApp, ctx: &egui::Context, t: &Tokens) {
     if let Some(name) = st.confirm_delete.clone() {
         let mut answer: Option<bool> = None;
         super::dialogs::modal(ctx, "Delete Preset", vec2(460.0, 150.0), t, |ui| {
-            ui.label(RichText::new(format!("Delete the preset “{name}”?")).color(t.tab_text_active));
+            ui.label(RichText::new(format!("Delete the preset “{}”?", crate::i18n::neutral(&name))).color(t.tab_text_active));
             ui.add_space(4.0);
             ui.label(RichText::new(tr("You can't undo this.")).color(t.text_dim).size(11.0));
             ui.add_space(18.0);

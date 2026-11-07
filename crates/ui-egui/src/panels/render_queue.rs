@@ -619,7 +619,7 @@ pub fn show(app: &mut EvoEffectApp, ui: &mut egui::Ui, rect: Rect) {
         let st_rect = Rect::from_min_size(pos2(cx_status, row.min.y), vec2(w_status, ROW_H));
         lp.text(pos2(cx_status + 2.0, row.center().y), Align2::LEFT_CENTER, &status, Tokens::ui(12.0), status_color(&t, &it.status));
         if let RenderStatus::Failed(e) = &it.status {
-            ui.interact(st_rect, egui::Id::new(("rq-st", it.id)), Sense::hover()).on_hover_text(e);
+            ui.interact(st_rect, egui::Id::new(("rq-st", it.id)), Sense::hover()).on_hover_text(crate::i18n::neutral(e).into_owned());
         }
         app.auto.add(&aid("status"), st_rect, &status);
         if let Some(s) = it.started {

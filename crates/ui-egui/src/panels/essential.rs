@@ -360,8 +360,9 @@ fn value_widget(app: &mut EvoEffectApp, ui: &mut egui::Ui, auto: &str, ty: Optio
             r.rect
         }
         ControlType::Dropdown => {
-            let opts = match &p.ui {
-                ParamUi::Popup { options } => options.clone(),
+            let opts: Vec<String> = match &p.ui {
+                // Evora (EVORA-KIN-58): an option can name the engine (OCIO's built-in configuration).
+                ParamUi::Popup { options } => options.iter().map(|o| crate::i18n::neutral(o).into_owned()).collect(),
                 _ => vec![],
             };
             let cur = v.as_enum() as usize;

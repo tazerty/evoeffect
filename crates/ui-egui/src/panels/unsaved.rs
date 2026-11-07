@@ -71,7 +71,7 @@ pub fn project_name(app: &EvoEffectApp) -> String {
 /// The window title: the project's path (or name) and `*` while it has unsaved changes.
 pub fn window_title(app: &EvoEffectApp) -> String {
     let doc = app.session.path.clone().unwrap_or_else(|| project_name(app));
-    format!("EvoEffect - {doc}{}", if app.session.is_dirty() { " *" } else { "" })
+    crate::i18n::neutral_owned(format!("EvoEffect - {doc}{}", if app.session.is_dirty() { " *" } else { "" }))
 }
 
 /// Whether the prompt is Revert Project (Revert / Cancel) instead of Unsaved Changes.
@@ -91,7 +91,8 @@ pub fn show(app: &mut EvoEffectApp, ctx: &egui::Context, t: &Tokens) {
         return;
     }
     let revert = is_revert(app);
-    let name = project_name(app);
+    // Evora (EVORA-KIN-58): the project's name as the interface shows it, without the extension.
+    let name = crate::i18n::neutral_owned(project_name(app));
     let mut answer = None;
     let title = if revert { "Revert Project" } else { "Unsaved Changes" };
     super::dialogs::modal(ctx, title, vec2(460.0, 170.0), t, |ui| {
@@ -219,7 +220,7 @@ mod tests {
         crate::menus::invoke(&mut app, &ctx, "file.newProject", json!({})).unwrap();
         assert!(app.dialog.is_none());
         modified(&mut app);
-        assert!(window_title(&app).ends_with("Untitled Project.evoeffect *"), "{}", window_title(&app));
+        assert!(window_title(&app).ends_with("Untitled Project *"), "{}", window_title(&app));
         let r = crate::menus::invoke(&mut app, &ctx, "file.newProject", json!({})).unwrap();
         assert_eq!(r, json!({"dialog": "unsavedChanges"}));
         assert_eq!(app.dialog, Some(Dialog::UnsavedChanges));
@@ -305,7 +306,7 @@ mod tests {
         modified(&mut app);
         app.session.execute("file.saveAs", json!({"path": path.to_string_lossy()})).unwrap();
         assert!(!app.session.is_dirty());
-        assert!(window_title(&app).ends_with("Kept.evoeffect"), "{}", window_title(&app));
+        assert!(window_title(&app).ends_with("Kept"), "{}", window_title(&app));
         // Revert: Revert / Cancel.
         app.session.execute("layer.newNull", json!({})).unwrap();
         crate::menus::invoke(&mut app, &ctx, "file.revert", json!({})).unwrap();

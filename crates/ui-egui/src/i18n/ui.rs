@@ -159,7 +159,8 @@ pub(crate) fn tr_args(text: &str, args: &[&dyn Display]) -> String {
         rest = &rest[at + 2..];
     }
     out.push_str(rest);
-    out
+    // Evora (EVORA-KIN-58): the values too (a path into the auto-save folder names the engine).
+    super::neutral::neutral_owned(out)
 }
 
 /// Japanese: the same rows, in the same order, as the Chinese catalogs below.
@@ -5496,6 +5497,17 @@ mod tests {
         assert_eq!(tr_args("Step {} of {}: {}", &[&1, &3, &"Colour"]), "Step 1 of 3: Colour");
         assert_eq!(tr_args("Proxy Use: {}", &[&"Best"]), "Proxy Use: Best");
         assert_eq!(tr_args("Proxy Use: {}", &[]), "Proxy Use: ");
+    }
+
+    /// Evora (EVORA-KIN-58): no row of any language shows an engine's name once it is drawn.
+    #[test]
+    fn no_row_shows_an_engine_name() {
+        for (en, translated) in catalogs() {
+            for text in [en, translated] {
+                let shown = super::super::neutral::neutral(text);
+                assert!(!shown.contains("EvoEffect"), "{en:?}: {text:?} shows {shown:?}");
+            }
+        }
     }
 
     /// Every row is asked for by a converted panel: a leftover row is stale, because the panel's

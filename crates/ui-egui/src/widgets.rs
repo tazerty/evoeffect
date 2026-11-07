@@ -349,6 +349,9 @@ pub fn dropdown(ui: &mut Ui, rect: Rect, text: &str, t: &Tokens, id: egui::Id) -
 
 /// [`dropdown`] with a tooltip `tip` (shown always; it replaces the elided text's tooltip).
 pub fn dropdown_tip(ui: &mut Ui, rect: Rect, text: &str, tip: Option<&str>, t: &Tokens, id: egui::Id) -> Response {
+    // Evora (EVORA-KIN-58): an effect's option can name the engine (OCIO's built-in configuration).
+    let text = crate::i18n::neutral(text);
+    let text: &str = &text;
     let resp = ui.interact(rect, id, Sense::click());
     ui.painter().rect_filled(rect, 3.0, if resp.hovered() { t.hover } else { t.field_bg });
     ui.painter().rect_stroke(rect, 3.0, Stroke::new(1.0, t.field_border), StrokeKind::Inside);
@@ -561,7 +564,8 @@ pub fn popup_menu(ui: &mut Ui, id: egui::Id, pos: egui::Pos2, options: &[String]
         for (i, o) in options.iter().enumerate() {
             if o == "-" {
                 ui.separator();
-            } else if ui.selectable_label(current == Some(i), o).clicked() {
+            // Evora (EVORA-KIN-58): an option, or a line of an effect's About, can name the engine.
+            } else if ui.selectable_label(current == Some(i), &*crate::i18n::neutral(o)).clicked() {
                 chosen = Some(i);
             }
         }

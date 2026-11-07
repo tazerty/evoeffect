@@ -18,7 +18,7 @@ pub fn home_tab(app: &mut EvoEffectApp, ui: &mut egui::Ui, area: Rect) {
     p.text(
         pos2(x, y + 26.0),
         Align2::LEFT_CENTER,
-        "Hands-on tutorials that run inside EvoEffect. Do each step yourself, or press Show me.",
+        crate::i18n::neutral("Hands-on tutorials that run inside EvoEffect. Do each step yourself, or press Show me."),
         Tokens::ui(11.5),
         t.text_faint,
     );

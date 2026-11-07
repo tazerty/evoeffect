@@ -11,7 +11,7 @@ use evoeffect_project::build::{self, Ids};
 use evoeffect_project::{Comp, ItemId, ItemKind, Layer, LayerSource, Project, PropGroup, Solid};
 use evoeffect_time::{FrameRate, Tick};
 
-pub const MAIN_COMP: &str = "EvoEffect Intro";
+pub const MAIN_COMP: &str = "Kinetika Intro";
 pub const SHOWCASE_3D: &str = "3D Showcase";
 
 /// Seconds → the nearest frame of the demo's 29.97 fps comps (AE keeps times frame-aligned).
@@ -116,8 +116,8 @@ fn lower_third(p: &mut Project) -> Comp {
     let mut title = text_layer(
         p,
         &c,
-        "Built with EvoEffect",
-        TextDoc { text: "Built with EvoEffect".into(), size: 40.0, style: "SemiBold".into(), justify: Justify::Center, ..Default::default() },
+        "Built with Kinetika",
+        TextDoc { text: "Built with Kinetika".into(), size: 40.0, style: "SemiBold".into(), justify: Justify::Center, ..Default::default() },
         [440.0, 914.0],
     );
     anim(&mut title, "transform/opacity", keys(&[(0.4, Value::Scalar(0.0)), (0.9, Value::Scalar(100.0))]));
@@ -384,8 +384,8 @@ pub fn demo_project() -> Project {
     let mut title = text_layer(
         &mut p,
         &comp,
-        "EVOEFFECT",
-        TextDoc { text: "EVOEFFECT".into(), size: 148.0, style: "Bold".into(), tracking: 120.0, justify: Justify::Center, ..Default::default() },
+        "KINETIKA",
+        TextDoc { text: "KINETIKA".into(), size: 148.0, style: "Bold".into(), tracking: 120.0, justify: Justify::Center, ..Default::default() },
         [960.0, 560.0],
     );
     let mut next = p.next_id;

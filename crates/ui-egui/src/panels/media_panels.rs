@@ -373,7 +373,7 @@ pub fn progress(app: &mut EvoEffectApp, ui: &mut egui::Ui, rect: Rect) {
                 "cancelled" => t.text_dim,
                 _ => t.danger,
             };
-            let msg = if r.message.is_empty() { format!("{} · {:.1} s", r.status, r.seconds) } else { format!("{} · {}", r.status, r.message) };
+            let msg = if r.message.is_empty() { format!("{} · {:.1} s", r.status, r.seconds) } else { format!("{} · {}", r.status, crate::i18n::neutral(&r.message)) };
             p.text(pos2(x0, y + 8.0), Align2::LEFT_CENTER, &r.label, Tokens::ui(11.5), col);
             p.text(pos2(x0 + w, y + 8.0), Align2::RIGHT_CENTER, msg, Tokens::ui(11.0), t.text_faint);
             y += 18.0;

@@ -417,7 +417,7 @@ fn mask_mode(app: &mut EvoEffectApp, ui: &mut egui::Ui, ctx: &egui::Context, p: 
             match crate::menus::invoke(app, ctx, "track.extractFaceMeasurements", json!({"layer": layer.0})) {
                 Ok(v) => {
                     if let Some(text) = v.get("clipboard").and_then(|t| t.as_str()) {
-                        ctx.copy_text(text.to_string());
+                        ctx.copy_text(crate::i18n::neutral(text).into_owned());
                     }
                 }
                 Err(e) => app.ui.status = e,

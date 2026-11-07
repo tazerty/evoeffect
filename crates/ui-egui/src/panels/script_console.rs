@@ -93,7 +93,7 @@ pub fn show(app: &mut EvoEffectApp, ui: &mut egui::Ui, rect: Rect) {
             "result" => t.accent,
             _ => t.text,
         };
-        p.text(pos2(out_rect.min.x + 8.0, out_rect.min.y + 4.0 + i as f32 * line_h), Align2::LEFT_TOP, &l.text, Tokens::mono(11.5), color);
+        p.text(pos2(out_rect.min.x + 8.0, out_rect.min.y + 4.0 + i as f32 * line_h), Align2::LEFT_TOP, crate::i18n::neutral(&l.text), Tokens::mono(11.5), color);
     }
     if log.is_empty() {
         p.text(

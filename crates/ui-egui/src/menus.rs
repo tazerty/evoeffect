@@ -926,7 +926,7 @@ pub(crate) fn run_engine(app: &mut EvoEffectApp, ctx: &egui::Context, id: &str, 
     if let Err(e) = &r {
         app.ui.status = e.clone();
     } else if COPY_COMMANDS.contains(&id) && app.session.state.text_edit.is_none() {
-        ctx.copy_text(clipboard_note(&app.session));
+        ctx.copy_text(crate::i18n::neutral_owned(clipboard_note(&app.session)));
     }
     let events = app.session.drain_events();
     for (index, ev) in events.into_iter().enumerate() {
@@ -2318,7 +2318,10 @@ fn menu_nodes(
                         "recentPresets" => app.session.prefs.recent_presets.get(i).cloned(),
                         _ => None,
                     };
-                    let r = ui.add_enabled(entry_enabled(app, e), egui::Button::new((gutter(entry_checked(app, e) == Some(true)), e.label.as_str())));
+                    // Evora (EVORA-KIN-58): a recent file's name and path can name the engine.
+                    let tip = tip.map(crate::i18n::neutral_owned);
+                    let label = crate::i18n::neutral(&e.label);
+                    let r = ui.add_enabled(entry_enabled(app, e), egui::Button::new((gutter(entry_checked(app, e) == Some(true)), &*label)));
                     let r = match &tip {
                         Some(t) => r.on_hover_text(t),
                         None => r,

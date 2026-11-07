@@ -728,7 +728,7 @@ pub fn show(app: &mut EvoEffectApp, ui: &mut egui::Ui, rect: Rect) {
             let m = Rect::from_center_size(pos2(r.min.x + name_w - 8.0, r.center().y), vec2(13.0, 12.0));
             lp.add(egui::Shape::convex_polygon(vec![m.center_top(), m.right_bottom(), m.left_bottom()], t.warning, Stroke::NONE));
             lp.text(m.center() + vec2(0.0, 1.5), Align2::CENTER_CENTER, "!", Tokens::semibold(9.0), Color32::BLACK);
-            ui.interact(m.expand(2.0).intersect(list), egui::Id::new(("pproblem", id.0)), Sense::hover()).on_hover_text(why.as_str());
+            ui.interact(m.expand(2.0).intersect(list), egui::Id::new(("pproblem", id.0)), Sense::hover()).on_hover_text(crate::i18n::neutral(why).into_owned());
             app.auto.add(&format!("project.item.{}.problem", id.0), m, why);
         }
         let name_rect = Rect::from_min_max(pos2(x0 + 28.0, r.min.y + 2.0), pos2(r.min.x + name_w + 2.0, r.max.y - 2.0));

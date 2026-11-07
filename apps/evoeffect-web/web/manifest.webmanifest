@@ -1,7 +1,7 @@
 {
   "name": "Kinetika",
   "short_name": "Kinetika",
-  "description": "Motion design and visual effects (Evora build based on EvoEffect)",
+  "description": "Motion design and visual effects (Evora build)",
   "id": "./",
   "start_url": "./",
   "scope": "./",
