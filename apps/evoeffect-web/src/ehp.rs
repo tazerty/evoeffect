@@ -396,6 +396,7 @@ pub fn apply_init(session: &mut evoeffect_engine::Session, boot: &Boot) {
     session.prefs.appearance.appearance_mode = if boot.dark { "dark" } else { "light" }.to_string();
     // Evora (KIN-FK-B2, E2-KIN): Evora's palette, with the accent of `evora:init`.
     evoeffect_ui_egui::theme::set_host_accent(boot.accent);
+    paint_page_accent(boot.accent);
     if let Some(on) = boot.disk_cache {
         session.prefs.disk.disk_cache_enabled = on;
     }
@@ -1068,6 +1069,7 @@ fn on_theme(id: &str, p: &JsValue) {
         // Evora (KIN-FK-B2, E2-KIN): Evora's palette with this accent; light or dark changes here,
         // not saved.
         evoeffect_ui_egui::theme::set_host_accent(accent);
+        paint_page_accent(accent);
         app.session.prefs.appearance.appearance_mode = if dark { "dark" } else { "light" }.to_string();
         app.session.prefs_changed();
         // Applied now (a drawn frame would apply it too, but none comes while the iframe isn't
@@ -1261,6 +1263,20 @@ fn is_storage_ns(ns: &str) -> bool {
 }
 
 /// `accent` of §4.2: `#RRGGBB`, as a colour.
+/// EVORA-KIN-59: the page's own button (graphics device lost) in the member's colour. The indigo
+/// keeps the rules written in `index.html`.
+fn paint_page_accent(accent: egui::Color32) {
+    let Some(root) = web_sys::window().and_then(|w| w.document()).and_then(|d| d.document_element()) else { return };
+    let written = if accent == egui::Color32::from_rgb(0x4f, 0x46, 0xe5) {
+        root.remove_attribute("style")
+    } else {
+        root.set_attribute("style", &format!("--evora-accent:#{:02x}{:02x}{:02x}", accent.r(), accent.g(), accent.b()))
+    };
+    if let Err(e) = written {
+        log::warn!("Evora host bridge: the page's accent couldn't be set: {e:?}");
+    }
+}
+
 fn parse_accent(a: &str) -> Option<egui::Color32> {
     if !(a.len() == 7 && a.starts_with('#') && a.chars().skip(1).all(|c| c.is_ascii_hexdigit())) {
         return None;

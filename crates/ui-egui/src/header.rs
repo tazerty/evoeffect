@@ -641,14 +641,16 @@ fn ws_menu(app: &mut EvoEffectApp, ui: &mut egui::Ui) {
 
 /// Evora (E1): a neutral mark drawn from shapes (three stacked layers on an indigo tile), in place
 /// of the Upstream mark that a modified build must not carry (docs/brand/LICENSE-brand.txt). It
-/// keeps the former signature, so the Tools bar and the About dialog are unchanged.
+/// keeps the former signature, so the Tools bar and the About dialog are unchanged. EVORA-KIN-59:
+/// the tile takes the member's colour when the host sent one.
 pub fn paint_logo(p: &egui::Painter, r: Rect) {
     let s = r.width().min(r.height());
     if s <= 0.0 {
         return;
     }
     let c = r.center();
-    p.rect_filled(Rect::from_center_size(c, vec2(s, s)), s * 0.22, Color32::from_rgb(0x4f, 0x46, 0xe5));
+    let tile = crate::theme::host_accent().unwrap_or(Color32::from_rgb(0x4f, 0x46, 0xe5));
+    p.rect_filled(Rect::from_center_size(c, vec2(s, s)), s * 0.22, tile);
     let (hw, hh, step) = (s * 0.30, s * 0.13, s * 0.14);
     for (k, alpha) in [(1.0_f32, 110_u8), (0.0, 170), (-1.0, 255)] {
         let y = c.y + k * step;
